@@ -43,6 +43,12 @@
           }
         }
       }
+    },
+    {
+      "label": "CosmosDB Emulator",
+      "options": { "cwd": "C:/Program Files/Azure Cosmos DB Emulator" },
+      "type": "shell",
+      "command": "./CosmosDB.Emulator.exe /EnableMongoDBEndpoint=3.6"
     }
   ]
 }
