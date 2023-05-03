@@ -6,9 +6,17 @@ import { ConfigModule } from './config/config.module';
 import { DatabaseModule } from './database/database.module';
 import { EventModule } from './event/event.module';
 import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [DatabaseModule, ClanModule, EventModule, UserModule, ConfigModule],
+  imports: [
+    DatabaseModule,
+    ClanModule,
+    EventModule,
+    UserModule,
+    AuthModule,
+    ConfigModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
