@@ -1,6 +1,6 @@
 import { Body, Controller, HttpException, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CodeRedeemRequest } from './auth.requests';
+import { CodeRedeemRequest, CodeRedeemResponse } from './auth.requests';
 import { DiscordUserService } from 'src/discord/discord.user.service';
 
 @Controller('auth')
@@ -11,7 +11,9 @@ export class AuthController {
   ) {}
 
   @Post('redeem')
-  async redeemCode(@Body() request: CodeRedeemRequest) {
+  async redeemCode(
+    @Body() request: CodeRedeemRequest,
+  ): Promise<CodeRedeemResponse> {
     if (!request || !request.code) {
       throw new HttpException('No code provided', 400);
     }
@@ -28,13 +30,19 @@ export class AuthController {
   }
 
   @Post('refresh')
-  async refreshCode(@Body() request: CodeRedeemRequest) {
+  async refreshCode(
+    @Body() request: CodeRedeemRequest,
+  ): Promise<CodeRedeemResponse> {
     if (!request || !request.code) {
       throw new HttpException('No refresh token provided', 400);
     }
 
     try {
-      return this.authService.refreshCode(request.code);
+      const token = await this.authService.redeemCode(request.code);
+      const user = await this.discordUserService.getUserInfo(
+        token.access_token,
+      );
+      return { ...token, user };
     } catch (ex) {
       console.error(ex);
     }
