@@ -2,17 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MongooseOptionsFactory } from '@nestjs/mongoose';
 import { MongooseModuleOptions } from '@nestjs/mongoose/dist';
-import { Configuration, DatabaseConfiguration } from './config';
+import { AppConfig } from './config';
+import { DatabaseConfig } from 'src/database/database.config';
 
 @Injectable()
 export class MongooseConfigService implements MongooseOptionsFactory {
-  constructor(private config: ConfigService<Configuration>) {}
+  constructor(private config: ConfigService<AppConfig>) {}
 
   async createMongooseOptions(): Promise<MongooseModuleOptions> {
     return {
-      uri: this.config.get<DatabaseConfiguration>('database').uri,
-      sslKey: this.config.get<DatabaseConfiguration>('database').key,
-      sslCert: this.config.get<DatabaseConfiguration>('database').key,
+      uri: this.config.get<DatabaseConfig>('database').uri,
+      sslKey: this.config.get<DatabaseConfig>('database').key,
+      sslCert: this.config.get<DatabaseConfig>('database').key,
     };
   }
 }
