@@ -7,6 +7,10 @@ import { HomeComponent } from './pages/home/home.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { CounterComponent } from './pages/counter/counter.component';
+import { HttpClientModule } from '@angular/common/http';
+import { AuthModule } from './auth/auth.module';
+import { ConfigService } from './config/config.service';
+import { ProfileComponent } from './pages/profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -15,9 +19,10 @@ import { CounterComponent } from './pages/counter/counter.component';
     NotFoundComponent,
     ToolbarComponent,
     CounterComponent,
+    ProfileComponent,
   ],
-  imports: [BrowserModule, AppRoutingModule],
-  providers: [],
+  imports: [BrowserModule, AppRoutingModule, HttpClientModule, AuthModule],
+  providers: [ConfigService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

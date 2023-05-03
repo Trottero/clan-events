@@ -3,6 +3,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { CounterComponent } from './pages/counter/counter.component';
 import { HomeComponent } from './pages/home/home.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
+import { CodeRedirectComponent } from './auth/components/code-redirect/code-redirect.component';
+import { ProfileComponent } from './pages/profile/profile.component';
 
 const routes: Routes = [
   {
@@ -12,6 +14,14 @@ const routes: Routes = [
   {
     path: 'counter',
     component: CounterComponent,
+  },
+  {
+    path: 'code',
+    component: CodeRedirectComponent,
+  },
+  {
+    path: 'profile',
+    component: ProfileComponent,
   },
   {
     path: '**',
