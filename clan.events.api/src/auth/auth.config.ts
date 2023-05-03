@@ -1,6 +1,6 @@
 export interface AuthConfig {
-  client_id: string;
-  client_secret: string;
-  grant_type: string;
-  redirect_uri: string;
+  clientId: string;
+  clientSecret: string;
+  grantType: string;
+  redirectUri: string;
 }

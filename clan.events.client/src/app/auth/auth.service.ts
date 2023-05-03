@@ -17,8 +17,8 @@ export class AuthService {
   ) {}
 
   initialState: AuthState = {
-    access_token: { token: '', expires_at: 0 },
-    refresh_token: { token: '', expires_at: 0 },
+    accessToken: { token: '', expiresAt: 0 },
+    refreshToken: { token: '', expiresAt: 0 },
   };
 
   private _authState$ = new BehaviorSubject<AuthState>(this.initialState);
@@ -32,9 +32,9 @@ export class AuthService {
   hasValidToken$ = this.authState$.pipe(
     map(
       (authState) =>
-        !!authState.access_token &&
-        !!authState.refresh_token &&
-        authState.access_token.expires_at > Date.now()
+        !!authState.accessToken &&
+        !!authState.refreshToken &&
+        authState.accessToken.expiresAt > Date.now()
     )
   );
 
@@ -56,13 +56,13 @@ export class AuthService {
 
   private handleNewToken(res: ApiResponse<any>) {
     reducer(this._authState$, {
-      access_token: {
+      accessToken: {
         token: res.data.access_token,
-        expires_at: Date.now() + res.data.expires_in * 1000,
+        expiresAt: Date.now() + res.data.expires_in * 1000,
       },
-      refresh_token: {
+      refreshToken: {
         token: res.data.refresh_token,
-        expires_at: Date.now() + 24 * 7 * 3600 * 1000,
+        expiresAt: Date.now() + 24 * 7 * 3600 * 1000,
       },
     });
 

@@ -1,10 +1,10 @@
 import { DiscordUser } from 'src/discord/models/discord.user';
-import { DiscordCodeRedeemResponse } from './auth.service';
+import { DiscordAccessTokenResponse } from './auth.service';
 
 export interface CodeRedeemRequest {
   code: string;
 }
 
-export interface CodeRedeemResponse extends DiscordCodeRedeemResponse {
+export interface CodeRedeemResponse extends DiscordAccessTokenResponse {
   user: DiscordUser;
 }

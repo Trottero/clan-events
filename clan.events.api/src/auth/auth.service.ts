@@ -4,11 +4,22 @@ import { AuthConfig } from './auth.config';
 import { firstValueFrom, map } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
 
-export interface DiscordCodeRedeemRequest extends AuthConfig {
+export interface DiscordCodeRedeemRequest {
+  client_id: string;
+  client_secret: string;
+  grant_type: string;
+  redirect_uri: string;
   code: string;
 }
 
-export interface DiscordCodeRedeemResponse {
+export interface DiscordTokenRefreshRequest {
+  client_id: string;
+  client_secret: string;
+  refresh_token: string;
+  grant_type: string;
+}
+
+export interface DiscordAccessTokenResponse {
   access_token: string;
   token_type: string;
   expires_in: number;
@@ -23,12 +34,18 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async redeemCode(code: string): Promise<DiscordCodeRedeemResponse> {
+  async redeemCode(code: string): Promise<DiscordAccessTokenResponse> {
     const authConfig = this.configService.get<AuthConfig>('auth');
-    const body: DiscordCodeRedeemRequest = { ...authConfig, code: code };
+    const body: DiscordCodeRedeemRequest = {
+      code: code,
+      client_id: authConfig.clientId,
+      client_secret: authConfig.clientSecret,
+      grant_type: 'authorization_code',
+      redirect_uri: authConfig.redirectUri,
+    };
 
     const response = this.httpClient
-      .post<DiscordCodeRedeemResponse>(
+      .post<DiscordAccessTokenResponse>(
         'https://discord.com/api/v10/oauth2/token',
         body,
         {
@@ -42,16 +59,17 @@ export class AuthService {
     return firstValueFrom(response);
   }
 
-  async refreshCode(refreshToken: string): Promise<DiscordCodeRedeemResponse> {
+  async refreshCode(refreshToken: string): Promise<DiscordAccessTokenResponse> {
     const authConfig = this.configService.get<AuthConfig>('auth');
-    const body = {
-      ...authConfig,
+    const body: DiscordTokenRefreshRequest = {
+      client_id: authConfig.clientId,
+      client_secret: authConfig.clientSecret,
       refresh_token: refreshToken,
       grant_type: 'refresh_token',
     };
 
     const response = this.httpClient
-      .post<DiscordCodeRedeemResponse>(
+      .post<DiscordAccessTokenResponse>(
         'https://discord.com/api/v10/oauth2/token',
         body,
         {
