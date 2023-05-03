@@ -1,6 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AuthService } from '../../auth.service';
-import { Subscription, filter, from, interval, map, switchMap } from 'rxjs';
+import {
+  Subscription,
+  filter,
+  from,
+  interval,
+  map,
+  switchMap,
+  withLatestFrom,
+} from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({

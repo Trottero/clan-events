@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, map, tap } from 'rxjs';
+import { BehaviorSubject, Observable, map, shareReplay, tap } from 'rxjs';
 import { ConfigService } from '../config/config.service';
 import { AuthState } from './auth.state';
 import { ApiResponse } from '../common/api.response';
 import { UserService } from '../user/user.service';
+import { hydrate } from '../common/hydrate.pipe';
+import { reducer } from '../common/reduce';
 
 @Injectable()
 export class AuthService {
@@ -15,23 +17,24 @@ export class AuthService {
   ) {}
 
   initialState: AuthState = {
-    access_token: '',
-    token_type: '',
-    expires_at: 0,
-    refresh_token: '',
+    access_token: { token: '', expires_at: 0 },
+    refresh_token: { token: '', expires_at: 0 },
   };
 
-  private _authState$: BehaviorSubject<AuthState> =
-    new BehaviorSubject<AuthState>(this.initialState);
+  private _authState$ = new BehaviorSubject<AuthState>(this.initialState);
 
-  authState$: Observable<AuthState> = this._authState$.pipe(tap(console.log));
+  authState$: Observable<AuthState> = this._authState$.pipe(
+    hydrate('authState', this.initialState),
+    tap(console.log),
+    shareReplay(1)
+  );
 
   hasValidToken$ = this.authState$.pipe(
     map(
       (authState) =>
         !!authState.access_token &&
         !!authState.refresh_token &&
-        authState.expires_at > Date.now()
+        authState.access_token.expires_at > Date.now()
     )
   );
 
@@ -40,15 +43,7 @@ export class AuthService {
       .post<ApiResponse<any>>(`${this.configService.backEndUrl}/auth/redeem`, {
         code,
       })
-      .pipe(
-        tap((res) => {
-          this._authState$.next({
-            ...res.data,
-            expires_at: Date.now() + res.data.expires_in * 1000,
-          });
-          this.userService.infoReceived(res.data.user);
-        })
-      );
+      .pipe(tap((x) => this.handleNewToken(x)));
   }
 
   refreshCode(refreshToken: string): Observable<any> {
@@ -56,19 +51,26 @@ export class AuthService {
       .post<ApiResponse<any>>(`${this.configService.backEndUrl}/auth/refresh`, {
         code: refreshToken,
       })
-      .pipe(
-        tap((res) => {
-          this._authState$.next({
-            ...res.data,
-            expires_at: Date.now() + res.data.expires_in * 1000,
-          });
-          this.userService.infoReceived(res.data.user);
-        })
-      );
+      .pipe(tap((x) => this.handleNewToken(x)));
+  }
+
+  private handleNewToken(res: ApiResponse<any>) {
+    reducer(this._authState$, {
+      access_token: {
+        token: res.data.access_token,
+        expires_at: Date.now() + res.data.expires_in * 1000,
+      },
+      refresh_token: {
+        token: res.data.refresh_token,
+        expires_at: Date.now() + 24 * 7 * 3600 * 1000,
+      },
+    });
+
+    this.userService.infoReceived(res.data.user);
   }
 
   logout() {
-    this._authState$.next(this.initialState);
+    reducer(this._authState$, this.initialState);
     this.userService.logout();
   }
 }

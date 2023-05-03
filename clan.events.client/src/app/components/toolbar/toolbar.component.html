@@ -5,6 +5,6 @@
   <a class="nav-link" [routerLink]="'counter'">Counter</a>
   <div class="spacer"></div>
   <a *ngIf="!(userName$ | async)" class="nav-link" [href]="discordLoginUrl">Log in</a>
-  <span *ngIf="(userName$ | async)" class="nav-link">{{userName$ | async}}</span>
+  <span *ngIf="(userName$ | async)" [routerLink]="'/profile'" class="nav-link">{{userName$ | async}}</span>
   <a *ngIf="(userName$ | async)" class="nav-link" (click)="logout()">Log out</a>
 </div>
