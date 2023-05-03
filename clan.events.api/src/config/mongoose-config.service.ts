@@ -10,12 +10,6 @@ export class MongooseConfigService implements MongooseOptionsFactory {
   constructor(private config: ConfigService<AppConfig>) {}
 
   async createMongooseOptions(): Promise<MongooseModuleOptions> {
-    const key = this.config.get<DatabaseConfig>('database').key;
-
-    return {
-      uri: this.config.get<DatabaseConfig>('database').uri,
-      sslKey: key,
-      sslCert: key,
-    };
+    return { ...this.config.get<DatabaseConfig>('database') };
   }
 }

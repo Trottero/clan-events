@@ -1,4 +1,5 @@
 export interface DatabaseConfig {
   uri: string;
-  key?: string;
+  sslKey?: string;
+  sslCert?: string;
 }
