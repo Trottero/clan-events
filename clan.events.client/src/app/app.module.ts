@@ -13,13 +13,14 @@ import { ConfigService } from './config/config.service';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { UserModule } from './user/user.module';
 import { AuthInterceptorService } from './auth/auth-interceptor.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToolbarModule } from './components/toolbar/toolbar.module';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
     NotFoundComponent,
-    ToolbarComponent,
     CounterComponent,
     ProfileComponent,
   ],
@@ -29,6 +30,9 @@ import { AuthInterceptorService } from './auth/auth-interceptor.service';
     HttpClientModule,
     AuthModule,
     UserModule,
+    BrowserAnimationsModule,
+
+    ToolbarModule,
   ],
   providers: [
     ConfigService,
