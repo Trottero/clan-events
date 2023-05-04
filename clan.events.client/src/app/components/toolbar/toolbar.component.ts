@@ -15,11 +15,10 @@ export class ToolbarComponent {
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly userService: UserService,
-    private readonly authService: AuthService
+    private readonly userService: UserService
   ) {}
 
   logout() {
-    this.authService.logout();
+    this.userService.logout();
   }
 }

@@ -11,6 +11,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AuthModule } from './auth/auth.module';
 import { ConfigService } from './config/config.service';
 import { ProfileComponent } from './pages/profile/profile.component';
+import { UserModule } from './user/user.module';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,13 @@ import { ProfileComponent } from './pages/profile/profile.component';
     CounterComponent,
     ProfileComponent,
   ],
-  imports: [BrowserModule, AppRoutingModule, HttpClientModule, AuthModule],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    HttpClientModule,
+    AuthModule,
+    UserModule,
+  ],
   providers: [ConfigService],
   bootstrap: [AppComponent],
 })
