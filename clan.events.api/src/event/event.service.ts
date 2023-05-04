@@ -13,27 +13,16 @@ import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class EventService {
-  constructor(
+  public constructor(
     @InjectModel(Event.name) private eventModel: Model<Event>,
     private readonly userService: UserService,
     private readonly clanService: ClanService,
   ) {}
 
   public async createRandomEvent(): Promise<Event> {
-    const finalTile: Tile = {
-      name: 'Final Tile',
-      challenges: [],
-    };
-
-    const nextTile: Tile = {
-      name: 'Second Tile',
-      challenges: [],
-    };
-
-    const startingTile: Tile = {
-      name: 'Starting Tile',
-      challenges: [],
-    };
+    const finalTile = this.createTile('Final Tile');
+    const nextTile = this.createTile('Next Tile');
+    const startingTile = this.createTile('Starting Tile');
 
     const event = new this.eventModel({
       description: 'Test Event Description',
@@ -87,7 +76,22 @@ export class EventService {
     return this.eventModel.findById(id).exec();
   }
 
-  async getAllEvents(): Promise<Event[]> {
+  public async getAllEvents(): Promise<Event[]> {
     return this.eventModel.find().exec();
+  }
+
+  private createTile(name: string): Tile {
+    return {
+      name,
+      challenges: [],
+      canvas: {
+        width: 100,
+        height: 100,
+        x: 0,
+        y: 0,
+        borderWidth: 1,
+        borderColor: '#000000',
+      },
+    };
   }
 }
