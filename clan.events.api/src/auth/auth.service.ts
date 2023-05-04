@@ -1,89 +1,57 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
-import { AuthConfig } from './auth.config';
-import { firstValueFrom, map } from 'rxjs';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { TokenCacheService } from './token.cache.service';
-
-export interface DiscordCodeRedeemRequest {
-  client_id: string;
-  client_secret: string;
-  grant_type: string;
-  redirect_uri: string;
-  code: string;
-}
-
-export interface DiscordTokenRefreshRequest {
-  client_id: string;
-  client_secret: string;
-  refresh_token: string;
-  grant_type: string;
-}
-
-export interface DiscordAccessTokenResponse {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-  refresh_token: string;
-  scope: string;
-}
+import { JwtService } from '@nestjs/jwt';
+import { DiscordAuthService } from 'src/discord/discord.auth.service';
+import { DiscordUserService } from 'src/discord/discord.user.service';
+import { DiscordAccessTokenResponse } from 'src/discord/models/discord.token.response';
+import { JwtTokenContent as JwtTokenPayload } from './models/jwt.token';
+import { AuthConfig } from './auth.config';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly httpClient: HttpService,
     private readonly configService: ConfigService,
-    private readonly tokenCacheService: TokenCacheService,
+    private readonly discordAuthService: DiscordAuthService,
+    private readonly discordUserService: DiscordUserService,
+    private readonly jwtService: JwtService,
   ) {}
 
-  async redeemCode(code: string): Promise<DiscordAccessTokenResponse> {
-    const authConfig = this.configService.get<AuthConfig>('auth');
-    const body: DiscordCodeRedeemRequest = {
-      code: code,
-      client_id: authConfig.clientId,
-      client_secret: authConfig.clientSecret,
-      grant_type: 'authorization_code',
-      redirect_uri: authConfig.redirectUri,
-    };
+  private logger = new Logger(AuthService.name);
 
-    const response$ = this.httpClient
-      .post<DiscordAccessTokenResponse>(
-        'https://discord.com/api/v10/oauth2/token',
-        body,
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        },
-      )
-      .pipe(map((resp) => resp.data));
-    const response = await firstValueFrom(response$);
-    await this.tokenCacheService.getTokenInfo(response.access_token);
-    return response;
+  async redeemDiscordCode(discordCode: string): Promise<string> {
+    const discordToken = await this.discordAuthService.redeemCode(discordCode);
+    return await this.jwtFromDiscordAccessToken(discordToken);
   }
 
-  async refreshCode(refreshToken: string): Promise<DiscordAccessTokenResponse> {
+  async refreshCode(refreshToken: string): Promise<string> {
+    const discordToken = await this.discordAuthService.refreshToken(
+      refreshToken,
+    );
+    return await this.jwtFromDiscordAccessToken(discordToken);
+  }
+
+  async jwtFromDiscordAccessToken(
+    discordToken: DiscordAccessTokenResponse,
+  ): Promise<string> {
+    const discordUser = await this.discordUserService.getUserInfo(
+      discordToken.access_token,
+    );
+    const discordTokenInfo = await this.discordUserService.getOAuthInfo(
+      discordToken.access_token,
+    );
+
     const authConfig = this.configService.get<AuthConfig>('auth');
-    const body: DiscordTokenRefreshRequest = {
-      client_id: authConfig.clientId,
-      client_secret: authConfig.clientSecret,
-      refresh_token: refreshToken,
-      grant_type: 'refresh_token',
+    const tokenPayload: JwtTokenPayload = {
+      username: discordUser.username,
+      sub: discordUser.id,
+      discordToken: discordToken.access_token,
+      discordRefreshToken: discordToken.refresh_token,
+      expiresIn: authConfig.jwtLifetime,
     };
 
-    const response$ = this.httpClient
-      .post<DiscordAccessTokenResponse>(
-        'https://discord.com/api/v10/oauth2/token',
-        body,
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        },
-      )
-      .pipe(map((resp) => resp.data));
-    const response = await firstValueFrom(response$);
-    await this.tokenCacheService.getTokenInfo(response.access_token);
-    return response;
+    const jwt = await this.jwtService.signAsync(tokenPayload);
+
+    return jwt;
   }
 }

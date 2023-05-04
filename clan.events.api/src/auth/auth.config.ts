@@ -1,5 +1,4 @@
 export interface AuthConfig {
-  clientId: string;
-  clientSecret: string;
-  redirectUri: string;
+  jwtSecret: string;
+  jwtLifetime: number;
 }

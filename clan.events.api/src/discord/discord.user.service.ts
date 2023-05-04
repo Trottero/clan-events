@@ -20,14 +20,14 @@ export class DiscordUserService {
     return firstValueFrom(response);
   }
 
-  async getTokenInfo(accessToken: string): Promise<DiscordAuthorizationInfo> {
+  async getOAuthInfo(accessToken: string): Promise<DiscordAuthorizationInfo> {
     try {
       const reponse = this.httpClient
         .get<DiscordAuthorizationInfo>(
           'https://discord.com/api/v10/oauth2/@me',
           {
             headers: {
-              Authentication: `Bearer ${accessToken}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           },
         )

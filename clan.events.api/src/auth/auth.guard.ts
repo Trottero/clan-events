@@ -4,12 +4,18 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { TokenCacheService } from './token.cache.service';
+import { AuthConfig } from './auth.config';
+import { JwtTokenContent } from './models/jwt.token';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private readonly tokenCache: TokenCacheService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -18,7 +24,13 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
     try {
-      const payload = await this.tokenCache.getTokenInfo(token);
+      const authConfig = this.configService.get<AuthConfig>('auth');
+      const payload = await this.jwtService.verifyAsync<JwtTokenContent>(
+        token,
+        {
+          secret: authConfig.jwtSecret,
+        },
+      );
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
       request['user'] = payload;

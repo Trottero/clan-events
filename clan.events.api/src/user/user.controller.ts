@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { User } from 'src/database/schemas/user.schema';
 import { UserService } from './user.service';
-import { DiscordAuthorizationInfo } from 'src/discord/models/discord.auth.info';
+import { JwtTokenContent } from 'src/auth/models/jwt.token';
 import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('user')
@@ -25,7 +25,7 @@ export class UserController {
 
   @UseGuards(AuthGuard)
   @Get('info')
-  async getUserInfo(@Request() req): Promise<DiscordAuthorizationInfo> {
+  async getUserInfo(@Request() req): Promise<JwtTokenContent> {
     return req['user'];
   }
 }

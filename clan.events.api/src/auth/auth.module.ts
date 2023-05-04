@@ -4,12 +4,18 @@ import { HttpModule } from '@nestjs/axios';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { DiscordModule } from 'src/discord/discord.module';
-import { TokenCacheService } from './token.cache.service';
+import { JwtModule } from '@nestjs/jwt';
+import { JwtConfigService } from './jwt/jwt-config.service';
 
 @Module({
-  imports: [HttpModule, DiscordModule, CacheModule.register()],
+  imports: [
+    HttpModule,
+    DiscordModule,
+    JwtModule.registerAsync({ global: true, useClass: JwtConfigService }),
+    CacheModule.register(),
+  ],
   controllers: [AuthController],
-  providers: [AuthService, TokenCacheService],
-  exports: [AuthService, TokenCacheService],
+  providers: [AuthService],
+  exports: [AuthService],
 })
 export class AuthModule {}
