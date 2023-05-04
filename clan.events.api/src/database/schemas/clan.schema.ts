@@ -1,19 +1,19 @@
 import * as mongoose from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { User } from './user.schema';
+import { ClanMembership, ClanMembershipSchema } from './clan-membership.schema';
 
 export type ClanDocument = mongoose.HydratedDocument<Clan>;
 
 @Schema()
 export class Clan {
-  @Prop()
+  @Prop({ unique: true })
   name: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
-  owner: User;
+  @Prop()
+  displayName: string;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
-  members: User[];
+  @Prop({ type: [ClanMembershipSchema] })
+  members: ClanMembership[];
 }
 
 export const ClanSchema = SchemaFactory.createForClass(Clan);

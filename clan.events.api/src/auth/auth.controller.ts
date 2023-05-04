@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpException,
   HttpStatus,
@@ -13,16 +14,12 @@ import {
   DiscordCodeRedeemRequest,
   AccessTokenResponse,
 } from './models/auth.requests';
-import { DiscordUserService } from 'src/discord/discord.user.service';
 import { AuthGuard } from './auth.guard';
 import { JwtTokenContent } from './models/jwt.token';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly discordUserService: DiscordUserService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('redeem')
   async redeemCode(
@@ -53,5 +50,11 @@ export class AuthController {
       console.error(ex);
       throw new HttpException('Unauthorized', 401);
     }
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('me')
+  async getUserInfo(@Request() req): Promise<JwtTokenContent> {
+    return req['user'];
   }
 }

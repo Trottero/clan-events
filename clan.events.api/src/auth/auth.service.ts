@@ -48,6 +48,7 @@ export class AuthService {
       discordToken: discordToken.access_token,
       discordRefreshToken: discordToken.refresh_token,
       expiresIn: authConfig.jwtLifetime,
+      permissions: [],
     };
 
     const jwt = await this.jwtService.signAsync(tokenPayload);

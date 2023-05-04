@@ -16,7 +16,12 @@ export class UserService {
     return user.save();
   }
 
-  async createUser(discordId: number, name: string): Promise<User> {
+  async getOrCreateUser(discordId: number, name: string): Promise<User> {
+    const existingUser = await this.getUserForDiscordId(discordId);
+    if (existingUser) {
+      return existingUser;
+    }
+
     const user = new this.userModel({
       discordId: discordId,
       name: name,

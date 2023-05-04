@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
+import { ClanMembership, ClanMembershipSchema } from './clan-membership.schema';
 import { Clan } from './clan.schema';
 
 export type UserDocument = mongoose.HydratedDocument<User>;
@@ -9,10 +10,12 @@ export class User {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Clan' })
   primaryClan: Clan;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Clan' }] })
-  clans: Clan[];
+  @Prop({
+    type: [ClanMembershipSchema],
+  })
+  clans: ClanMembership[];
 
-  @Prop()
+  @Prop({ unique: true })
   discordId: number;
 
   @Prop()
