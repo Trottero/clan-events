@@ -7,11 +7,12 @@ import { HomeComponent } from './pages/home/home.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { CounterComponent } from './pages/counter/counter.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AuthModule } from './auth/auth.module';
 import { ConfigService } from './config/config.service';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { UserModule } from './user/user.module';
+import { AuthInterceptorService } from './auth/auth-interceptor.service';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,14 @@ import { UserModule } from './user/user.module';
     AuthModule,
     UserModule,
   ],
-  providers: [ConfigService],
+  providers: [
+    ConfigService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptorService,
+      multi: true,
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
