@@ -12,5 +12,6 @@ import { UserModule } from 'src/user/user.module';
   ],
   controllers: [ClanController],
   providers: [ClanService],
+  exports: [ClanService],
 })
 export class ClanModule {}
