@@ -1,7 +1,7 @@
 <h2>Events</h2>
 
-<ul>
-  <li *ngFor="let event of events">
+<ul *ngIf="events$ | async as events">
+  <li *ngFor="let event of events.data.items">
     <a [routerLink]="['/events', event.id]">{{event.name}}</a>
   </li>
 </ul>

@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EventsComponent } from './events.component';
 import { RouterModule } from '@angular/router';
+import { EventsService } from './events.service';
 
 @NgModule({
   declarations: [EventsComponent],
@@ -24,5 +25,6 @@ import { RouterModule } from '@angular/router';
       },
     ]),
   ],
+  providers: [EventsService],
 })
 export class EventsModule {}
