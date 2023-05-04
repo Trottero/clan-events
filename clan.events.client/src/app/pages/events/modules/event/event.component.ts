@@ -19,9 +19,10 @@ export class EventComponent {
   ) {}
 
   @Memoize() public get id$(): Observable<string> {
-    return this.route.paramMap
-      .pipe(map((params) => params.get('id')))
-      .pipe(notNullOrUndefined());
+    return this.route.paramMap.pipe(
+      map((params) => params.get('id')),
+      notNullOrUndefined()
+    );
   }
 
   @Memoize() public get event$(): Observable<Response<EventResponse>> {
