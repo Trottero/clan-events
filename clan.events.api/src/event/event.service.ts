@@ -9,7 +9,7 @@ import {
   MoveEventAction,
   RollDiceEventAction,
 } from 'src/database/schemas/event-action.schema';
-import { Event } from 'src/database/schemas/event.schema';
+import { Event, EventDocument } from 'src/database/schemas/event.schema';
 import {
   ItemRequirement,
   RequirementType,
@@ -100,6 +100,10 @@ export class EventService {
 
   public async getAllEvents(): Promise<Event[]> {
     return this.eventModel.find().exec();
+  }
+
+  public async getEventById(id: string): Promise<EventDocument> {
+    return this.eventModel.findById(id).exec();
   }
 
   private createTile(name: string): Tile {
