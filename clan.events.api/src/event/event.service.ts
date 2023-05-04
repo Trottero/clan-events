@@ -98,8 +98,19 @@ export class EventService {
     return this.eventModel.findById(id).exec();
   }
 
-  public async getAllEvents(): Promise<Event[]> {
-    return this.eventModel.find().exec();
+  public async countAllEvents(): Promise<number> {
+    return this.eventModel.countDocuments().exec();
+  }
+
+  public async getAllEvents(
+    page: number,
+    pageSize: number,
+  ): Promise<EventDocument[]> {
+    return this.eventModel
+      .find()
+      .limit(pageSize)
+      .skip(page * pageSize)
+      .exec();
   }
 
   public async getEventById(id: string): Promise<EventDocument> {

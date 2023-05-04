@@ -7,13 +7,14 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
+import { Response } from 'clan.events.common/responses';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const now = Date.now();
     return next.handle().pipe(
-      map((response: any) => {
+      map((response: Response<unknown>) => {
         return {
           data: response,
           timestamp: Date.now(),

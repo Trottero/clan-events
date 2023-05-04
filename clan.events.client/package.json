@@ -19,10 +19,11 @@
     "@angular/platform-browser-dynamic": "^15.2.0",
     "@angular/router": "^15.2.0",
     "bootstrap": "^5.2.3",
-    "clan.events.common": "file:../clan.events.common",
     "buffer": "^6.0.3",
+    "clan.events.common": "file:../clan.events.common",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
+    "typescript-memoize": "^1.1.1",
     "zone.js": "~0.12.0"
   },
   "devDependencies": {

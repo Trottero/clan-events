@@ -1,4 +1,4 @@
-export interface EventModel {
+export interface Clan {
   id: string;
   name: string;
 }
