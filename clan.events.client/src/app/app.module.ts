@@ -34,14 +34,7 @@ import { ToolbarModule } from './components/toolbar/toolbar.module';
 
     ToolbarModule,
   ],
-  providers: [
-    ConfigService,
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptorService,
-      multi: true,
-    },
-  ],
+  providers: [ConfigService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
