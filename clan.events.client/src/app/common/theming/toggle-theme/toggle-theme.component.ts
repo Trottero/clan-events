@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { ThemingService } from '../theming.service';
-import { Memoize } from 'typescript-memoize';
 import { Observable, lastValueFrom, map, of, take, withLatestFrom } from 'rxjs';
 import { Theme } from '../theme';
+import { Memoized } from 'src/app/common/decorators';
 
 @Component({
   selector: 'app-toggle-theme',
@@ -12,11 +12,11 @@ import { Theme } from '../theme';
 export class ToggleThemeComponent {
   constructor(private readonly themingService: ThemingService) {}
 
-  @Memoize() public get isToggleChecked$(): Observable<boolean> {
+  @Memoized public get isToggleChecked$(): Observable<boolean> {
     return this._theme$.pipe(map((theme) => theme === Theme.Dark));
   }
 
-  @Memoize() private get _theme$(): Observable<Theme> {
+  @Memoized private get _theme$(): Observable<Theme> {
     return this.themingService.theme$;
   }
 

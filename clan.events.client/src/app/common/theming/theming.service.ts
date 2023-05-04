@@ -1,7 +1,7 @@
-import { Injectable, OnDestroy, OnInit } from '@angular/core';
-import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
-import { Memoize } from 'typescript-memoize';
+import { Injectable, OnDestroy } from '@angular/core';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { Theme, themeFromString } from './theme';
+import { Memoized } from '../decorators/memoized.decorator';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +17,7 @@ export class ThemingService implements OnDestroy {
 
   private _subscriptions = new Subscription();
 
-  @Memoize() public get theme$(): Observable<Theme> {
+  @Memoized public get theme$(): Observable<Theme> {
     return this._themeSubject.asObservable();
   }
 
