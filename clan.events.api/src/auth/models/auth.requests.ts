@@ -1,5 +1,5 @@
 import { DiscordUser } from 'src/discord/models/discord.user';
-import { DiscordAccessTokenResponse } from './auth.service';
+import { DiscordAccessTokenResponse } from '../auth.service';
 
 export interface CodeRedeemRequest {
   code: string;

@@ -1,6 +1,8 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { User } from 'src/database/schemas/user.schema';
 import { UserService } from './user.service';
+import { DiscordAuthorizationInfo } from 'src/discord/models/discord.auth.info';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('user')
 export class UserController {
@@ -19,5 +21,11 @@ export class UserController {
   @Get('random')
   async createRandomUser(): Promise<User> {
     return await this.clanService.createRandomUser();
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('info')
+  async getUserInfo(@Request() req): Promise<DiscordAuthorizationInfo> {
+    return req['user'];
   }
 }

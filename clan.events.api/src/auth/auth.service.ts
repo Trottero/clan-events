@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { AuthConfig } from './auth.config';
 import { firstValueFrom, map } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
+import { TokenCacheService } from './token.cache.service';
 
 export interface DiscordCodeRedeemRequest {
   client_id: string;
@@ -32,6 +33,7 @@ export class AuthService {
   constructor(
     private readonly httpClient: HttpService,
     private readonly configService: ConfigService,
+    private readonly tokenCacheService: TokenCacheService,
   ) {}
 
   async redeemCode(code: string): Promise<DiscordAccessTokenResponse> {
@@ -44,7 +46,7 @@ export class AuthService {
       redirect_uri: authConfig.redirectUri,
     };
 
-    const response = this.httpClient
+    const response$ = this.httpClient
       .post<DiscordAccessTokenResponse>(
         'https://discord.com/api/v10/oauth2/token',
         body,
@@ -55,8 +57,9 @@ export class AuthService {
         },
       )
       .pipe(map((resp) => resp.data));
-
-    return firstValueFrom(response);
+    const response = await firstValueFrom(response$);
+    await this.tokenCacheService.getTokenInfo(response.access_token);
+    return response;
   }
 
   async refreshCode(refreshToken: string): Promise<DiscordAccessTokenResponse> {
@@ -68,7 +71,7 @@ export class AuthService {
       grant_type: 'refresh_token',
     };
 
-    const response = this.httpClient
+    const response$ = this.httpClient
       .post<DiscordAccessTokenResponse>(
         'https://discord.com/api/v10/oauth2/token',
         body,
@@ -79,7 +82,8 @@ export class AuthService {
         },
       )
       .pipe(map((resp) => resp.data));
-
-    return firstValueFrom(response);
+    const response = await firstValueFrom(response$);
+    await this.tokenCacheService.getTokenInfo(response.access_token);
+    return response;
   }
 }

@@ -1,6 +1,6 @@
 import { Body, Controller, HttpException, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CodeRedeemRequest, CodeRedeemResponse } from './auth.requests';
+import { CodeRedeemRequest, CodeRedeemResponse } from './models/auth.requests';
 import { DiscordUserService } from 'src/discord/discord.user.service';
 
 @Controller('auth')
