@@ -9,6 +9,9 @@ export class User {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Clan' })
   primaryClan: Clan;
 
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Clan' }] })
+  clans: Clan[];
+
   @Prop()
   discordId: number;
 
