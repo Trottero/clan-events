@@ -1,9 +1,12 @@
 import * as mongoose from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Clan } from './clan.schema';
-import { User } from './user.schema';
 import { Board, BoardSchema } from './board.schema';
 import { EventTeam, EventTeamSchema } from './event-team.schema';
+import {
+  EventActionSchema,
+  registerEventActionsSchemas,
+} from './event-action.schema';
 
 export type EventDocument = mongoose.HydratedDocument<Event>;
 
@@ -20,6 +23,7 @@ export class Event {
 
   @Prop()
   startsAt: Date;
+
   @Prop()
   endsAt: Date;
 
@@ -28,6 +32,14 @@ export class Event {
 
   @Prop({ type: BoardSchema, required: true })
   board: Board;
+
+  @Prop({ type: [EventActionSchema] })
+  actions: unknown[];
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);
+
+const actionsArray = EventSchema.path(
+  'actions',
+) as mongoose.Schema.Types.DocumentArray;
+registerEventActionsSchemas(actionsArray);

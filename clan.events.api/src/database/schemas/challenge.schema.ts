@@ -2,9 +2,8 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Tile } from './tile.schema';
 import mongoose from 'mongoose';
 import {
-  ItemRequirementSchema,
   RequirementSchema,
-  RequirementType,
+  registerRequirementSchemas,
 } from './requirements.schema';
 
 @Schema({ _id: false })
@@ -22,7 +21,4 @@ const requirementsArraySchema = ChallengeSchema.path(
   'requirements',
 ) as mongoose.Schema.Types.DocumentArray;
 
-requirementsArraySchema.discriminator(
-  RequirementType.Item,
-  ItemRequirementSchema,
-);
+registerRequirementSchemas(requirementsArraySchema);

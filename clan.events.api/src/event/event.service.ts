@@ -3,6 +3,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ClanService } from 'src/clan/clan.service';
 import { BoardType } from 'src/database/schemas/board.schema';
+import {
+  EventAction,
+  EventActionType,
+  MoveEventAction,
+  RollDiceEventAction,
+} from 'src/database/schemas/event-action.schema';
 import { Event } from 'src/database/schemas/event.schema';
 import {
   ItemRequirement,
@@ -71,6 +77,22 @@ export class EventService {
         } as ItemRequirement,
       ],
     });
+
+    result.actions.push({
+      type: EventActionType.RollDice,
+      roll: 2,
+      actor: result.participants[0].members[0],
+      team: result.participants[0],
+      performedAt: new Date(),
+    } as RollDiceEventAction & EventAction);
+
+    result.actions.push({
+      type: EventActionType.Move,
+      destination: result.board.tiles[2],
+      actor: result.participants[0].members[0],
+      team: result.participants[0],
+      performedAt: new Date(),
+    } as MoveEventAction);
 
     const id = await result.save().then((result) => result._id);
     return this.eventModel.findById(id).exec();
