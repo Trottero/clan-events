@@ -5,10 +5,20 @@ import { CommonModule } from '@angular/common';
 import { UserModule } from '../user/user.module';
 import { JwtService } from './jwt.service';
 import { AuthInterceptorService } from './auth-interceptor.service';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 @NgModule({
   imports: [CommonModule],
-  providers: [AuthService, JwtService, AuthInterceptorService],
+  providers: [
+    AuthService,
+    JwtService,
+    AuthInterceptorService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptorService,
+      multi: true,
+    },
+  ],
   declarations: [CodeRedirectComponent],
 })
 export class AuthModule {}
