@@ -3,7 +3,7 @@ import { EventListItem } from 'clan.events.common/events';
 import { EventsService } from './events.service';
 import { PaginatedResponse } from 'clan.events.common/responses';
 import { Observable, map } from 'rxjs';
-import { Memoize } from 'typescript-memoize';
+import { Memoized } from 'src/app/common/decorators/memoized.decorator';
 
 @Component({
   selector: 'app-events',
@@ -16,9 +16,7 @@ export class EventsComponent {
 
   constructor(private readonly eventsService: EventsService) {}
 
-  @Memoize() public get events$(): Observable<
-    PaginatedResponse<EventListItem>
-  > {
+  @Memoized public get events$(): Observable<PaginatedResponse<EventListItem>> {
     return this.eventsService.getEvents({
       page: this.page,
       pageSize: this.pageSize,
