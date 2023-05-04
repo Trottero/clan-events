@@ -1,14 +1,11 @@
 import { EventListItem } from 'clan.events.common/events';
-import {
-  PaginatedResponse,
-  PaginationModel,
-} from 'clan.events.common/pagination';
+import { PaginatedModel, PaginationModel } from 'clan.events.common/responses';
 import { EventDocument } from '../../database/schemas/event.schema';
 
 export function convertToEventListResponse(
   events: EventDocument[],
   pagination: PaginationModel,
-): PaginatedResponse<EventListItem> {
+): PaginatedModel<EventListItem> {
   return {
     items: events.map(convertToEventResponse),
     ...pagination,

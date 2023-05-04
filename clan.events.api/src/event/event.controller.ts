@@ -2,7 +2,7 @@ import { Controller, Get, Param, Query } from '@nestjs/common';
 import { EventService } from './event.service';
 import { Event } from 'src/database/schemas/event.schema';
 import { EventListItem, GetEventsRequest } from 'clan.events.common/events';
-import { PaginatedResponse } from 'clan.events.common/pagination';
+import { PaginatedModel } from 'clan.events.common/responses';
 import { convertToEventListResponse } from './converters/event-list.converter';
 
 @Controller('events')
@@ -12,7 +12,7 @@ export class EventController {
   @Get()
   async getAllEvents(
     @Query() params: GetEventsRequest,
-  ): Promise<PaginatedResponse<EventListItem>> {
+  ): Promise<PaginatedModel<EventListItem>> {
     const { page, pageSize } = params;
 
     const result = await this.eventService.getAllEvents(page, pageSize);
