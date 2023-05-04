@@ -114,7 +114,7 @@ export class EventService {
   }
 
   public async getEventById(id: string): Promise<EventDocument> {
-    return this.eventModel.findById(id).exec();
+    return this.eventModel.findById(id).populate('participants.members').exec();
   }
 
   private createTile(name: string): Tile {

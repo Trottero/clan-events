@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { PaginatedResponse } from 'clan.events.common/responses';
-import { EventListItem } from 'clan.events.common/events';
+import { PaginatedResponse, Response } from 'clan.events.common/responses';
+import { EventListItem, EventResponse } from 'clan.events.common/events';
 import { GetEventsRequest } from 'clan.events.common/events';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
@@ -24,6 +24,12 @@ export class EventsService {
           pageSize: request.pageSize.toString(),
         },
       }
+    );
+  }
+
+  public getEventById(id: string) {
+    return this.http.get<Response<EventResponse>>(
+      `${this.configService.backEndUrl}/events/${id}`
     );
   }
 }

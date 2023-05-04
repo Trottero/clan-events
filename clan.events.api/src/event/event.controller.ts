@@ -1,9 +1,14 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { EventService } from './event.service';
 import { Event } from 'src/database/schemas/event.schema';
-import { EventListItem, GetEventsRequest } from 'clan.events.common/events';
+import {
+  EventListItem,
+  EventResponse,
+  GetEventsRequest,
+} from 'clan.events.common/events';
 import { PaginatedModel } from 'clan.events.common/responses';
 import { convertToEventListResponse } from './converters/event-list.converter';
+import { convertToEventResponse } from './converters/event.converter';
 
 @Controller('events')
 export class EventController {
@@ -32,8 +37,8 @@ export class EventController {
   }
 
   @Get(':id')
-  async getEventById(@Param() params): Promise<Event> {
-    const id = params.id;
-    return await this.eventService.getEventById(id);
+  async getEventById(@Param() { id }: { id: string }): Promise<EventResponse> {
+    const event = await this.eventService.getEventById(id);
+    return convertToEventResponse(event);
   }
 }
