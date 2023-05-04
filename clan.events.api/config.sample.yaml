@@ -4,7 +4,12 @@ database:
   uri: 'mongodb://localhost:27017'
   key: './path/to/key.pem (optional)'
 
-auth:
+discord:
   clientId: '123456'
   clientSecret: 'A secret'
   redirectUri: 'http://localhost:4200/code'
+  discordApiUrl: 'https://discord.com/api/v10'
+
+auth:
+  jwtSecret: 'Another secret'
+  jwtLifetime: 3600

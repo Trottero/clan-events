@@ -7,18 +7,18 @@ import { ApiResponse } from '../common/api.response';
 import { UserService } from '../user/user.service';
 import { hydrate } from '../common/hydrate.pipe';
 import { reducer } from '../common/reduce';
+import { JwtService } from './jwt.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly httpClient: HttpClient,
     private readonly configService: ConfigService,
-    private readonly userService: UserService
+    private readonly jwtService: JwtService
   ) {}
 
   initialState: AuthState = {
-    accessToken: { token: '', expiresAt: 0 },
-    refreshToken: { token: '', expiresAt: 0 },
+    accessToken: '',
   };
 
   private _authState$ = new BehaviorSubject<AuthState>(this.initialState);
@@ -29,12 +29,19 @@ export class AuthService {
     shareReplay(1)
   );
 
-  hasValidToken$ = this.authState$.pipe(
+  decodedToken$ = this.authState$.pipe(
+    map((authState) =>
+      authState.accessToken
+        ? this.jwtService.decodeToken(authState.accessToken)
+        : null
+    )
+  );
+
+  hasValidToken$ = this.decodedToken$.pipe(
     map(
-      (authState) =>
-        !!authState.accessToken &&
-        !!authState.refreshToken &&
-        authState.accessToken.expiresAt > Date.now()
+      (decodedToken) =>
+        !!decodedToken &&
+        decodedToken.iat + decodedToken.expiresIn > Date.now() / 1000
     )
   );
 
@@ -54,23 +61,13 @@ export class AuthService {
       .pipe(tap((x) => this.handleNewToken(x)));
   }
 
-  private handleNewToken(res: ApiResponse<any>) {
+  private handleNewToken(res: ApiResponse<{ token: string }>) {
     reducer(this._authState$, {
-      accessToken: {
-        token: res.data.access_token,
-        expiresAt: Date.now() + res.data.expires_in * 1000,
-      },
-      refreshToken: {
-        token: res.data.refresh_token,
-        expiresAt: Date.now() + 24 * 7 * 3600 * 1000,
-      },
+      accessToken: res.data.token,
     });
-
-    this.userService.infoReceived(res.data.user);
   }
 
   logout() {
     reducer(this._authState$, this.initialState);
-    this.userService.logout();
   }
 }
