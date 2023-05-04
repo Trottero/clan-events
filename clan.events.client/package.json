@@ -23,7 +23,6 @@
     "clan.events.common": "file:../clan.events.common",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
-    "typescript-memoize": "^1.1.1",
     "zone.js": "~0.12.0"
   },
   "devDependencies": {
