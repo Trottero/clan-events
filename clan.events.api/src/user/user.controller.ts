@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { User } from 'src/database/schemas/user.schema';
 import { UserService } from './user.service';
-import { JwtTokenContent } from 'src/auth/models/jwt.token';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { JwtTokenContent } from 'clan.events.common/auth';
 
 @Controller('user')
 export class UserController {

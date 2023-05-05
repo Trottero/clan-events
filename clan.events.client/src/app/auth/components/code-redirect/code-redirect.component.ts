@@ -6,8 +6,9 @@ import {
   from,
   interval,
   map,
+  share,
   switchMap,
-  withLatestFrom,
+  tap,
 } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 
@@ -22,12 +23,10 @@ export class CodeRedirectComponent implements OnInit, OnDestroy {
   codeRedeemer$ = this.route.queryParamMap.pipe(
     map((params) => params.get('code')),
     filter((x) => !!x),
-    switchMap((code) => this.authService.redeemCode(code as string))
-  );
-
-  navigateToHome$ = this.authService.hasValidToken$.pipe(
-    filter((x) => x),
-    switchMap(() => from(this.router.navigate(['/profile'])))
+    tap((code) => console.log('CodeRedirectComponent.codeRedeemer$', code)),
+    switchMap((code) => this.authService.redeemCode(code as string)),
+    switchMap(() => from(this.router.navigate(['/profile']))),
+    share()
   );
 
   private _subscription: Subscription = new Subscription();
@@ -40,7 +39,6 @@ export class CodeRedirectComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this._subscription.add(this.codeRedeemer$.subscribe());
-    this._subscription.add(this.navigateToHome$.subscribe());
   }
 
   ngOnDestroy(): void {

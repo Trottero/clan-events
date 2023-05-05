@@ -7,4 +7,5 @@ export interface JwtTokenContent {
   discordRefreshToken: string;
   expiresIn: number;
   permissions: ClanPermissions[];
+  iat?: number;
 }

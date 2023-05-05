@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, map, shareReplay, tap } from 'rxjs';
+import { Observable, map, shareReplay, tap } from 'rxjs';
 import { ConfigService } from '../config/config.service';
 import { AuthState } from './auth.state';
 import { ApiResponse } from '../common/api.response';
-import { UserService } from '../user/user.service';
+import { AccessTokenResponse } from 'clan.events.common/auth';
 import { hydrate } from '../common/hydrate.pipe';
-import { reducer } from '../common/reduce';
 import { JwtService } from './jwt.service';
+import { State } from '../common/state';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +21,7 @@ export class AuthService {
     accessToken: '',
   };
 
-  private _authState$ = new BehaviorSubject<AuthState>(this.initialState);
+  private _authState$ = new State<AuthState>(this.initialState);
 
   authState$: Observable<AuthState> = this._authState$.pipe(
     hydrate('authState', this.initialState),
@@ -41,33 +41,40 @@ export class AuthService {
     map(
       (decodedToken) =>
         !!decodedToken &&
+        decodedToken.iat &&
         decodedToken.iat + decodedToken.expiresIn > Date.now() / 1000
     )
   );
 
   redeemCode(code: string): Observable<any> {
     return this.httpClient
-      .post<ApiResponse<any>>(`${this.configService.backEndUrl}/auth/redeem`, {
-        code,
-      })
+      .post<ApiResponse<AccessTokenResponse>>(
+        `${this.configService.backEndUrl}/auth/redeem`,
+        {
+          code,
+        }
+      )
       .pipe(tap((x) => this.handleNewToken(x)));
   }
 
   refreshCode(refreshToken: string): Observable<any> {
     return this.httpClient
-      .post<ApiResponse<any>>(`${this.configService.backEndUrl}/auth/refresh`, {
-        code: refreshToken,
-      })
+      .post<ApiResponse<AccessTokenResponse>>(
+        `${this.configService.backEndUrl}/auth/refresh`,
+        {
+          code: refreshToken,
+        }
+      )
       .pipe(tap((x) => this.handleNewToken(x)));
   }
 
-  private handleNewToken(res: ApiResponse<{ token: string }>) {
-    reducer(this._authState$, {
+  private handleNewToken(res: ApiResponse<AccessTokenResponse>) {
+    this._authState$.next({
       accessToken: res.data.token,
     });
   }
 
   logout() {
-    reducer(this._authState$, this.initialState);
+    this._authState$.next(this.initialState);
   }
 }

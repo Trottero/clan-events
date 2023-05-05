@@ -1,19 +1,18 @@
 import { Injectable } from '@angular/core';
 import { UserState } from './user.state';
-import { BehaviorSubject, Observable, map, shareReplay } from 'rxjs';
+import { Observable, map, shareReplay } from 'rxjs';
 import { hydrate } from '../common/hydrate.pipe';
-import { reducer } from '../common/reduce';
 import { AuthService } from '../auth/auth.service';
+import { State } from '../common/state';
 
 @Injectable()
 export class UserService {
   initialState: UserState = {
-    id: '',
+    id: 0,
     username: '',
   };
 
-  private _userState$: BehaviorSubject<UserState> =
-    new BehaviorSubject<UserState>(this.initialState);
+  private _userState$ = new State<UserState>(this.initialState);
 
   userState$: Observable<UserState> = this._userState$.pipe(
     hydrate('userState', this.initialState),
@@ -34,12 +33,11 @@ export class UserService {
   }
 
   infoReceived(userState: UserState) {
-    reducer(this._userState$, userState);
+    this._userState$.next(userState);
   }
 
   logout() {
-    reducer(this._userState$, this.initialState);
-
+    this._userState$.next(this.initialState);
     this.authService.logout();
   }
 }

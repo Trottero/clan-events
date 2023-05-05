@@ -13,9 +13,9 @@ import { AuthService } from './auth.service';
 import {
   DiscordCodeRedeemRequest,
   AccessTokenResponse,
-} from './models/auth.requests';
+  JwtTokenContent,
+} from 'clan.events.common/auth';
 import { AuthGuard } from './auth.guard';
-import { JwtTokenContent } from './models/jwt.token';
 
 @Controller('auth')
 export class AuthController {

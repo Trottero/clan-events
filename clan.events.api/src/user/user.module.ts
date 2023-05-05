@@ -5,13 +5,14 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { AuthModule } from 'src/auth/auth.module';
 
+const MongooseDbConfig = MongooseModule.forFeature([
+  { name: User.name, schema: UserSchema },
+]);
+
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-    AuthModule,
-  ],
+  imports: [AuthModule, MongooseDbConfig],
   controllers: [UserController],
   providers: [UserService],
-  exports: [UserService],
+  exports: [UserService, MongooseDbConfig],
 })
 export class UserModule {}

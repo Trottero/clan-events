@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { JwtTokenContent } from './jwt.token';
 import { Buffer } from 'buffer';
+import { JwtTokenContent } from 'clan.events.common/auth';
 
 @Injectable()
 export class JwtService {

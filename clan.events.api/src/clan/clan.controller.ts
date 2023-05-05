@@ -13,16 +13,21 @@ import {
 import { ClanService } from './clan.service';
 import { Clan } from 'src/database/schemas/clan.schema';
 import { AuthGuard } from 'src/auth/auth.guard';
-import { JwtTokenContent } from 'src/auth/models/jwt.token';
 import {
   ClanResponse,
   CreateClanRequest,
   DeleteClanRequest,
 } from 'clan.events.common/clan';
+import { ClanMembershipService } from './clan-membership.service';
+import { ClanRole } from 'src/database/models/auth.role';
+import { JwtTokenContent } from 'clan.events.common/auth';
 
 @Controller('clan')
 export class ClanController {
-  constructor(private readonly clanService: ClanService) {}
+  constructor(
+    private readonly clanService: ClanService,
+    private readonly clanMembershipService: ClanMembershipService,
+  ) {}
 
   @Get()
   async getAllClans(): Promise<Clan[]> {
@@ -47,11 +52,20 @@ export class ClanController {
 
     const jwt = req.user as JwtTokenContent;
     try {
-      return await this.clanService.createClan(clan.name, jwt.sub);
+      const createdClan = await this.clanService.createClan(clan.name);
+
+      await this.clanMembershipService.addMemberToClan(
+        createdClan,
+        jwt.sub,
+        ClanRole.Owner,
+      );
+
+      return this.clanService.getClanByName(clan.name);
     } catch (ex: any) {
       if (ex.code === 11000) {
         throw new BadRequestException('A clan with this name already exists');
       }
+      throw ex;
     }
   }
 

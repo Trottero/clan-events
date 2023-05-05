@@ -1,4 +1,4 @@
 export interface UserState {
-  id: string;
+  id: number;
   username: string;
 }

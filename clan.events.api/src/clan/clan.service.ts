@@ -2,15 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ClanRole } from 'src/database/models/auth.role';
-import { ClanMembership } from 'src/database/schemas/clan-membership.schema';
-import { Clan } from 'src/database/schemas/clan.schema';
+import { Clan, ClanDocument } from 'src/database/schemas/clan.schema';
+import { User } from 'src/database/schemas/user.schema';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class ClanService {
   constructor(
     @InjectModel(Clan.name) private clanModel: Model<Clan>,
-    @InjectModel(Clan.name) private clanMembershipModel: Model<ClanMembership>,
+    @InjectModel(User.name) private userModel: Model<User>,
     private readonly userService: UserService,
   ) {}
 
@@ -26,28 +26,18 @@ export class ClanService {
     return clan.save();
   }
 
-  async createClan(displayName: string, discordId: number): Promise<Clan> {
+  async createClan(displayName: string): Promise<ClanDocument> {
     // Sanatize the display name
-    const user = await this.userService.getUserForDiscordId(discordId);
     const clan = new this.clanModel({
-      members: [],
       name: this.convertToSafeName(displayName),
       displayName: displayName,
-      owner: user,
     });
     await clan.save();
-
-    const membership = new this.clanMembershipModel({
-      clan: clan,
-      user: user,
-      role: ClanRole.Owner,
-    });
-    await membership.save();
 
     return this.getClanByName(displayName);
   }
 
-  async deleteClan(name: string, ownerId: number) {
+  async deleteClan(name: string, ownerDiscordId: number) {
     const safeName = this.convertToSafeName(name);
     const clan = await this.getClanByName(name);
     if (!clan) {
@@ -57,7 +47,7 @@ export class ClanService {
     if (
       clan.members?.length &&
       !clan.members.find(
-        (x) => x.user.discordId === ownerId && x.role === ClanRole.Owner,
+        (x) => x.user.discordId == ownerDiscordId && x.role === ClanRole.Owner,
       )
     ) {
       throw new Error('You are not the owner of this clan');
@@ -70,9 +60,13 @@ export class ClanService {
     return this.clanModel.find().exec();
   }
 
-  async getClanByName(clanName: string): Promise<Clan> {
+  async getClanByName(clanName: string): Promise<ClanDocument> {
     return await this.clanModel
       .findOne({ name: this.convertToSafeName(clanName) })
+      .populate({
+        path: 'members',
+        populate: { path: 'user', model: this.userModel, select: '-clans' },
+      })
       .exec();
   }
 
