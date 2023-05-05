@@ -1,17 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Tile, TileSchema } from './tile.schema';
-
-export enum BoardType {
-  Tilerace = 'TILERACE',
-  Bingo = 'BINGO',
-}
+import { BoardType } from 'clan.events.common/events';
 
 @Schema({ _id: false })
 export class Board {
   @Prop({ type: String, required: true, enum: Object.values(BoardType) })
   type: BoardType;
 
-  @Prop({ type: [TileSchema], required: true })
+  @Prop({ type: [TileSchema], required: true, default: [] })
   tiles: Tile[];
 }
 
