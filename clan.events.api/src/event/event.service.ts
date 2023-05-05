@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { BoardType } from 'clan.events.common/events';
+import { BoardType } from '@common/events';
 import { Model } from 'mongoose';
 import { ClanService } from 'src/clan/clan.service';
 import {

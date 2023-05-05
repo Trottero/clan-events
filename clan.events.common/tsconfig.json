@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "module": "AMD",
+    "preserveWatchOutput": true,
+    "module": "CommonJS",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -17,11 +18,12 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "rootDir": ".",
     "strict": true,
     "declarationMap": true,
     "composite": true,
-    "outFile": "./dist/index.js"
+    "rootDir": "src",
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo"
   },
-  "include": ["**/*.ts"]
+  "compileOnSave": true,
+  "include": ["./src/**/*.ts"]
 }

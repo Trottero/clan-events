@@ -7,7 +7,7 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
-import { Response } from 'clan.events.common/responses';
+import { Response } from 'clan.events.common/src/responses';
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
