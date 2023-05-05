@@ -2,6 +2,7 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { Theme, themeFromString } from './theme';
 import { Memoized } from '../decorators/memoized.decorator';
+import { hydrate } from '../hydrate.pipe';
 
 @Injectable({
   providedIn: 'root',
@@ -17,14 +18,13 @@ export class ThemingService implements OnDestroy {
 
   private _subscriptions = new Subscription();
 
-  public theme$: Observable<Theme> = this._themeSubject.asObservable();
+  public theme$: Observable<Theme> = this._themeSubject.pipe(
+    hydrate('app-theme', Theme.Unknown as Theme)
+  );
 
   constructor() {
-    this.getThemeFromLocalStorage();
-
     this._subscriptions.add(
       this.theme$.subscribe((theme) => {
-        localStorage.setItem('theme', theme);
         this.setThemeClass(theme);
       })
     );
@@ -36,13 +36,6 @@ export class ThemingService implements OnDestroy {
 
   public setTheme(theme: Theme) {
     this._themeSubject.next(theme);
-  }
-
-  private getThemeFromLocalStorage() {
-    const theme = localStorage.getItem('theme');
-    if (theme) {
-      this.setTheme(themeFromString(theme));
-    }
   }
 
   private setThemeClass(theme: Theme) {
