@@ -3,71 +3,87 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, map, shareReplay, tap } from 'rxjs';
 import { ConfigService } from '../config/config.service';
 import { AuthState } from './auth.state';
-import { ApiResponse } from '../common/api.response';
-import { UserService } from '../user/user.service';
 import { hydrate } from '../common/hydrate.pipe';
 import { reducer } from '../common/reduce';
 import { JwtService } from './jwt.service';
+import { Response } from 'clan.events.common/responses';
+import { Memoized } from '../common/decorators';
+import { JwtTokenContent } from './jwt.token';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly httpClient: HttpClient,
-    private readonly configService: ConfigService,
-    private readonly jwtService: JwtService
-  ) {}
-
-  initialState: AuthState = {
+  public initialState: AuthState = {
     accessToken: '',
   };
 
-  private _authState$ = new BehaviorSubject<AuthState>(this.initialState);
-
-  authState$: Observable<AuthState> = this._authState$.pipe(
-    hydrate('authState', this.initialState),
-    tap(console.log),
-    shareReplay(1)
+  private readonly _authState$ = new BehaviorSubject<AuthState>(
+    this.initialState,
   );
 
-  decodedToken$ = this.authState$.pipe(
-    map((authState) =>
-      authState.accessToken
-        ? this.jwtService.decodeToken(authState.accessToken)
-        : null
-    )
-  );
+  constructor(
+    private readonly httpClient: HttpClient,
+    private readonly configService: ConfigService,
+    private readonly jwtService: JwtService,
+  ) {}
 
-  hasValidToken$ = this.decodedToken$.pipe(
-    map(
-      (decodedToken) =>
-        !!decodedToken &&
-        decodedToken.iat + decodedToken.expiresIn > Date.now() / 1000
-    )
-  );
+  @Memoized public get authState$(): Observable<AuthState> {
+    return this._authState$.pipe(
+      hydrate('authState', this.initialState),
+      shareReplay(1),
+    );
+  }
 
-  redeemCode(code: string): Observable<any> {
+  @Memoized public get decodedToken$(): Observable<JwtTokenContent | null> {
+    return this.authState$.pipe(
+      map((authState) =>
+        authState.accessToken
+          ? this.jwtService.decodeToken(authState.accessToken)
+          : null,
+      ),
+    );
+  }
+
+  @Memoized public get hasValidToken$(): Observable<boolean> {
+    return this.decodedToken$.pipe(
+      map(
+        (decodedToken) =>
+          !!decodedToken &&
+          decodedToken.iat + decodedToken.expiresIn > Date.now() / 1000,
+      ),
+    );
+  }
+
+  public redeemCode(code: string): Observable<Response<{ token: string }>> {
     return this.httpClient
-      .post<ApiResponse<any>>(`${this.configService.backEndUrl}/auth/redeem`, {
-        code,
-      })
+      .post<Response<{ token: string }>>(
+        `${this.configService.backEndUrl}/auth/redeem`,
+        {
+          code,
+        },
+      )
       .pipe(tap((x) => this.handleNewToken(x)));
   }
 
-  refreshCode(refreshToken: string): Observable<any> {
+  public refreshCode(
+    refreshToken: string,
+  ): Observable<Response<{ token: string }>> {
     return this.httpClient
-      .post<ApiResponse<any>>(`${this.configService.backEndUrl}/auth/refresh`, {
-        code: refreshToken,
-      })
+      .post<Response<{ token: string }>>(
+        `${this.configService.backEndUrl}/auth/refresh`,
+        {
+          code: refreshToken,
+        },
+      )
       .pipe(tap((x) => this.handleNewToken(x)));
   }
 
-  private handleNewToken(res: ApiResponse<{ token: string }>) {
+  public logout(): void {
+    reducer(this._authState$, this.initialState);
+  }
+
+  private handleNewToken(res: Response<{ token: string }>): void {
     reducer(this._authState$, {
       accessToken: res.data.token,
     });
-  }
-
-  logout() {
-    reducer(this._authState$, this.initialState);
   }
 }

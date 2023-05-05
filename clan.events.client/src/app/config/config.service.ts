@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
-import { Environment } from './environment';
+import { ENVIRONMENT } from './environment';
 
 @Injectable()
 export class ConfigService {
-  get backEndUrl(): string {
-    return Environment.backendUrl;
+  public get backEndUrl(): string {
+    return ENVIRONMENT.backendUrl;
   }
 
-  get discordLoginUrl(): string {
-    return Environment.discordLoginUrl;
+  public get discordLoginUrl(): string {
+    return ENVIRONMENT.discordLoginUrl;
   }
 }

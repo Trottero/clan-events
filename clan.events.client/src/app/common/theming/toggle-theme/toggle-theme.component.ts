@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ThemingService } from '../theming.service';
-import { Observable, lastValueFrom, map, of, take, withLatestFrom } from 'rxjs';
+import { Observable, map, take } from 'rxjs';
 import { Theme } from '../theme';
 import { Memoized } from 'src/app/common/decorators';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-toggle-theme',
   templateUrl: './toggle-theme.component.html',
   styleUrls: ['./toggle-theme.component.scss'],
@@ -20,7 +21,7 @@ export class ToggleThemeComponent {
     return this.themingService.theme$;
   }
 
-  public onToggleChange() {
+  public onToggleChange(): void {
     this._theme$.pipe(take(1)).subscribe((theme) => {
       if (theme === Theme.Dark) {
         this.themingService.setTheme(Theme.Light);

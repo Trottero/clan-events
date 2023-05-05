@@ -13,9 +13,9 @@ export class ThemingService implements OnDestroy {
     [Theme.Dark]: 'dark-theme',
   };
 
-  private _themeSubject = new BehaviorSubject<Theme>(Theme.Dark);
+  private readonly _themeSubject = new BehaviorSubject<Theme>(Theme.Dark);
 
-  private _subscriptions = new Subscription();
+  private readonly _subscriptions = new Subscription();
 
   @Memoized public get theme$(): Observable<Theme> {
     return this._themeSubject.asObservable();
@@ -28,7 +28,7 @@ export class ThemingService implements OnDestroy {
       this.theme$.subscribe((theme) => {
         localStorage.setItem('theme', theme);
         this.setThemeClass(theme);
-      })
+      }),
     );
   }
 
@@ -36,18 +36,18 @@ export class ThemingService implements OnDestroy {
     this._subscriptions.unsubscribe();
   }
 
-  public setTheme(theme: Theme) {
+  public setTheme(theme: Theme): void {
     this._themeSubject.next(theme);
   }
 
-  private getThemeFromLocalStorage() {
+  private getThemeFromLocalStorage(): void {
     const theme = localStorage.getItem('theme');
     if (theme) {
       this.setTheme(themeFromString(theme));
     }
   }
 
-  private setThemeClass(theme: Theme) {
+  private setThemeClass(theme: Theme): void {
     const themeClass = this.themeToClassMap[theme];
     if (themeClass) {
       const body = document.getElementsByTagName('body')[0];
