@@ -1,12 +1,8 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { EventService } from './event.service';
 import { Event } from 'src/database/schemas/event.schema';
-import {
-  EventListItem,
-  EventResponse,
-  GetEventsRequest,
-} from 'clan.events.common/events';
-import { PaginatedModel } from 'clan.events.common/responses';
+import { EventListItem, EventResponse, GetEventsRequest } from '@common/events';
+import { PaginatedModel } from '@common/responses';
 import { convertToEventListResponse } from './converters/event-list.converter';
 import { convertToEventResponse } from './converters/event.converter';
 

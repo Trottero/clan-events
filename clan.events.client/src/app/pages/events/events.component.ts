@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { EventListItem } from 'clan.events.common/events';
 import { EventsService } from './events.service';
-import { PaginatedResponse } from 'clan.events.common/responses';
 import { Observable } from 'rxjs';
+import { EventListItem } from '@common/events';
+import { PaginatedResponse } from '@common/responses';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,

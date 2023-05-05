@@ -1,7 +1,7 @@
+import { ClanRole } from '@common/auth/auth.role';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject } from '@nestjs/common';
 import { Cache } from 'cache-manager';
-import { ClanRole } from 'src/database/models/auth.role';
 import { UserService } from 'src/user/user.service';
 
 export class CachedRolesService {

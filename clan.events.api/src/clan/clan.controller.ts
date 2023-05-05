@@ -10,10 +10,10 @@ import {
 import { ClanService } from './clan.service';
 import { Clan } from 'src/database/schemas/clan.schema';
 import { ApiTokenGuard } from 'src/auth/guards/api-token.guard';
-import { ClanResponse, CreateClanRequest } from 'clan.events.common/clan';
 import { ClanMembershipService } from './clan-membership.service';
-import { ClanRole } from 'src/database/models/auth.role';
-import { JwtTokenContent } from 'clan.events.common/auth';
+import { JwtTokenContent } from '@common/auth';
+import { ClanRole } from '@common/auth/auth.role';
+import { ClanResponse, CreateClanRequest } from '@common/clan';
 
 @Controller('clan')
 export class ClanController {

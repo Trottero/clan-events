@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ClanRole } from 'src/database/models/auth.role';
 import { ClanMembership } from 'src/database/schemas/clan-membership.schema';
 import { Clan, ClanDocument } from 'src/database/schemas/clan.schema';
 import { User } from 'src/database/schemas/user.schema';
 import { UserService } from 'src/user/user.service';
 import { ClanMembershipService } from './clan-membership.service';
+import { ClanRole } from '@common/auth/auth.role';
 
 @Injectable()
 export class ClanService {

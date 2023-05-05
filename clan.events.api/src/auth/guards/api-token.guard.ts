@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { AuthConfig } from '../auth.config';
-import { JwtTokenContent } from 'clan.events.common/auth';
+import { JwtTokenContent } from '@common/auth';
 
 @Injectable()
 export class ApiTokenGuard implements CanActivate {

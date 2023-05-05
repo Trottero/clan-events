@@ -9,13 +9,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
-import {
-  DiscordCodeRedeemRequest,
-  AccessTokenResponse,
-  JwtTokenContent,
-} from 'clan.events.common/auth';
 import { ApiTokenGuard } from './guards/api-token.guard';
 import { User } from 'src/common/decorators/user.decorator';
+import {
+  AccessTokenResponse,
+  DiscordCodeRedeemRequest,
+  JwtTokenContent,
+} from '@common/auth';
 
 @Controller('auth')
 export class AuthController {

@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Clan, ClanDocument } from './clan.schema';
 import { User, UserDocument } from './user.schema';
-import { ClanRole } from '../models/auth.role';
 import mongoose from 'mongoose';
+import { ClanRole } from '@common/auth/auth.role';
 
 export type ClanMembershipDocument = mongoose.HydratedDocument<ClanMembership>;
 

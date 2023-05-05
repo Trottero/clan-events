@@ -3,7 +3,7 @@ import { User } from 'src/database/schemas/user.schema';
 import { User as UserDecorator } from 'src/common/decorators/user.decorator';
 import { UserService } from './user.service';
 import { ApiTokenGuard } from 'src/auth/guards/api-token.guard';
-import { JwtTokenContent } from 'clan.events.common/auth';
+import { JwtTokenContent } from '@common/auth';
 
 @Controller('user')
 export class UserController {

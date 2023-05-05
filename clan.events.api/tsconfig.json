@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "preserveWatchOutput": true,
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
@@ -17,6 +18,14 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "strict": true
+    "strict": true,
+    "typeRoots": [
+      "node_modules/@types",
+      "index.d.ts",
+      "../clan.events.common/dist"
+    ],
+    "paths": {
+      "@common/*": ["../clan.events.common/dist/*"]
+    }
   }
 }

@@ -1,5 +1,5 @@
+import { JwtTokenContent } from '@common/auth';
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { JwtTokenContent } from 'clan.events.common/auth';
 
 export const User = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {

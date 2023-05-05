@@ -4,7 +4,6 @@
   "monorepo": true,
   "root": "./",
   "compilerOptions": {
-    "webpack": true,
     "tsConfigPath": "tsconfig.build.json",
     "deleteOutDir": true,
     "assets": [
@@ -28,7 +27,7 @@
     "clan.events.common": {
       "type": "library",
       "root": "../clan.events.common",
-      "sourceRoot": "../clan.events.common/src",
+      "sourceRoot": "../clan.events.common/dist",
       "compilerOptions": {
         "tsConfigPath": "../clan.events.common/tsconfig.json"
       }

@@ -1,10 +1,10 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ClanRole } from 'src/database/models/auth.role';
 import { ROLES_KEY } from '../role-in-clan.decorator';
-import { JwtTokenContent } from 'clan.events.common/auth';
 import { CachedRolesService } from '../services/cached-roles.service';
 import { ClanDocument } from 'src/database/schemas/clan.schema';
+import { ClanRole } from '@common/auth/auth.role';
+import { JwtTokenContent } from '@common/auth';
 
 @Injectable()
 export class RoleInClanGuard implements CanActivate {

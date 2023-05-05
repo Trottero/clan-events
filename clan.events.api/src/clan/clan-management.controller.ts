@@ -11,16 +11,16 @@ import {
 import { ClanService } from './clan.service';
 import { ClanMembershipService } from './clan-membership.service';
 import { HasRoleInClan } from 'src/auth/authorized.decorator';
-import { ClanRole } from 'src/database/models/auth.role';
-import { JwtTokenContent } from 'clan.events.common/auth';
 import { User } from 'src/common/decorators/user.decorator';
+import { ClanRole } from '@common/auth/auth.role';
+import { JwtTokenContent } from '@common/auth';
 import {
   AddClanMemberRequest,
   ClanMemberResponse,
   ClanResponse,
   DeleteClanMemberRequest,
   UpdateClanMemberRequest,
-} from 'clan.events.common/clan';
+} from '@common/clan';
 
 @Controller('clan/:clanName')
 export class ClanManagementController {
