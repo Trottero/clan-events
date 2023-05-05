@@ -1,0 +1,25 @@
+{
+  "name": "clan-events",
+  "version": "1.0.0",
+  "description": "This repo contains both back and front-end for the clan-events website where you can host your bingos, tile-races or Monopoly-style events!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Trottero/clan-events.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Trottero/clan-events/issues"
+  },
+  "homepage": "https://github.com/Trottero/clan-events#readme",
+  "workspaces": [
+    "clan.events.api",
+    "clan.events.client",
+    "clan.events.common"
+  ]
+}
