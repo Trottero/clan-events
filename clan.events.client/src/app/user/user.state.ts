@@ -1,4 +1,5 @@
 export interface UserState {
-  id: number;
+  id: string;
+  discordId: number;
   username: string;
 }

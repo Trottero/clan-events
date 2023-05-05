@@ -56,7 +56,7 @@ export class ClanController {
 
       await this.clanMembershipService.addMemberToClan(
         createdClan,
-        jwt.sub,
+        jwt.discordId,
         ClanRole.Owner,
       );
 
@@ -76,7 +76,7 @@ export class ClanController {
     @Body() clan: DeleteClanRequest,
   ): Promise<void> {
     const jwt = req.user as JwtTokenContent;
-    await this.clanService.deleteClan(clan.name, jwt.sub);
+    await this.clanService.deleteClan(clan.name, jwt.discordId);
   }
 
   @Get('/:clanName')

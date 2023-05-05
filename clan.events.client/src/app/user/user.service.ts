@@ -8,7 +8,8 @@ import { State } from '../common/state';
 @Injectable()
 export class UserService {
   readonly initialState: UserState = {
-    id: 0,
+    id: '',
+    discordId: 0,
     username: '',
   };
 
@@ -29,6 +30,7 @@ export class UserService {
         this.infoReceived({
           id: decodedToken.sub,
           username: decodedToken.username,
+          discordId: decodedToken.discordId,
         });
       }
     });

@@ -22,13 +22,13 @@ export class UserController {
   @Post()
   async createUser(@Request() req): Promise<User> {
     const jwt = req['user'] as JwtTokenContent;
-    return await this.userService.getOrCreateUser(jwt.sub, jwt.username);
+    return await this.userService.getOrCreateUser(jwt.discordId, jwt.username);
   }
 
   @UseGuards(AuthGuard)
   @Get('me')
   async getSelf(@Request() req): Promise<User> {
     const jwt = req['user'] as JwtTokenContent;
-    return await this.userService.getUserForDiscordId(jwt.sub);
+    return await this.userService.getUserForDiscordId(jwt.discordId);
   }
 }
