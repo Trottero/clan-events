@@ -7,7 +7,7 @@ import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UserService {
-  public initialState: UserState = {
+  private readonly initialState: UserState = {
     id: '',
     username: '',
   };
@@ -15,17 +15,17 @@ export class UserService {
   private readonly _userState$: BehaviorSubject<UserState> =
     new BehaviorSubject<UserState>(this.initialState);
 
-  public userState$: Observable<UserState> = this._userState$.pipe(
+  userState$: Observable<UserState> = this._userState$.pipe(
     hydrate('userState', this.initialState),
-    shareReplay(1),
+    shareReplay(1)
   );
 
-  public userName$: Observable<string> = this.userState$.pipe(
-    map((userState) => userState.username),
+  userName$: Observable<string> = this.userState$.pipe(
+    map(userState => userState.username)
   );
 
   constructor(private readonly authService: AuthService) {
-    this.authService.decodedToken$.subscribe((decodedToken) => {
+    this.authService.decodedToken$.subscribe(decodedToken => {
       if (decodedToken) {
         this.infoReceived({
           id: decodedToken.sub,
@@ -35,11 +35,11 @@ export class UserService {
     });
   }
 
-  public infoReceived(userState: UserState): void {
+  infoReceived(userState: UserState): void {
     reducer(this._userState$, userState);
   }
 
-  public logout(): void {
+  logout(): void {
     reducer(this._userState$, this.initialState);
 
     this.authService.logout();
