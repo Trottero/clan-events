@@ -24,9 +24,7 @@ export class ClanMembershipService {
     discordUserId: number,
     role: ClanRole,
   ) {
-    const user = (await this.userService.getUserForDiscordId(
-      discordUserId,
-    )) as HydratedDocument<User>;
+    const user = await this.userService.getUserForDiscordId(discordUserId);
 
     if (!user) {
       throw new Error('User not found');
