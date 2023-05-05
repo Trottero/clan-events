@@ -30,14 +30,13 @@ export class CodeRedirectComponent implements OnInit, OnDestroy {
     map(i => '.'.repeat((i % 4) + 1))
   );
 
-  codeRedeemer$: Observable<Response<{ token: string }>> =
-    this.route.queryParamMap.pipe(
-      map(params => params.get('code')),
-      filter(x => !!x),
-      switchMap(code => this.authService.redeemCode(code!))
-    );
+  codeRedeemer$ = this.route.queryParamMap.pipe(
+    map(params => params.get('code')),
+    filter(x => !!x),
+    switchMap(code => this.authService.redeemCode(code!))
+  );
 
-  navigateToHome$: Observable<boolean> = this.authService.hasValidToken$.pipe(
+  navigateToHome$ = this.authService.hasValidToken$.pipe(
     filter(x => x),
     switchMap(() => from(this.router.navigate(['/profile'])))
   );

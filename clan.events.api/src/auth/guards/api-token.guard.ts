@@ -7,11 +7,11 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { AuthConfig } from './auth.config';
-import { JwtTokenContent } from './models/jwt.token';
+import { AuthConfig } from '../auth.config';
+import { JwtTokenContent } from '@common/auth';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class ApiTokenGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
