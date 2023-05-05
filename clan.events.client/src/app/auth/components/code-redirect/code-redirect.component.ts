@@ -15,7 +15,6 @@ import {
   switchMap,
 } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Memoized } from 'src/app/common/decorators';
 import { Response } from 'clan.events.common/responses';
 
 @Component({
@@ -25,6 +24,23 @@ import { Response } from 'clan.events.common/responses';
   styleUrls: ['./code-redirect.component.scss'],
 })
 export class CodeRedirectComponent implements OnInit, OnDestroy {
+  public loadingDots$: Observable<string> = interval(1000).pipe(
+    map((i) => '.'.repeat((i % 4) + 1)),
+  );
+
+  public codeRedeemer$: Observable<Response<{ token: string }>> =
+    this.route.queryParamMap.pipe(
+      map((params) => params.get('code')),
+      filter((x) => !!x),
+      switchMap((code) => this.authService.redeemCode(code!)),
+    );
+
+  public navigateToHome$: Observable<boolean> =
+    this.authService.hasValidToken$.pipe(
+      filter((x) => x),
+      switchMap(() => from(this.router.navigate(['/profile']))),
+    );
+
   private readonly _subscription: Subscription = new Subscription();
 
   constructor(
@@ -32,27 +48,6 @@ export class CodeRedirectComponent implements OnInit, OnDestroy {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
   ) {}
-
-  @Memoized public get loadingDots$(): Observable<string> {
-    return interval(1000).pipe(map((i) => '.'.repeat((i % 4) + 1)));
-  }
-
-  @Memoized public get codeRedeemer$(): Observable<
-    Response<{ token: string }>
-  > {
-    return this.route.queryParamMap.pipe(
-      map((params) => params.get('code')),
-      filter((x) => !!x),
-      switchMap((code) => this.authService.redeemCode(code!)),
-    );
-  }
-
-  @Memoized public get navigateToHome$(): Observable<boolean> {
-    return this.authService.hasValidToken$.pipe(
-      filter((x) => x),
-      switchMap(() => from(this.router.navigate(['/profile']))),
-    );
-  }
 
   public ngOnInit(): void {
     this._subscription.add(this.codeRedeemer$.subscribe());

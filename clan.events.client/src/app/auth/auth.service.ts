@@ -7,7 +7,6 @@ import { hydrate } from '../common/hydrate.pipe';
 import { reducer } from '../common/reduce';
 import { JwtService } from './jwt.service';
 import { Response } from 'clan.events.common/responses';
-import { Memoized } from '../common/decorators';
 import { JwtTokenContent } from './jwt.token';
 
 @Injectable()
@@ -20,38 +19,33 @@ export class AuthService {
     this.initialState,
   );
 
-  constructor(
-    private readonly httpClient: HttpClient,
-    private readonly configService: ConfigService,
-    private readonly jwtService: JwtService,
-  ) {}
+  public authState$: Observable<AuthState> = this._authState$.pipe(
+    hydrate('authState', this.initialState),
+    shareReplay(1),
+  );
 
-  @Memoized public get authState$(): Observable<AuthState> {
-    return this._authState$.pipe(
-      hydrate('authState', this.initialState),
-      shareReplay(1),
-    );
-  }
-
-  @Memoized public get decodedToken$(): Observable<JwtTokenContent | null> {
-    return this.authState$.pipe(
+  public decodedToken$: Observable<JwtTokenContent | null> =
+    this.authState$.pipe(
       map((authState) =>
         authState.accessToken
           ? this.jwtService.decodeToken(authState.accessToken)
           : null,
       ),
     );
-  }
 
-  @Memoized public get hasValidToken$(): Observable<boolean> {
-    return this.decodedToken$.pipe(
-      map(
-        (decodedToken) =>
-          !!decodedToken &&
-          decodedToken.iat + decodedToken.expiresIn > Date.now() / 1000,
-      ),
-    );
-  }
+  public hasValidToken$: Observable<boolean> = this.decodedToken$.pipe(
+    map(
+      (decodedToken) =>
+        !!decodedToken &&
+        decodedToken.iat + decodedToken.expiresIn > Date.now() / 1000,
+    ),
+  );
+
+  constructor(
+    private readonly httpClient: HttpClient,
+    private readonly configService: ConfigService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   public redeemCode(code: string): Observable<Response<{ token: string }>> {
     return this.httpClient

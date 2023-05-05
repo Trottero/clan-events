@@ -1,7 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { Theme, themeFromString } from './theme';
-import { Memoized } from '../decorators/memoized.decorator';
 
 @Injectable({
   providedIn: 'root',

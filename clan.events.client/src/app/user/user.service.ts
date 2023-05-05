@@ -4,7 +4,6 @@ import { BehaviorSubject, Observable, map, shareReplay } from 'rxjs';
 import { hydrate } from '../common/hydrate.pipe';
 import { reducer } from '../common/reduce';
 import { AuthService } from '../auth/auth.service';
-import { Memoized } from '../common/decorators';
 
 @Injectable()
 export class UserService {
@@ -16,6 +15,15 @@ export class UserService {
   private readonly _userState$: BehaviorSubject<UserState> =
     new BehaviorSubject<UserState>(this.initialState);
 
+  public userState$: Observable<UserState> = this._userState$.pipe(
+    hydrate('userState', this.initialState),
+    shareReplay(1),
+  );
+
+  public userName$: Observable<string> = this.userState$.pipe(
+    map((userState) => userState.username),
+  );
+
   constructor(private readonly authService: AuthService) {
     this.authService.decodedToken$.subscribe((decodedToken) => {
       if (decodedToken) {
@@ -25,17 +33,6 @@ export class UserService {
         });
       }
     });
-  }
-
-  @Memoized public get userState$(): Observable<UserState> {
-    return this._userState$.pipe(
-      hydrate('userState', this.initialState),
-      shareReplay(1),
-    );
-  }
-
-  @Memoized public get userName$(): Observable<string> {
-    return this.userState$.pipe(map((userState) => userState.username));
   }
 
   public infoReceived(userState: UserState): void {
