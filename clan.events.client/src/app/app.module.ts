@@ -5,14 +5,12 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './pages/home/home.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
-import { ToolbarComponent } from './components/toolbar/toolbar.component';
 import { CounterComponent } from './pages/counter/counter.component';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { AuthModule } from './auth/auth.module';
 import { ConfigService } from './config/config.service';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { UserModule } from './user/user.module';
-import { AuthInterceptorService } from './auth/auth-interceptor.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToolbarModule } from './components/toolbar/toolbar.module';
 

@@ -4,12 +4,12 @@ export enum Theme {
   Dark = 'DARK',
 }
 
-const stringToTheme = new Map<string, Theme>([
+const THEME_MAP = new Map<string, Theme>([
   ['UNKNOWN', Theme.Unknown],
   ['LIGHT', Theme.Light],
   ['DARK', Theme.Dark],
 ]);
 
 export function themeFromString(theme: string): Theme {
-  return stringToTheme.get(theme) ?? Theme.Unknown;
+  return THEME_MAP.get(theme) ?? Theme.Unknown;
 }

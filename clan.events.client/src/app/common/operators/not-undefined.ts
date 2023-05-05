@@ -1,9 +1,9 @@
 import {
-  UnaryFunction,
   Observable,
-  pipe,
-  filter,
   OperatorFunction,
+  UnaryFunction,
+  filter,
+  pipe,
 } from 'rxjs';
 
 export function notNullOrUndefined<T>(): UnaryFunction<
@@ -11,7 +11,7 @@ export function notNullOrUndefined<T>(): UnaryFunction<
   Observable<T>
 > {
   return pipe(
-    filter((x) => x !== null && x !== undefined) as OperatorFunction<
+    filter(x => x !== null && x !== undefined) as OperatorFunction<
       T | null | undefined,
       T
     >

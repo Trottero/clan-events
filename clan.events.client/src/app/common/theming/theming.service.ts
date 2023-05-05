@@ -1,7 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
-import { Theme, themeFromString } from './theme';
-import { Memoized } from '../decorators/memoized.decorator';
+import { Theme } from './theme';
 import { hydrate } from '../hydrate.pipe';
 
 @Injectable({
@@ -14,31 +13,31 @@ export class ThemingService implements OnDestroy {
     [Theme.Dark]: 'dark-theme',
   };
 
-  private _themeSubject = new BehaviorSubject<Theme>(Theme.Dark);
+  private readonly _themeSubject = new BehaviorSubject<Theme>(Theme.Dark);
 
-  private _subscriptions = new Subscription();
+  private readonly _subscriptions = new Subscription();
 
-  public theme$: Observable<Theme> = this._themeSubject.pipe(
+  theme$: Observable<Theme> = this._themeSubject.pipe(
     hydrate('app-theme', Theme.Unknown as Theme)
   );
 
   constructor() {
     this._subscriptions.add(
-      this.theme$.subscribe((theme) => {
+      this.theme$.subscribe(theme => {
         this.setThemeClass(theme);
       })
     );
   }
 
-  public ngOnDestroy(): void {
+  ngOnDestroy(): void {
     this._subscriptions.unsubscribe();
   }
 
-  public setTheme(theme: Theme) {
+  setTheme(theme: Theme): void {
     this._themeSubject.next(theme);
   }
 
-  private setThemeClass(theme: Theme) {
+  private setThemeClass(theme: Theme): void {
     const themeClass = this.themeToClassMap[theme];
     if (themeClass) {
       const body = document.getElementsByTagName('body')[0];

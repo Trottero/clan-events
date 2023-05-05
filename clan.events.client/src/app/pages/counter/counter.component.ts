@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-counter',
   templateUrl: './counter.component.html',
   styleUrls: ['./counter.component.scss'],
@@ -8,7 +9,7 @@ import { Component } from '@angular/core';
 export class CounterComponent {
   currentCount = 0;
 
-  public incrementCounter() {
+  incrementCounter(): void {
     this.currentCount++;
   }
 }
