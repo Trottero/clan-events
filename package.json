@@ -4,7 +4,7 @@
   "description": "This repo contains both back and front-end for the clan-events website where you can host your bingos, tile-races or Monopoly-style events!",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",

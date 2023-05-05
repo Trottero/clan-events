@@ -1,11 +1,37 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "monorepo": true,
+  "root": "./",
   "compilerOptions": {
+    "webpack": true,
+    "tsConfigPath": "tsconfig.build.json",
     "deleteOutDir": true,
     "assets": [
-      { "include": "./config/*.yaml", "outDir": "./dist/", "watchAssets": true }
+      {
+        "include": "./config.*.yaml",
+        "outDir": "./dist/",
+        "watchAssets": true
+      }
     ]
+  },
+  "projects": {
+    "clan.events.api": {
+      "type": "application",
+      "root": ".",
+      "entryFile": "main.ts",
+      "sourceRoot": "./src",
+      "compilerOptions": {
+        "tsConfigPath": "./tsconfig.build.json"
+      }
+    },
+    "clan.events.common": {
+      "type": "library",
+      "root": "../clan.events.common",
+      "sourceRoot": "../clan.events.common/src",
+      "compilerOptions": {
+        "tsConfigPath": "../clan.events.common/tsconfig.json"
+      }
+    }
   }
 }

@@ -18,8 +18,8 @@ export class Event {
   @Prop()
   description: string;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Clan', required: true })
-  owner: Clan;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Clan' })
+  owner?: Clan;
 
   @Prop()
   startsAt: Date;
