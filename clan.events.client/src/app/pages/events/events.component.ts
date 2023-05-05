@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { EventListItem } from 'clan.events.common/events';
+import { EventListItem } from 'clan.events.common/dist/events';
 import { EventsService } from './events.service';
-import { PaginatedResponse } from 'clan.events.common/responses';
+import { PaginatedResponse } from 'clan.events.common/dist/responses';
 import { Observable } from 'rxjs';
 
 @Component({

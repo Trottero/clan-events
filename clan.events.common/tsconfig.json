@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "AMD",
+    "module": "CommonJS",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -17,11 +17,11 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "rootDir": ".",
+    "rootDir": "src",
     "strict": true,
     "declarationMap": true,
-    "composite": true,
-    "outFile": "./dist/index.js"
+    "composite": true
   },
-  "include": ["**/*.ts"]
+  "compileOnSave": true,
+  "include": ["./src/**/*", "index.d.ts"]
 }

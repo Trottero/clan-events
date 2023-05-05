@@ -17,6 +17,11 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "strict": true
+    "strict": true,
+    "typeRoots": [
+      "node_modules/@types",
+      "index.d.ts",
+      "../clan.events.common/dist"
+    ]
   }
 }

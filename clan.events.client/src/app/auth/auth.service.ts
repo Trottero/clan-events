@@ -6,7 +6,7 @@ import { AuthState } from './auth.state';
 import { hydrate } from '../common/hydrate.pipe';
 import { reducer } from '../common/reduce';
 import { JwtService } from './jwt.service';
-import { Response } from 'clan.events.common/responses';
+import { Response } from 'clan.events.common/dist/responses';
 import { JwtTokenContent } from './jwt.token';
 @Injectable()
 export class AuthService {

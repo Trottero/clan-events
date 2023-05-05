@@ -1,5 +1,5 @@
-import { EventListItem } from 'clan.events.common/events';
-import { PaginatedModel, PaginationModel } from 'clan.events.common/responses';
+import { PaginatedModel, PaginationModel } from 'clan.events.common/dist';
+import { EventListItem } from 'clan.events.common/dist/events';
 import { EventDocument } from '../../database/schemas/event.schema';
 
 export function convertToEventListResponse(
