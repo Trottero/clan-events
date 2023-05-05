@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
 import { User } from 'src/database/schemas/user.schema';
+import { User as UserDecorator } from 'src/common/decorators/user.decorator';
 import { UserService } from './user.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { JwtTokenContent } from 'clan.events.common/auth';
@@ -19,16 +20,11 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard)
-  @Post()
-  async createUser(@Request() req): Promise<User> {
-    const jwt = req['user'] as JwtTokenContent;
-    return await this.userService.getOrCreateUser(jwt.discordId, jwt.username);
-  }
-
-  @UseGuards(AuthGuard)
   @Get('me')
-  async getSelf(@Request() req): Promise<User> {
-    const jwt = req['user'] as JwtTokenContent;
-    return await this.userService.getUserForDiscordId(jwt.discordId);
+  async getSelf(@UserDecorator() user: JwtTokenContent): Promise<User> {
+    return await this.userService.getOrCreateUser(
+      user.discordId,
+      user.username,
+    );
   }
 }

@@ -16,6 +16,10 @@ export class UserService {
     return user.save();
   }
 
+  async getUserById(id: string): Promise<UserDocument> {
+    return this.userModel.findById(id).exec();
+  }
+
   async getOrCreateUser(
     discordId: number,
     name: string,

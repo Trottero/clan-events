@@ -6,7 +6,6 @@ import {
   HttpException,
   HttpStatus,
   Post,
-  Request,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -16,6 +15,7 @@ import {
   JwtTokenContent,
 } from 'clan.events.common/auth';
 import { AuthGuard } from './auth.guard';
+import { User } from 'src/common/decorators/user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -41,10 +41,13 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('refresh')
-  async refreshToken(@Request() req): Promise<AccessTokenResponse> {
+  async refreshToken(
+    @User() user: JwtTokenContent,
+  ): Promise<AccessTokenResponse> {
     try {
-      const jwt = req['user'] as JwtTokenContent;
-      const token = await this.authService.refreshCode(jwt.discordRefreshToken);
+      const token = await this.authService.refreshCode(
+        user.discordRefreshToken,
+      );
       return { token };
     } catch (ex) {
       console.error(ex);
@@ -54,7 +57,7 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Get('me')
-  async getUserInfo(@Request() req): Promise<JwtTokenContent> {
-    return req['user'];
+  async getUserInfo(@User() user: JwtTokenContent): Promise<JwtTokenContent> {
+    return user;
   }
 }
