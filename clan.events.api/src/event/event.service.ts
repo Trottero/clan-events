@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { BoardType } from '@common/events';
+import { BoardType, CreateEventRequest } from '@common/events';
 import { Model } from 'mongoose';
+import { JwtTokenContent } from 'src/auth/models/jwt.token';
 import { ClanService } from 'src/clan/clan.service';
 import {
   EventAction,
@@ -102,12 +103,15 @@ export class EventService {
     return this.eventModel.countDocuments().exec();
   }
 
-  public async getAllEvents(
+  public async getAllEventsForUser(
+    user: JwtTokenContent,
     page: number,
     pageSize: number,
   ): Promise<EventDocument[]> {
     return this.eventModel
-      .find()
+      .find({
+        'participants.name': user.username,
+      })
       .limit(pageSize)
       .skip(page * pageSize)
       .exec();
@@ -115,6 +119,33 @@ export class EventService {
 
   public async getEventById(id: string): Promise<EventDocument> {
     return this.eventModel.findById(id).populate('participants.members').exec();
+  }
+
+  public async createEvent(
+    user: JwtTokenContent,
+    event: CreateEventRequest,
+  ): Promise<EventDocument> {
+    const newEvent = new this.eventModel<Event>({
+      actions: [],
+      board: {
+        type: event.boardType,
+        tiles: [],
+      },
+      description: event.description,
+      startsAt: event.startsAt,
+      endsAt: event.endsAt,
+      name: event.name,
+      participants: [
+        {
+          name: `${user.username}'s Team`,
+          members: [await this.userService.getUserByUsername(user.username)],
+        },
+      ],
+    });
+
+    const result: EventDocument = await newEvent.save();
+    result.populate('participants.members');
+    return result;
   }
 
   private createTile(name: string): Tile {
