@@ -15,12 +15,11 @@ export class EventsComponent {
   private readonly page: number = 0;
   private readonly pageSize: number = 10;
 
-  constructor(private readonly eventsService: EventsService) {}
-
-  @Memoized public get events$(): Observable<PaginatedResponse<EventListItem>> {
-    return this.eventsService.getEvents({
+  public events$: Observable<PaginatedResponse<EventListItem>> =
+    this.eventsService.getEvents({
       page: this.page,
       pageSize: this.pageSize,
     });
-  }
+
+  constructor(private readonly eventsService: EventsService) {}
 }
