@@ -8,13 +8,13 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService } from './services/auth.service';
 import {
   DiscordCodeRedeemRequest,
   AccessTokenResponse,
   JwtTokenContent,
 } from 'clan.events.common/auth';
-import { AuthGuard } from './auth.guard';
+import { ApiTokenGuard } from './guards/api-token.guard';
 import { User } from 'src/common/decorators/user.decorator';
 
 @Controller('auth')
@@ -38,7 +38,7 @@ export class AuthController {
     }
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(ApiTokenGuard)
   @HttpCode(HttpStatus.OK)
   @Post('refresh')
   async refreshToken(
@@ -55,7 +55,7 @@ export class AuthController {
     }
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(ApiTokenGuard)
   @Get('me')
   async getUserInfo(@User() user: JwtTokenContent): Promise<JwtTokenContent> {
     return user;

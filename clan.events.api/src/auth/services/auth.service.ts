@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { DiscordAuthService } from 'src/discord/discord.auth.service';
 import { DiscordUserService } from 'src/discord/discord.user.service';
 import { DiscordAccessTokenResponse } from 'src/discord/models/discord.token.response';
-import { AuthConfig } from './auth.config';
+import { AuthConfig } from '../auth.config';
 import { JwtTokenContent } from 'clan.events.common/auth';
 import { UserService } from 'src/user/user.service';
 

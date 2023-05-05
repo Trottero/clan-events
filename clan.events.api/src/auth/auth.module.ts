@@ -2,11 +2,12 @@ import { Module } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
 import { HttpModule } from '@nestjs/axios';
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { AuthService } from './services/auth.service';
 import { DiscordModule } from 'src/discord/discord.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtConfigService } from './jwt/jwt-config.service';
 import { UserModule } from 'src/user/user.module';
+import { CachedRolesService } from './services/cached-roles.service';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { UserModule } from 'src/user/user.module';
     CacheModule.register(),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
-  exports: [AuthService],
+  providers: [AuthService, CachedRolesService],
+  exports: [AuthService, CachedRolesService],
 })
 export class AuthModule {}

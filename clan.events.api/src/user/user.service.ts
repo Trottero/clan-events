@@ -17,7 +17,7 @@ export class UserService {
   }
 
   async getUserById(id: string): Promise<UserDocument> {
-    return this.userModel.findById(id).exec();
+    return await this.userModel.findById(id).exec();
   }
 
   async getOrCreateUser(

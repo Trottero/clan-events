@@ -6,6 +6,7 @@ import { Model, HydratedDocument } from 'mongoose';
 import { Clan, ClanDocument } from 'src/database/schemas/clan.schema';
 import { User } from 'src/database/schemas/user.schema';
 import { ClanMembership } from 'src/database/schemas/clan-membership.schema';
+import { CachedRolesService } from 'src/auth/services/cached-roles.service';
 
 @Injectable()
 export class ClanMembershipService {
@@ -15,6 +16,7 @@ export class ClanMembershipService {
     @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(ClanMembership.name)
     private clanMembershipModel: Model<ClanMembership>,
+    private readonly cachedRolesService: CachedRolesService,
   ) {}
 
   async addMemberToClan(
@@ -29,6 +31,8 @@ export class ClanMembershipService {
     if (!user) {
       throw new Error('User not found');
     }
+
+    this.cachedRolesService.invalidateCache(user.id);
 
     const membership = new this.clanMembershipModel({
       clan: clan,
@@ -50,6 +54,8 @@ export class ClanMembershipService {
       throw new Error('User not found');
     }
 
+    this.cachedRolesService.invalidateCache(user.id);
+
     await clan.updateOne({ $pull: { members: { user: user._id } } }).exec();
     await user.updateOne({ $pull: { clans: { clan: clan._id } } }).exec();
   }
@@ -64,6 +70,8 @@ export class ClanMembershipService {
     if (!user) {
       throw new Error('User not found');
     }
+
+    this.cachedRolesService.invalidateCache(user.id);
 
     const membership = new this.clanMembershipModel({
       clan: clan,
