@@ -3,78 +3,78 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map, shareReplay, tap } from 'rxjs';
 import { ConfigService } from '../config/config.service';
 import { AuthState } from './auth.state';
-import { ApiResponse } from '../common/api.response';
-import { AccessTokenResponse } from 'clan.events.common/auth';
+import { AccessTokenResponse, JwtTokenContent } from 'clan.events.common/auth';
 import { hydrate } from '../common/hydrate.pipe';
 import { JwtService } from './jwt.service';
 import { State } from '../common/state';
 
+import { Response } from 'clan.events.common/responses';
+
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly httpClient: HttpClient,
-    private readonly configService: ConfigService,
-    private readonly jwtService: JwtService
-  ) {}
-
-  initialState: AuthState = {
+  private readonly initialState: AuthState = {
     accessToken: '',
   };
 
-  private _authState$ = new State<AuthState>(this.initialState);
+  private readonly _authState$ = new State<AuthState>(this.initialState);
 
   authState$: Observable<AuthState> = this._authState$.pipe(
     hydrate('authState', this.initialState),
-    tap(console.log),
     shareReplay(1)
   );
 
-  decodedToken$ = this.authState$.pipe(
-    map((authState) =>
+  decodedToken$: Observable<JwtTokenContent | null> = this.authState$.pipe(
+    map(authState =>
       authState.accessToken
         ? this.jwtService.decodeToken(authState.accessToken)
         : null
     )
   );
 
-  hasValidToken$ = this.decodedToken$.pipe(
+  hasValidToken$: Observable<boolean> = this.decodedToken$.pipe(
     map(
-      (decodedToken) =>
+      decodedToken =>
         !!decodedToken &&
-        decodedToken.iat &&
+        !!decodedToken.iat &&
         decodedToken.iat + decodedToken.expiresIn > Date.now() / 1000
     )
   );
 
-  redeemCode(code: string): Observable<any> {
+  constructor(
+    private readonly httpClient: HttpClient,
+    private readonly configService: ConfigService,
+    private readonly jwtService: JwtService
+  ) {}
+
+  redeemCode(code: string): Observable<Response<{ token: string }>> {
     return this.httpClient
-      .post<ApiResponse<AccessTokenResponse>>(
+      .post<Response<AccessTokenResponse>>(
         `${this.configService.backEndUrl}/auth/redeem`,
         {
           code,
         }
       )
-      .pipe(tap((x) => this.handleNewToken(x)));
+      .pipe(tap(x => this.handleNewToken(x)));
   }
 
-  refreshCode(refreshToken: string): Observable<any> {
+  refreshCode(refreshToken: string): Observable<Response<{ token: string }>> {
     return this.httpClient
-      .post<ApiResponse<AccessTokenResponse>>(
+      .post<Response<AccessTokenResponse>>(
         `${this.configService.backEndUrl}/auth/refresh`,
         {
           code: refreshToken,
         }
       )
-      .pipe(tap((x) => this.handleNewToken(x)));
+      .pipe(tap(x => this.handleNewToken(x)));
   }
 
-  private handleNewToken(res: ApiResponse<AccessTokenResponse>) {
+  logout(): void {
+    this._authState$.next(this.initialState);
+  }
+
+  private handleNewToken(res: Response<AccessTokenResponse>): void {
     this._authState$.next({
       accessToken: res.data.token,
     });
-  }
-
-  logout() {
-    this._authState$.next(this.initialState);
   }
 }

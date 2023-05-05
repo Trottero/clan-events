@@ -1,17 +1,18 @@
-import { MonoTypeOperatorFunction, map, pipe, tap } from 'rxjs';
+import { MonoTypeOperatorFunction, map, pipe } from 'rxjs';
 
-let hydrationMap: { [key: string]: boolean } = {};
+const HYDRATION_MAP: { [key: string]: boolean } = {};
 
 export function hydrate<T>(
   storageKey: string,
   initialState: T
 ): MonoTypeOperatorFunction<T> {
   return pipe(
-    map((val) => {
+    map(val => {
       // If already hydrated, update storage and return
-      if (hydrationMap[storageKey]) {
+      if (HYDRATION_MAP[storageKey]) {
         // Store in local storage
         localStorage.setItem(storageKey, JSON.stringify(val));
+
         return val;
       }
 
@@ -20,14 +21,17 @@ export function hydrate<T>(
       if (stored) {
         // If there's a stored value, return it
         // and mark the hydrated as true
-        console.log('Hydrated from localstorage', val);
-        hydrationMap[storageKey] = true;
+        HYDRATION_MAP[storageKey] = true;
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return { ...initialState, ...JSON.parse(stored) };
       }
 
       // Nothing stored, return the state that was passed, but mark it as hydrated
       localStorage.setItem(storageKey, JSON.stringify(val));
-      hydrationMap[storageKey] = true;
+      HYDRATION_MAP[storageKey] = true;
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return { ...JSON.parse(JSON.stringify(val)) };
     })
   );

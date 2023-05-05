@@ -4,8 +4,6 @@ import { JwtTokenContent } from 'clan.events.common/auth';
 
 @Injectable()
 export class JwtService {
-  constructor() {}
-
   decodeToken(token: string): JwtTokenContent {
     const parts = token.split('.');
     if (parts.length !== 3) {
@@ -15,6 +13,7 @@ export class JwtService {
     if (!decoded) {
       throw new Error('Cannot decode the token');
     }
+
     return JSON.parse(decoded) as JwtTokenContent;
   }
 

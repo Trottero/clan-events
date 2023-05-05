@@ -7,6 +7,7 @@ export function Memoized<T extends { constructor: Function }>(
   propertyKey: string,
   descriptor: PropertyDescriptor
 ): PropertyDescriptor {
+  // eslint-disable-next-line @typescript-eslint/unbound-method
   const originalGet = descriptor.get;
 
   if (!originalGet) {
@@ -28,6 +29,7 @@ export function Memoized<T extends { constructor: Function }>(
         return localMemoizationMap.get(propertyKey);
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const value = originalGet.call(this);
 
       localMemoizationMap.set(propertyKey, value);

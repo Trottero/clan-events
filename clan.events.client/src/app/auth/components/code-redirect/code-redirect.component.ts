@@ -1,35 +1,38 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { AuthService } from '../../auth.service';
 import {
   Subscription,
   filter,
   from,
-  interval,
   map,
-  share,
   switchMap,
-  tap,
 } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-code-redirect',
   templateUrl: './code-redirect.component.html',
   styleUrls: ['./code-redirect.component.scss'],
 })
 export class CodeRedirectComponent implements OnInit, OnDestroy {
-  loadingDots$ = interval(1000).pipe(map((i) => '.'.repeat((i % 4) + 1)));
+  private readonly _subscription: Subscription = new Subscription();
 
   codeRedeemer$ = this.route.queryParamMap.pipe(
     map((params) => params.get('code')),
     filter((x) => !!x),
-    tap((code) => console.log('CodeRedirectComponent.codeRedeemer$', code)),
-    switchMap((code) => this.authService.redeemCode(code as string)),
-    switchMap(() => from(this.router.navigate(['/profile']))),
-    share()
+    switchMap((code) => this.authService.redeemCode(code as string))
   );
 
-  private _subscription: Subscription = new Subscription();
+  navigateToHome$ = this.authService.hasValidToken$.pipe(
+    filter((x) => x),
+    switchMap(() => from(this.router.navigate(['/profile'])))
+  );
 
   constructor(
     private readonly authService: AuthService,

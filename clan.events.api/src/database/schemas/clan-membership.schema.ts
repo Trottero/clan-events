@@ -8,10 +8,10 @@ export type ClanMembershipDocument = mongoose.HydratedDocument<ClanMembership>;
 
 @Schema({ _id: false })
 export class ClanMembership {
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Clan.name })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Clan' })
   clan: Clan;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   user: User;
 
   @Prop()
