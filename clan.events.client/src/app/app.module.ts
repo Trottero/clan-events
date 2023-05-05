@@ -29,7 +29,6 @@ import { ToolbarModule } from './components/toolbar/toolbar.module';
     AuthModule,
     UserModule,
     BrowserAnimationsModule,
-
     ToolbarModule,
   ],
   providers: [ConfigService],
