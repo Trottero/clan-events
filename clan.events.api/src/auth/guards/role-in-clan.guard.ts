@@ -30,7 +30,6 @@ export class RoleInClanGuard implements CanActivate {
       return false;
     }
 
-    console.log(roles, roleInClan, requiredRoles);
     return requiredRoles.some((role) => roleInClan == role);
   }
 }
