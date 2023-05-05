@@ -6,7 +6,7 @@ import { Clan, ClanDocument } from 'src/database/schemas/clan.schema';
 import { User } from 'src/database/schemas/user.schema';
 import { ClanMembership } from 'src/database/schemas/clan-membership.schema';
 import { CachedRolesService } from 'src/auth/services/cached-roles.service';
-import { ClanRole } from '@common/auth/auth.role';
+import { ClanRole } from '@common/auth/clan.role';
 
 @Injectable()
 export class ClanMembershipService {

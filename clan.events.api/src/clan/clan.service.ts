@@ -6,7 +6,7 @@ import { Clan, ClanDocument } from 'src/database/schemas/clan.schema';
 import { User } from 'src/database/schemas/user.schema';
 import { UserService } from 'src/user/user.service';
 import { ClanMembershipService } from './clan-membership.service';
-import { ClanRole } from '@common/auth/auth.role';
+import { ClanRole } from '@common/auth/clan.role';
 
 @Injectable()
 export class ClanService {
@@ -28,16 +28,15 @@ export class ClanService {
     const clan = new this.clanModel({
       members: [],
       displayName: displayName,
-      name: this.convertToSafeName(displayName),
+      name: this.sanitizeClanName(displayName),
       owner: randomUser,
     });
     return clan.save();
   }
 
   async createClan(displayName: string): Promise<ClanDocument> {
-    // Sanatize the display name
     const clan = new this.clanModel({
-      name: this.convertToSafeName(displayName),
+      name: this.sanitizeClanName(displayName),
       displayName: displayName,
     });
     await clan.save();
@@ -46,7 +45,7 @@ export class ClanService {
   }
 
   async deleteClan(name: string, ownerDiscordId: number) {
-    const safeName = this.convertToSafeName(name);
+    const safeName = this.sanitizeClanName(name);
     const clan = await this.getClanByName(name);
     if (!clan) {
       throw new Error('Clan not found');
@@ -92,7 +91,7 @@ export class ClanService {
 
   async getClanByName(clanName: string): Promise<ClanDocument> {
     return await this.clanModel
-      .findOne({ name: this.convertToSafeName(clanName) })
+      .findOne({ name: this.sanitizeClanName(clanName) })
       .populate({
         path: 'members',
         populate: { path: 'user', model: this.userModel, select: '-clans' },
@@ -100,7 +99,7 @@ export class ClanService {
       .exec();
   }
 
-  private convertToSafeName(name: string): string {
+  private sanitizeClanName(name: string): string {
     // Remove all non-alphanumeric characters
     let safeName = name.replace(/[^a-zA-Z0-9 \-]/g, '');
     // Convert to lowercase

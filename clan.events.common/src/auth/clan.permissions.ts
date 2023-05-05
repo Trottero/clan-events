@@ -1,4 +1,4 @@
-import { ClanRole } from './auth.role';
+import { ClanRole } from './clan.role';
 
 export interface ClanPermissions {
   name: string;

@@ -1,6 +1,6 @@
-import { ClanRole } from '@common/auth/auth.role';
+import { ClanRole } from '@common/auth/clan.role';
 import { SetMetadata } from '@nestjs/common';
 
-export const ROLES_KEY = 'roles';
+export const CLAN_ROLES_KEY = 'roles';
 export const RoleInClan = (...roles: ClanRole[]) =>
-  SetMetadata(ROLES_KEY, roles);
+  SetMetadata(CLAN_ROLES_KEY, roles);

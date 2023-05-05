@@ -12,8 +12,9 @@ import { Clan } from 'src/database/schemas/clan.schema';
 import { ApiTokenGuard } from 'src/auth/guards/api-token.guard';
 import { ClanMembershipService } from './clan-membership.service';
 import { JwtTokenContent } from '@common/auth';
-import { ClanRole } from '@common/auth/auth.role';
 import { ClanResponse, CreateClanRequest } from '@common/clan';
+import { ClanRole } from '@common/auth/clan.role';
+import { MongoErrorCode } from 'src/database/mongo-error-codes';
 
 @Controller('clan')
 export class ClanController {
@@ -50,7 +51,7 @@ export class ClanController {
 
       return this.clanService.getClanByName(clan.name);
     } catch (ex: any) {
-      if (ex.code === 11000) {
+      if (ex.code === MongoErrorCode.DuplicateKey) {
         throw new BadRequestException('A clan with this name already exists');
       }
       throw ex;
