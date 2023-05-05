@@ -24,37 +24,36 @@ import { Response } from 'clan.events.common/responses';
   styleUrls: ['./code-redirect.component.scss'],
 })
 export class CodeRedirectComponent implements OnInit, OnDestroy {
-  public loadingDots$: Observable<string> = interval(1000).pipe(
-    map((i) => '.'.repeat((i % 4) + 1)),
+  private readonly _subscription: Subscription = new Subscription();
+
+  loadingDots$: Observable<string> = interval(1000).pipe(
+    map(i => '.'.repeat((i % 4) + 1))
   );
 
-  public codeRedeemer$: Observable<Response<{ token: string }>> =
+  codeRedeemer$: Observable<Response<{ token: string }>> =
     this.route.queryParamMap.pipe(
-      map((params) => params.get('code')),
-      filter((x) => !!x),
-      switchMap((code) => this.authService.redeemCode(code!)),
+      map(params => params.get('code')),
+      filter(x => !!x),
+      switchMap(code => this.authService.redeemCode(code!))
     );
 
-  public navigateToHome$: Observable<boolean> =
-    this.authService.hasValidToken$.pipe(
-      filter((x) => x),
-      switchMap(() => from(this.router.navigate(['/profile']))),
-    );
-
-  private readonly _subscription: Subscription = new Subscription();
+  navigateToHome$: Observable<boolean> = this.authService.hasValidToken$.pipe(
+    filter(x => x),
+    switchMap(() => from(this.router.navigate(['/profile'])))
+  );
 
   constructor(
     private readonly authService: AuthService,
     private readonly route: ActivatedRoute,
-    private readonly router: Router,
+    private readonly router: Router
   ) {}
 
-  public ngOnInit(): void {
+  ngOnInit(): void {
     this._subscription.add(this.codeRedeemer$.subscribe());
     this._subscription.add(this.navigateToHome$.subscribe());
   }
 
-  public ngOnDestroy(): void {
+  ngOnDestroy(): void {
     this._subscription.unsubscribe();
   }
 }

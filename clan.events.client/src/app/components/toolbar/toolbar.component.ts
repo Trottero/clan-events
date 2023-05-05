@@ -9,16 +9,16 @@ import { UserService } from 'src/app/user/user.service';
   styleUrls: ['./toolbar.component.scss'],
 })
 export class ToolbarComponent {
-  public discordLoginUrl = this.configService.discordLoginUrl;
+  discordLoginUrl = this.configService.discordLoginUrl;
 
-  public userName$ = this.userService.userName$;
+  userName$ = this.userService.userName$;
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly userService: UserService,
+    private readonly userService: UserService
   ) {}
 
-  public logout(): void {
+  logout(): void {
     this.userService.logout();
   }
 }

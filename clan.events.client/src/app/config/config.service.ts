@@ -3,11 +3,11 @@ import { ENVIRONMENT } from './environment';
 
 @Injectable()
 export class ConfigService {
-  public get backEndUrl(): string {
+  get backEndUrl(): string {
     return ENVIRONMENT.backendUrl;
   }
 
-  public get discordLoginUrl(): string {
+  get discordLoginUrl(): string {
     return ENVIRONMENT.discordLoginUrl;
   }
 }

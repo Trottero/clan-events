@@ -2,6 +2,7 @@
 
 module.exports = {
   extends: [
+    "./node_modules/gts/",
     'plugin:@angular-eslint/base',
     'plugin:@angular-eslint/template/process-inline-templates'
   ],
@@ -151,7 +152,7 @@ module.exports = {
     // ==================================================================================================================================
     'array-bracket-spacing': 'warn',
     'array-element-newline': ['warn', 'consistent'],
-    'arrow-parens': 'warn',
+    // 'arrow-parens': 'warn',
     'arrow-spacing': 'warn',
     'block-spacing': 'warn',
     // 'brace-style': 'warn', // Use @typescript-eslint/brace-style instead
@@ -209,7 +210,7 @@ module.exports = {
     '@typescript-eslint/ban-ts-comment': 'warn',
     '@typescript-eslint/ban-tslint-comment': 'warn',
     '@typescript-eslint/brace-style': ['warn', '1tbs', { 'allowSingleLine': true }],
-    '@typescript-eslint/comma-dangle': ['warn', 'always-multiline'],
+    // '@typescript-eslint/comma-dangle': ['warn', 'always-multiline'],
     '@typescript-eslint/comma-spacing': 'warn',
     '@typescript-eslint/consistent-generic-constructors': 'warn',
     '@typescript-eslint/consistent-type-assertions': ['warn', { 'assertionStyle': 'as', 'objectLiteralTypeAssertions': 'allow-as-parameter' }],
@@ -224,7 +225,11 @@ module.exports = {
     '@typescript-eslint/explicit-member-accessibility': ['warn', {
       'accessibility': 'explicit',
       'overrides': {
-        'constructors': 'no-public'
+        'constructors': 'no-public',
+        'methods': 'no-public',
+        'properties': 'no-public',
+        'accessors': 'no-public',
+        'parameterProperties': 'no-public'
       }
     }],
     '@typescript-eslint/func-call-spacing': 'warn',
@@ -234,12 +239,12 @@ module.exports = {
       'warn',
       {
         'default': [
-          'public-static-field',
-          'protected-static-field',
           'private-static-field',
-          'public-instance-field',
-          'protected-instance-field',
+          'protected-static-field',
+          'public-static-field',
           'private-instance-field',
+          'protected-instance-field',
+          'public-instance-field',
           'public-constructor',
           'protected-constructor',
           'private-constructor',
@@ -377,6 +382,16 @@ module.exports = {
     '@angular-eslint/use-component-selector': 'warn',
     '@angular-eslint/use-component-view-encapsulation': 'warn',
     '@angular-eslint/use-lifecycle-interface': 'warn',
-    '@angular-eslint/use-pipe-transform-interface': 'warn'
+    '@angular-eslint/use-pipe-transform-interface': 'warn',
+
+    // ==================================================================================================================================
+    // ESLint Prettier
+    // ==================================================================================================================================
+    'prettier/prettier': [
+      'warn',
+      {
+        'bracketSpacing': true,
+      }
+    ],
   }
 };

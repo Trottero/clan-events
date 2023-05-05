@@ -17,7 +17,7 @@ import { EventsService } from './events.service';
       {
         path: ':id',
         loadChildren: () =>
-          import('./modules/event/event.module').then((m) => m.EventModule),
+          import('./modules/event/event.module').then(m => m.EventModule),
       },
       {
         path: '**',

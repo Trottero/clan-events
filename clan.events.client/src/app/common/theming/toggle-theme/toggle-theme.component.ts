@@ -10,16 +10,16 @@ import { Theme } from '../theme';
   styleUrls: ['./toggle-theme.component.scss'],
 })
 export class ToggleThemeComponent {
-  public theme$: Observable<Theme> = this.themingService.theme$;
+  theme$: Observable<Theme> = this.themingService.theme$;
 
-  public isToggleChecked$: Observable<boolean> = this.theme$.pipe(
-    map((theme) => theme === Theme.Dark),
+  isToggleChecked$: Observable<boolean> = this.theme$.pipe(
+    map(theme => theme === Theme.Dark)
   );
 
   constructor(private readonly themingService: ThemingService) {}
 
-  public onToggleChange(): void {
-    this.theme$.pipe(take(1)).subscribe((theme) => {
+  onToggleChange(): void {
+    this.theme$.pipe(take(1)).subscribe(theme => {
       if (theme === Theme.Dark) {
         this.themingService.setTheme(Theme.Light);
       } else {

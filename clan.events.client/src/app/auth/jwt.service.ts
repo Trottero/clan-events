@@ -4,7 +4,7 @@ import { Buffer } from 'buffer';
 
 @Injectable()
 export class JwtService {
-  public decodeToken(token: string): JwtTokenContent {
+  decodeToken(token: string): JwtTokenContent {
     const parts = token.split('.');
     if (parts.length !== 3) {
       throw new Error('JWT must have 3 parts');
@@ -17,7 +17,7 @@ export class JwtService {
     return JSON.parse(decoded) as JwtTokenContent;
   }
 
-  public urlBase64Decode(data: string): string {
+  urlBase64Decode(data: string): string {
     return Buffer.from(data, 'base64').toString();
   }
 }

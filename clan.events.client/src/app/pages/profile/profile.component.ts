@@ -8,7 +8,7 @@ import { UserService } from 'src/app/user/user.service';
   styleUrls: ['./profile.component.scss'],
 })
 export class ProfileComponent {
-  public userState$ = this.userService.userState$;
+  userState$ = this.userService.userState$;
 
   constructor(private readonly userService: UserService) {}
 }

@@ -5,14 +5,14 @@ const GLOBAL_MEMOIZATION_MAP = new WeakMap<object, Map<string, unknown>>();
 export function Memoized<T extends { constructor: Function }>(
   target: T,
   propertyKey: string,
-  descriptor: PropertyDescriptor,
+  descriptor: PropertyDescriptor
 ): PropertyDescriptor {
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const originalGet = descriptor.get;
 
   if (!originalGet) {
     throw new Error(
-      `Cannot apply @Memoized decorator to '${target.constructor.name}.${propertyKey}' since it has no get accessor`,
+      `Cannot apply @Memoized decorator to '${target.constructor.name}.${propertyKey}' since it has no get accessor`
     );
   }
 

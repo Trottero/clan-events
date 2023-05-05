@@ -16,24 +16,24 @@ export class ThemingService implements OnDestroy {
 
   private readonly _subscriptions = new Subscription();
 
-  public theme$: Observable<Theme> = this._themeSubject.asObservable();
+  theme$: Observable<Theme> = this._themeSubject.asObservable();
 
   constructor() {
     this.getThemeFromLocalStorage();
 
     this._subscriptions.add(
-      this.theme$.subscribe((theme) => {
+      this.theme$.subscribe(theme => {
         localStorage.setItem('theme', theme);
         this.setThemeClass(theme);
-      }),
+      })
     );
   }
 
-  public ngOnDestroy(): void {
+  ngOnDestroy(): void {
     this._subscriptions.unsubscribe();
   }
 
-  public setTheme(theme: Theme): void {
+  setTheme(theme: Theme): void {
     this._themeSubject.next(theme);
   }
 

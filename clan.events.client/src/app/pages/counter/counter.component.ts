@@ -7,9 +7,9 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   styleUrls: ['./counter.component.scss'],
 })
 export class CounterComponent {
-  public currentCount = 0;
+  currentCount = 0;
 
-  public incrementCounter(): void {
+  incrementCounter(): void {
     this.currentCount++;
   }
 }

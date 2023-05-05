@@ -4,10 +4,10 @@ const HYDRATION_MAP: { [key: string]: boolean } = {};
 
 export function hydrate<T>(
   storageKey: string,
-  initialState: T,
+  initialState: T
 ): MonoTypeOperatorFunction<T> {
   return pipe(
-    map((val) => {
+    map(val => {
       // If already hydrated, update storage and return
       if (HYDRATION_MAP[storageKey]) {
         // Store in local storage
@@ -33,6 +33,6 @@ export function hydrate<T>(
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return { ...JSON.parse(JSON.stringify(val)) };
-    }),
+    })
   );
 }

@@ -13,17 +13,17 @@ import { EventsService } from '../../events.service';
   styleUrls: ['./event.component.scss'],
 })
 export class EventComponent {
-  public id$: Observable<string> = this.route.paramMap.pipe(
-    map((params) => params.get('id')),
-    notNullOrUndefined(),
+  id$: Observable<string> = this.route.paramMap.pipe(
+    map(params => params.get('id')),
+    notNullOrUndefined()
   );
 
-  public event$: Observable<Response<EventResponse>> = this.id$.pipe(
-    switchMap((id) => this.eventsService.getEventById(id)),
+  event$: Observable<Response<EventResponse>> = this.id$.pipe(
+    switchMap(id => this.eventsService.getEventById(id))
   );
 
   constructor(
     private readonly route: ActivatedRoute,
-    private readonly eventsService: EventsService,
+    private readonly eventsService: EventsService
   ) {}
 }
