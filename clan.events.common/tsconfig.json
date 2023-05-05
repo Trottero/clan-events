@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "preserveWatchOutput": true,
     "module": "CommonJS",
     "declaration": true,
     "removeComments": true,
@@ -17,11 +18,12 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "rootDir": "src",
     "strict": true,
     "declarationMap": true,
-    "composite": true
+    "composite": true,
+    "rootDir": "src",
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo"
   },
   "compileOnSave": true,
-  "include": ["./src/**/*", "index.d.ts"]
+  "include": ["./src/**/*.ts"]
 }
