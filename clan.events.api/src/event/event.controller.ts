@@ -1,26 +1,10 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { EventService } from './event.service';
 import { Event } from 'src/database/schemas/event.schema';
-import {
-  CreateEventRequest,
-  EventListItem,
-  EventResponse,
-  GetEventsRequest,
-} from 'clan.events.common/dist';
-import { PaginatedModel } from 'clan.events.common/dist';
+import { EventListItem, EventResponse, GetEventsRequest } from '@common/events';
+import { PaginatedModel } from '@common/responses';
 import { convertToEventListResponse } from './converters/event-list.converter';
 import { convertToEventResponse } from './converters/event.converter';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { User } from 'src/common/decorators/user.decorator';
-import { JwtTokenContent } from 'src/auth/models/jwt.token';
 
 @Controller('events')
 export class EventController {

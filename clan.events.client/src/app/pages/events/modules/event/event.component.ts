@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { EventResponse } from 'clan.events.common/dist/events';
+import { EventResponse } from '@common/events';
 import { Observable, map, switchMap } from 'rxjs';
 import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
-import { Response } from 'clan.events.common/dist/responses';
+import { Response } from '@common/responses';
 import { EventsService } from '../../events.service';
 
 @Component({

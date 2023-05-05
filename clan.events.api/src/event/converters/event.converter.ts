@@ -1,4 +1,4 @@
-import { EventResponse } from 'clan.events.common/dist';
+import { EventResponse } from '@common/events';
 import { EventDocument } from 'src/database/schemas/event.schema';
 
 export function convertToEventResponse(event: EventDocument): EventResponse {

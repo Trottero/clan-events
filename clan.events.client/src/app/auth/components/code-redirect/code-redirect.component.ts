@@ -15,7 +15,7 @@ import {
   switchMap,
 } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Response } from 'clan.events.common/dist/responses';
+import { Response } from '@common/responses';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,

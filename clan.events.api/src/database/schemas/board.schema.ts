@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Tile, TileSchema } from './tile.schema';
-import { BoardType } from 'clan.events.common/dist';
+import { BoardType } from '@common/events';
 
 @Schema({ _id: false })
 export class Board {

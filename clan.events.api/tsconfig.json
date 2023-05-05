@@ -22,6 +22,9 @@
       "node_modules/@types",
       "index.d.ts",
       "../clan.events.common/dist"
-    ]
+    ],
+    "paths": {
+      "@common/*": ["../clan.events.common/dist/*"]
+    }
   }
 }
