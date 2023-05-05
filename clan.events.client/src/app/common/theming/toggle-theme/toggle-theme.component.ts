@@ -10,18 +10,16 @@ import { Memoized } from 'src/app/common/decorators';
   styleUrls: ['./toggle-theme.component.scss'],
 })
 export class ToggleThemeComponent {
+  public theme$: Observable<Theme> = this.themingService.theme$;
+
+  public isToggleChecked$: Observable<boolean> = this.theme$.pipe(
+    map((theme) => theme === Theme.Dark)
+  );
+
   constructor(private readonly themingService: ThemingService) {}
 
-  @Memoized public get isToggleChecked$(): Observable<boolean> {
-    return this._theme$.pipe(map((theme) => theme === Theme.Dark));
-  }
-
-  @Memoized private get _theme$(): Observable<Theme> {
-    return this.themingService.theme$;
-  }
-
   public onToggleChange() {
-    this._theme$.pipe(take(1)).subscribe((theme) => {
+    this.theme$.pipe(take(1)).subscribe((theme) => {
       if (theme === Theme.Dark) {
         this.themingService.setTheme(Theme.Light);
       } else {

@@ -18,16 +18,12 @@ export class EventComponent {
     private readonly eventsService: EventsService
   ) {}
 
-  @Memoized public get id$(): Observable<string> {
-    return this.route.paramMap.pipe(
-      map((params) => params.get('id')),
-      notNullOrUndefined()
-    );
-  }
+  public id$: Observable<string> = this.route.paramMap.pipe(
+    map((params) => params.get('id')),
+    notNullOrUndefined()
+  );
 
-  @Memoized public get event$(): Observable<Response<EventResponse>> {
-    return this.id$.pipe(
-      switchMap((id) => this.eventsService.getEventById(id))
-    );
-  }
+  public event$: Observable<Response<EventResponse>> = this.id$.pipe(
+    switchMap((id) => this.eventsService.getEventById(id))
+  );
 }

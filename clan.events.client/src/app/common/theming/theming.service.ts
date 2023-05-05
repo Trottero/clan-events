@@ -17,9 +17,7 @@ export class ThemingService implements OnDestroy {
 
   private _subscriptions = new Subscription();
 
-  @Memoized public get theme$(): Observable<Theme> {
-    return this._themeSubject.asObservable();
-  }
+  public theme$: Observable<Theme> = this._themeSubject.asObservable();
 
   constructor() {
     this.getThemeFromLocalStorage();
