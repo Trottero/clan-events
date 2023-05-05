@@ -14,7 +14,7 @@ export class ClanMembership {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   user: User;
 
-  @Prop()
+  @Prop({ type: String, enum: ClanRole })
   role: ClanRole;
 }
 
