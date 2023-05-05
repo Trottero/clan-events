@@ -1,9 +1,15 @@
 import { Injectable } from '@angular/core';
 import { PaginatedResponse, Response } from '@common/responses';
-import { EventListItem, EventResponse, GetEventsRequest } from '@common/events';
+import {
+  CreateEventRequest,
+  EventListItem,
+  EventResponse,
+  GetEventsRequest,
+} from '@common/events';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ConfigService } from 'src/app/config/config.service';
+import { ValuesOf, FormControl } from '@ngneat/reactive-forms';
 
 @Injectable()
 export class EventsService {
@@ -29,6 +35,15 @@ export class EventsService {
   getEventById(id: string): Observable<Response<EventResponse>> {
     return this.http.get<Response<EventResponse>>(
       `${this.configService.backEndUrl}/events/${id}`
+    );
+  }
+
+  createEvent(
+    request: CreateEventRequest
+  ): Observable<Response<EventResponse>> {
+    return this.http.post<Response<EventResponse>>(
+      `${this.configService.backEndUrl}/events`,
+      request
     );
   }
 }

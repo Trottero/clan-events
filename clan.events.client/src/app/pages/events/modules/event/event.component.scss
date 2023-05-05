@@ -1,0 +1,15 @@
+:host {
+  .event {
+    display: flex;
+    flex-direction: column;
+
+    .label {
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+
+    .value {
+      margin-bottom: 10px;
+    }
+  }
+}

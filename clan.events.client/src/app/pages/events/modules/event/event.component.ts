@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { EventResponse } from '@common/events';
 import { Observable, map, switchMap } from 'rxjs';
 import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
@@ -24,6 +24,11 @@ export class EventComponent {
 
   constructor(
     private readonly route: ActivatedRoute,
+    private readonly router: Router,
     private readonly eventsService: EventsService
   ) {}
+
+  back() {
+    this.router.navigate(['../'], { relativeTo: this.route });
+  }
 }
