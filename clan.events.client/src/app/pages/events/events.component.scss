@@ -1,0 +1,24 @@
+:host {
+  width: 100%;
+
+  .events {
+    display: flex;
+    flex-direction: column;
+    row-gap: 32px;
+
+    .event {
+      display: flex;
+      justify-content: space-between;
+
+      .event__left {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .event__middle {
+        display: flex;
+        column-gap: 16px;
+      }
+    }
+  }
+}
