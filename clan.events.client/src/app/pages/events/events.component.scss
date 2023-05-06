@@ -1,14 +1,29 @@
+@use 'theme/variables' as variables;
+
 :host {
   width: 100%;
+  padding: 32px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+  }
 
   .events {
     display: flex;
     flex-direction: column;
-    row-gap: 32px;
+    margin: 0;
+    padding: 0;
+    row-gap: 8px;
 
     .event {
       display: flex;
       justify-content: space-between;
+      align-items: center;
+
+      background-color: var(--app-secondary-background-color);
+      padding: 16px;
+      border-radius: 4px;
 
       .event__left {
         display: flex;

@@ -1,7 +1,15 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription, shareReplay } from 'rxjs';
 import { Theme } from './theme';
 import { hydrate } from '../hydrate.pipe';
+
+interface ThemeState {
+  theme: Theme;
+}
+
+const INITIAL_THEME_STATE: ThemeState = {
+  theme: Theme.Unknown,
+};
 
 @Injectable({
   providedIn: 'root',
@@ -13,18 +21,21 @@ export class ThemingService implements OnDestroy {
     [Theme.Dark]: 'dark-theme',
   };
 
-  private readonly _themeSubject = new BehaviorSubject<Theme>(Theme.Dark);
+  private readonly _themeSubject = new BehaviorSubject<ThemeState>(
+    INITIAL_THEME_STATE
+  );
 
   private readonly _subscriptions = new Subscription();
 
-  theme$: Observable<Theme> = this._themeSubject.pipe(
-    hydrate('app-theme', Theme.Unknown as Theme)
+  theme$: Observable<ThemeState> = this._themeSubject.pipe(
+    hydrate('app-theme', INITIAL_THEME_STATE),
+    shareReplay(1)
   );
 
   constructor() {
     this._subscriptions.add(
-      this.theme$.subscribe(theme => {
-        this.setThemeClass(theme);
+      this.theme$.pipe().subscribe(themeState => {
+        this.setThemeClass(themeState.theme);
       })
     );
   }
@@ -34,7 +45,7 @@ export class ThemingService implements OnDestroy {
   }
 
   setTheme(theme: Theme): void {
-    this._themeSubject.next(theme);
+    this._themeSubject.next({ theme });
   }
 
   private setThemeClass(theme: Theme): void {

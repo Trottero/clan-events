@@ -2,6 +2,8 @@
   .event {
     display: flex;
     flex-direction: column;
+    background-color: var(--app-secondary-background-color);
+    padding: 16px;
 
     .label {
       font-weight: bold;

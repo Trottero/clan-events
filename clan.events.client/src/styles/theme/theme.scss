@@ -1,4 +1,5 @@
 @use '@angular/material' as mat;
+@use 'theme/variables' as variables;
 
 @include mat.core();
 
@@ -10,8 +11,9 @@ $dark-theme: mat.define-dark-theme(
       accent: mat.define-palette(mat.$blue-grey-palette),
     ),
     // Only include `typography` and `density` in the default dark theme.
-    typography: mat.define-typography-config(),
-    density: 0,
+    typography: mat.define-typography-config(
+      $font-family: 'Lato',
+    ),   
   )
 );
 
@@ -22,12 +24,19 @@ $light-theme: mat.define-light-theme(
       primary: mat.define-palette(mat.$indigo-palette),
       accent: mat.define-palette(mat.$pink-palette),
     ),
+    typography: mat.define-typography-config(
+      $font-family: 'Lato',
+    ),
   )
 );
 
-// Apply the dark theme by default
-@include mat.all-component-themes($dark-theme);
+
+.dark-theme {
+  @include mat.all-component-themes($dark-theme);
+  @include variables.app-theme-css-variables($dark-theme);
+}
 
 .light-theme {
   @include mat.all-component-themes($light-theme);
+  @include variables.app-theme-css-variables($light-theme);
 }
