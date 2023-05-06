@@ -13,6 +13,7 @@ import { ProfileComponent } from './pages/profile/profile.component';
 import { UserModule } from './user/user.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToolbarModule } from './components/toolbar/toolbar.module';
+import { ConfigModule } from './config/config.module';
 
 @NgModule({
   declarations: [
@@ -30,8 +31,9 @@ import { ToolbarModule } from './components/toolbar/toolbar.module';
     UserModule,
     BrowserAnimationsModule,
     ToolbarModule,
+    ConfigModule,
   ],
-  providers: [ConfigService],
+  providers: [],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

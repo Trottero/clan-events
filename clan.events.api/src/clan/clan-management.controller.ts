@@ -51,7 +51,17 @@ export class ClanManagementController {
     if (!result) {
       throw new NotFoundException('Clan not found');
     }
-    return result;
+    return {
+      name: result.name,
+      displayName: result.displayName,
+      members: result.members.map((x) => {
+        return {
+          name: x.user.name,
+          discordId: x.user.discordId,
+          clanRole: x.role,
+        };
+      }),
+    };
   }
 
   @Post('members')
@@ -60,20 +70,22 @@ export class ClanManagementController {
     @Param('clanName') clanName: string,
     @Body() body: AddClanMemberRequest,
   ): Promise<ClanMemberResponse> {
+    console.log(body);
     const clan = await this.clanService.getClanByName(clanName);
     if (!clan) {
       throw new NotFoundException('Clan not found');
     }
-
-    await this.clanMembershipService.addMemberToClan(
+    console.log(body);
+    const membership = await this.clanMembershipService.addMemberToClan(
       clan,
       body.discordId,
       body.clanRole as ClanRole,
     );
 
     return {
-      clanRole: body.clanRole as ClanRole,
-      discordId: body.discordId,
+      name: membership.user.name,
+      discordId: membership.user.discordId,
+      clanRole: membership.role,
     };
   }
 
@@ -102,15 +114,16 @@ export class ClanManagementController {
       throw new NotFoundException('Clan not found');
     }
 
-    await this.clanMembershipService.updateMemberRole(
+    const membership = await this.clanMembershipService.updateMemberRole(
       clan,
       body.discordId,
       body.clanRole as ClanRole,
     );
 
     return {
-      clanRole: body.clanRole as ClanRole,
-      discordId: body.discordId,
+      name: membership.user.name,
+      discordId: membership.user.discordId,
+      clanRole: membership.role,
     };
   }
 }

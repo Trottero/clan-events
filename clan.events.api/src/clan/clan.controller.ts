@@ -8,13 +8,13 @@ import {
   Body,
 } from '@nestjs/common';
 import { ClanService } from './clan.service';
-import { Clan } from 'src/database/schemas/clan.schema';
 import { ApiTokenGuard } from 'src/auth/guards/api-token.guard';
 import { ClanMembershipService } from './clan-membership.service';
 import { JwtTokenContent } from '@common/auth';
-import { ClanResponse, CreateClanRequest } from '@common/clan';
+import { ClanResponse, ClanWithRole, CreateClanRequest } from '@common/clan';
 import { ClanRole } from '@common/auth/clan.role';
 import { MongoErrorCode } from 'src/database/mongo-error-codes';
+import { User } from 'src/common/decorators/user.decorator';
 
 @Controller('clan')
 export class ClanController {
@@ -25,8 +25,8 @@ export class ClanController {
 
   @UseGuards(ApiTokenGuard)
   @Get()
-  async getAllClans(): Promise<Clan[]> {
-    return await this.clanService.getAllClans();
+  async getAllClans(@User() user: JwtTokenContent): Promise<ClanWithRole[]> {
+    return await this.clanService.getClansForUser(user.sub);
   }
 
   @UseGuards(ApiTokenGuard)
@@ -49,7 +49,18 @@ export class ClanController {
         ClanRole.Owner,
       );
 
-      return this.clanService.getClanByName(clan.name);
+      const result = await this.clanService.getClanByName(clan.name);
+      return {
+        name: result.name,
+        displayName: result.displayName,
+        members: result.members.map((x) => {
+          return {
+            clanRole: x.role,
+            discordId: x.user.discordId,
+            name: x.user.name,
+          };
+        }),
+      };
     } catch (ex: any) {
       if (ex.code === MongoErrorCode.DuplicateKey) {
         throw new BadRequestException('A clan with this name already exists');

@@ -27,7 +27,11 @@ const routes: Routes = [
   {
     path: 'events',
     loadChildren: () =>
-      import('./pages/events/events.module').then((m) => m.EventsModule),
+      import('./pages/events/events.module').then(m => m.EventsModule),
+  },
+  {
+    path: 'clan',
+    loadChildren: () => import('./clan/clan.module').then(m => m.ClanModule),
   },
   {
     path: '**',

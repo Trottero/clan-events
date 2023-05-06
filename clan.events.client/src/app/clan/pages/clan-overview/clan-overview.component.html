@@ -1,0 +1,47 @@
+<div *ngIf="clan$ | async as clan">
+  <p>{{clan.displayName}}</p>
+  <button *ngIf="!(editMode$ | async)" type="button" (click)="enterEditMode()">Edit</button>
+  <button *ngIf="(editMode$ | async)" type="button" (click)="confirmEdit()">Save</button>
+  <button *ngIf="(editMode$ | async)" type="button" (click)="discardEdit()">Discard</button>
+  <button type="button" (click)="deleteClan()">Delete</button>
+  <div>
+
+  </div>
+  <table mat-table [dataSource]="clan" class="mat-elevation-z8">
+    <ng-container matColumnDef="clanRole">
+      <th mat-header-cell *matHeaderCellDef> No. </th>
+      <td mat-cell *matCellDef="let element"> {{element.clanRole}} </td>
+    </ng-container>
+
+    <!-- Discord Id Column -->
+    <ng-container matColumnDef="discordId">
+      <th mat-header-cell *matHeaderCellDef> Name </th>
+      <td mat-cell *matCellDef="let element"> {{element.discordId}} </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name </th>
+      <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="['clanRole', 'discordId', 'name']"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+
+  </table>
+  <div class="table">
+    <div class="table-row text-white py-2 d-flex" *ngFor="let member of clan.members">
+      <p *ngIf="!(editMode$ | async) else elseBlock;">
+        {{member.name}}: {{member.clanRole}}
+      </p>
+      <ng-template #elseBlock>
+        {{member.name}}
+        <select title="Select role" [(ngModel)]="member.clanRole">
+          <option *ngFor="let role of clanRoles" [value]="role">{{role}}</option>
+        </select>
+        <button *ngIf="editMode$ | async" type="button" (click)="removeMember(member)">Remove</button>
+      </ng-template>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,8 @@
+<a [routerLink]="['/clan', 'new']">
+  <button type="button">Create</button>
+</a>
+<ul *ngIf="clans$ | async as clans">
+  <li *ngFor="let clan of clans">
+    <a [routerLink]="['/clan', clan.name]">{{ clan.displayName }}</a>
+  </li>
+</ul>

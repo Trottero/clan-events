@@ -3,15 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map, shareReplay, tap } from 'rxjs';
 import { ConfigService } from '../config/config.service';
 import { AuthState } from './auth.state';
-import { AccessTokenResponse } from 'clan.events.common/auth';
 import { hydrate } from '../common/hydrate.pipe';
 import { JwtService } from './jwt.service';
 import { State } from '../common/state';
-
-import { Response } from 'clan.events.common/responses';
-
 import { Response } from '@common/responses';
-import { JwtTokenContent } from './jwt.token';
+import { JwtTokenContent } from '@common/auth';
+import { AccessTokenResponse } from '@common/auth';
+
 @Injectable()
 export class AuthService {
   private readonly initialState: AuthState = {
