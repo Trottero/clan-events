@@ -34,7 +34,7 @@ export class ThemingService implements OnDestroy {
 
   constructor() {
     this._subscriptions.add(
-      this.theme$.pipe().subscribe(themeState => {
+      this.theme$.subscribe(themeState => {
         this.setThemeClass(themeState.theme);
       })
     );

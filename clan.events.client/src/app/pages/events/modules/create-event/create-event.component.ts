@@ -42,9 +42,6 @@ export class CreateEventComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.formGroup.valid$.subscribe(valid => console.log(valid));
-    this.formGroup.value$.subscribe(value => console.log(value));
-
     this.createEventSubject
       .pipe(
         withLatestFrom(this.formGroup.value$),
