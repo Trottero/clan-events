@@ -46,4 +46,10 @@ export class EventsService {
       request
     );
   }
+
+  deleteEventById(id: string): Observable<void> {
+    return this.http.delete<void>(
+      `${this.configService.backEndUrl}/events/${id}`
+    );
+  }
 }

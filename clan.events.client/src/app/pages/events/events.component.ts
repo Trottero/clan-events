@@ -1,6 +1,13 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { EventsService } from './events.service';
-import { Observable, Subject, map, startWith, switchMap } from 'rxjs';
+import {
+  Observable,
+  Subject,
+  Subscription,
+  map,
+  startWith,
+  switchMap,
+} from 'rxjs';
 import { EventListItem } from '@common/events';
 import { PaginatedResponse } from '@common/responses';
 import { PageEvent } from '@angular/material/paginator';
@@ -16,13 +23,14 @@ interface FetchEventsOptions {
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.scss'],
 })
-export class EventsComponent {
+export class EventsComponent implements OnDestroy {
   public readonly pageSizeOptions: number[] = [10, 25, 50, 100];
 
   private readonly page: number = 0;
   private readonly pageSize: number = 10;
 
   private triggerRefreshSubject = new Subject<FetchEventsOptions>();
+  private subscriptions = new Subscription();
 
   events$: Observable<PaginatedResponse<EventListItem>> =
     this.triggerRefreshSubject.pipe(
@@ -49,10 +57,25 @@ export class EventsComponent {
 
   constructor(private readonly eventsService: EventsService) {}
 
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
   onPageChange(event: PageEvent): void {
     this.triggerRefreshSubject.next({
       page: event.pageIndex,
       pageSize: event.pageSize,
     });
+  }
+
+  delete(eventId: string): void {
+    this.subscriptions.add(
+      this.eventsService.deleteEventById(eventId).subscribe(() => {
+        this.triggerRefreshSubject.next({
+          page: this.page,
+          pageSize: this.pageSize,
+        });
+      })
+    );
   }
 }

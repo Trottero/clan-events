@@ -9,13 +9,13 @@ import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class EventService {
-  public constructor(
+  constructor(
     @InjectModel(Event.name) private eventModel: Model<Event>,
     private readonly userService: UserService,
     private readonly clanService: ClanService,
   ) {}
 
-  public async countEventsForUser(user: JwtTokenContent): Promise<number> {
+  async countEventsForUser(user: JwtTokenContent): Promise<number> {
     const userObj = await this.userService.getUserByUsername(user.username);
 
     return this.eventModel
@@ -27,7 +27,7 @@ export class EventService {
       .exec();
   }
 
-  public async getPaginatedEventsForUser(
+  async getPaginatedEventsForUser(
     user: JwtTokenContent,
     page: number,
     pageSize: number,
@@ -48,7 +48,7 @@ export class EventService {
     return events;
   }
 
-  public async getEventById(
+  async getEventById(
     user: JwtTokenContent,
     id: string,
   ): Promise<EventDocument | null> {
@@ -66,7 +66,7 @@ export class EventService {
     return this.eventModel.findById(id).populate('participants.members').exec();
   }
 
-  public async createEvent(
+  async createEvent(
     user: JwtTokenContent,
     event: CreateEventRequest,
   ): Promise<EventDocument> {
@@ -94,5 +94,15 @@ export class EventService {
     result.populate('participants.members');
 
     return result;
+  }
+
+  /**
+   * Deletes an event by id
+   * @param user the user requesting the event to be deleted
+   * @param id the id of the event to be deleted
+   */
+  deleteEventById(user: JwtTokenContent, id: string) {
+    // TODO: check if user is admin of the clan
+    return this.eventModel.deleteOne({ _id: id }).exec();
   }
 }

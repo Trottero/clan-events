@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   Param,
@@ -11,6 +12,7 @@ import {
 import { EventService } from './event.service';
 import {
   CreateEventRequest,
+  DeleteEventByIdRequest,
   EventListItem,
   EventResponse,
   GetEventByIdRequest,
@@ -69,5 +71,14 @@ export class EventController {
   ): Promise<any> {
     const event = await this.eventService.createEvent(user, body);
     return convertToEventResponse(event);
+  }
+
+  @Delete(':id')
+  @UseGuards(AuthGuard)
+  public async deleteEventById(
+    @User() user: JwtTokenContent,
+    @Param() { id }: DeleteEventByIdRequest,
+  ): Promise<any> {
+    await this.eventService.deleteEventById(user, id);
   }
 }

@@ -17,9 +17,15 @@
       }}</span>
       <span class="event__ends-at">{{ event.endsAt | date : 'short' }}</span>
     </span>
-    <a [routerLink]="['/events', event.id]" mat-flat-button color="primary"
-      >View</a
-    >
+
+    <span class="event__right">
+      <button mat-flat-button color="warn" (click)="delete(event.id)">
+        Delete
+      </button>
+      <a [routerLink]="['/events', event.id]" mat-flat-button color="primary"
+        >View</a
+      >
+    </span>
   </li>
 </ul>
 
