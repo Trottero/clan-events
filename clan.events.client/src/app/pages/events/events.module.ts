@@ -4,6 +4,7 @@ import { EventsComponent } from './events.component';
 import { RouterModule } from '@angular/router';
 import { EventsService } from './events.service';
 import { MatButtonModule } from '@angular/material/button';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 const ROUTES = [
   {
@@ -30,7 +31,13 @@ const ROUTES = [
 
 @NgModule({
   declarations: [EventsComponent],
-  imports: [CommonModule, RouterModule.forChild(ROUTES), MatButtonModule],
+  imports: [
+    CommonModule,
+    RouterModule.forChild(ROUTES),
+
+    MatButtonModule,
+    MatPaginatorModule,
+  ],
   providers: [EventsService],
 })
 export class EventsModule {}

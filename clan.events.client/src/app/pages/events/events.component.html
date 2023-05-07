@@ -22,3 +22,14 @@
     >
   </li>
 </ul>
+
+<div class="pagination">
+  <mat-paginator
+    [length]="length$ | async"
+    [pageSize]="pageSize$ | async"
+    (page)="onPageChange($event)"
+    [pageSizeOptions]="pageSizeOptions"
+    aria-label="Select page"
+  >
+  </mat-paginator>
+</div>
