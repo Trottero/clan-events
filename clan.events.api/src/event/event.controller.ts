@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
   Param,
   Post,
   Query,
@@ -28,7 +29,7 @@ export class EventController {
 
   @Get()
   @UseGuards(AuthGuard)
-  async getAllEvents(
+  async getEventsForUser(
     @Query() params: GetEventsRequest,
     @User() user: JwtTokenContent,
   ): Promise<PaginatedModel<EventListItem>> {
@@ -50,16 +51,19 @@ export class EventController {
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard)
   async getEventById(
+    @User() user: JwtTokenContent,
     @Param() { id }: GetEventByIdRequest,
   ): Promise<EventResponse> {
-    const event = await this.eventService.getEventById(id);
+    const event = await this.eventService.getEventById(user, id);
+    if (!event) throw new HttpException('Event not found', 404);
     return convertToEventResponse(event);
   }
 
   @Post()
   @UseGuards(AuthGuard)
-  public async createEvent(
+  public async createEventForUser(
     @User() user: JwtTokenContent,
     @Body() body: CreateEventRequest,
   ): Promise<any> {
