@@ -26,84 +26,15 @@ export class EventService {
     private readonly clanService: ClanService,
   ) {}
 
-  public async createRandomEvent(): Promise<Event> {
-    const finalTile = this.createTile('Final Tile');
-    const nextTile = this.createTile('Next Tile');
-    const startingTile = this.createTile('Starting Tile');
-
-    const event = new this.eventModel({
-      description: 'Test Event Description',
-      name: 'Test Event',
-      owner: await this.clanService.createRandomClan(),
-      startsAt: new Date(),
-      endsAt: new Date(),
-      participants: [
-        {
-          name: 'Test Team',
-          members: [await this.userService.createRandomUser()],
-        },
-      ],
-      board: {
-        name: 'Test Board',
-        description: 'Test Board Description',
-        type: BoardType.Tilerace,
-        tiles: [startingTile, nextTile, finalTile],
-      },
-    });
-
-    const result = await event.save();
-
-    result.participants[0].tile = result.board.tiles[0];
-
-    result.board.tiles[0].nextTile = result.board.tiles[1];
-    result.board.tiles[0].challenges.push({
-      nextTile: result.board.tiles[1],
-      requirements: [
-        {
-          type: RequirementType.Item,
-          amount: 1,
-          itemId: 'Twisted Bow',
-        } as ItemRequirement,
-      ],
-    });
-
-    result.board.tiles[1].nextTile = result.board.tiles[2];
-    result.board.tiles[1].challenges.push({
-      nextTile: result.board.tiles[2],
-      requirements: [
-        {
-          type: RequirementType.Item,
-          amount: 1,
-          itemId: 'Fang',
-        } as ItemRequirement,
-      ],
-    });
-
-    result.actions.push({
-      type: EventActionType.RollDice,
-      roll: 2,
-      actor: result.participants[0].members[0],
-      team: result.participants[0],
-      performedAt: new Date(),
-    } as RollDiceEventAction & EventAction);
-
-    result.actions.push({
-      type: EventActionType.Move,
-      destination: result.board.tiles[2],
-      actor: result.participants[0].members[0],
-      team: result.participants[0],
-      performedAt: new Date(),
-    } as MoveEventAction);
-
-    const id = await result.save().then((result) => result._id);
-    return this.eventModel.findById(id).exec();
+  public async countEventsForUser(user: JwtTokenContent): Promise<number> {
+    return this.eventModel
+      .countDocuments({
+        'participants.name': user.username,
+      })
+      .exec();
   }
 
-  public async countAllEvents(): Promise<number> {
-    return this.eventModel.countDocuments().exec();
-  }
-
-  public async getAllEventsForUser(
+  public async getPaginatedEventsForUser(
     user: JwtTokenContent,
     page: number,
     pageSize: number,

@@ -8,11 +8,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { EventService } from './event.service';
-import { Event } from 'src/database/schemas/event.schema';
 import {
   CreateEventRequest,
   EventListItem,
   EventResponse,
+  GetEventByIdRequest,
   GetEventsRequest,
 } from '@common/events';
 import { PaginatedModel } from '@common/responses';
@@ -34,12 +34,12 @@ export class EventController {
   ): Promise<PaginatedModel<EventListItem>> {
     const { page, pageSize } = params;
 
-    const result = await this.eventService.getAllEventsForUser(
+    const result = await this.eventService.getPaginatedEventsForUser(
       user,
       page,
       pageSize,
     );
-    const count = await this.eventService.countAllEvents();
+    const count = await this.eventService.countEventsForUser(user);
 
     return convertToEventListResponse(result, {
       page,
@@ -49,13 +49,10 @@ export class EventController {
     });
   }
 
-  @Get('random')
-  async createRandomEvent(): Promise<Event> {
-    return await this.eventService.createRandomEvent();
-  }
-
   @Get(':id')
-  async getEventById(@Param() { id }: { id: string }): Promise<EventResponse> {
+  async getEventById(
+    @Param() { id }: GetEventByIdRequest,
+  ): Promise<EventResponse> {
     const event = await this.eventService.getEventById(id);
     return convertToEventResponse(event);
   }

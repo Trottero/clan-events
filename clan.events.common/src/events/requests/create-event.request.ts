@@ -5,6 +5,5 @@ export interface CreateEventRequest {
   description: string;
   startsAt: Date;
   endsAt: Date;
-  boardName: string;
   boardType: BoardType;
 }

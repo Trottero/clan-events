@@ -52,7 +52,6 @@ export class CreateEventComponent implements OnInit {
             startsAt: value.startsAt ?? new Date(),
             endsAt: value.endsAt ?? new Date(),
             boardType: value.boardType ?? BoardType.Unknown,
-            boardName: '',
           })
         )
       )
