@@ -244,7 +244,7 @@ $dark-theme: mat.define-dark-theme(
 
 // Theme Init
 @include mat.core();
-
+@include mat.typography-hierarchy($fonts);
 @include mat.all-component-themes($dark-theme);
 
 .light-theme {
