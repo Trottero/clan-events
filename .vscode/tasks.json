@@ -34,11 +34,14 @@
     },
     {
       "label": "[All] Start",
-      "dependsOn": ["[Client] Start", "[API] Debug", "[Common] Watch"]
+      "dependsOn": ["[Client] Start", "[API] Debug", "[Common] Watch"],
+      "problemMatcher": []
     },
     {
       "label": "CosmosDB Emulator",
-      "options": { "cwd": "C:/Program Files/Azure Cosmos DB Emulator" },
+      "options": {
+        "cwd": "C:/Program Files/Azure Cosmos DB Emulator"
+      },
       "type": "shell",
       "command": "./CosmosDB.Emulator.exe /EnableMongoDBEndpoint=3.6"
     }
