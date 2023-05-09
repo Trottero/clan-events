@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateEventRequest } from '@common/events';
 import { Model } from 'mongoose';
-import { JwtTokenContent } from 'src/auth/models/jwt.token';
+import { JwtTokenContent } from '@common/auth';
 import { ClanService } from 'src/clan/clan.service';
 import { Event, EventDocument } from 'src/database/schemas/event.schema';
 import { UserService } from 'src/user/user.service';
