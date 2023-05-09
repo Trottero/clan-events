@@ -9,11 +9,12 @@
       "type": "node"
     },
     {
-      "name": "ng serve",
-      "type": "edge",
-      "request": "launch",
-      "preLaunchTask": "npm: start",
-      "url": "http://localhost:4200/"
+      "name": "Launch & Attach",
+      "port": 9229,
+      "request": "attach",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node",
+      "preLaunchTask": "[All] Start"
     }
   ],
   "compounds": []

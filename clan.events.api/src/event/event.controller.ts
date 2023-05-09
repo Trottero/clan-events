@@ -21,16 +21,16 @@ import {
 import { PaginatedModel } from '@common/responses';
 import { convertToEventListResponse } from './converters/event-list.converter';
 import { convertToEventResponse } from './converters/event.converter';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { JwtTokenContent } from 'src/auth/models/jwt.token';
+import { JwtTokenContent } from '@common/auth';
 import { User } from 'src/common/decorators/user.decorator';
+import { ApiTokenGuard } from 'src/auth/guards/api-token.guard';
 
 @Controller('events')
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
   @Get()
-  @UseGuards(AuthGuard)
+  @UseGuards(ApiTokenGuard)
   async getEventsForUser(
     @Query() params: GetEventsRequest,
     @User() user: JwtTokenContent,
@@ -53,7 +53,7 @@ export class EventController {
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard)
+  @UseGuards(ApiTokenGuard)
   async getEventById(
     @User() user: JwtTokenContent,
     @Param() { id }: GetEventByIdRequest,
@@ -64,7 +64,7 @@ export class EventController {
   }
 
   @Post()
-  @UseGuards(AuthGuard)
+  @UseGuards(ApiTokenGuard)
   public async createEventForUser(
     @User() user: JwtTokenContent,
     @Body() body: CreateEventRequest,
@@ -74,7 +74,7 @@ export class EventController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard)
+  @UseGuards(ApiTokenGuard)
   public async deleteEventById(
     @User() user: JwtTokenContent,
     @Param() { id }: DeleteEventByIdRequest,

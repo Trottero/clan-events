@@ -3,50 +3,45 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "[Client] Start",
       "options": {
         "cwd": "${workspaceFolder}/clan.events.client"
       },
-      "type": "npm",
-      "script": "start",
-      "isBackground": true,
-      "problemMatcher": {
-        "owner": "typescript",
-        "pattern": "$tsc",
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": {
-            "regexp": "(.*?)"
-          },
-          "endsPattern": {
-            "regexp": "bundle generation complete"
-          }
-        }
-      }
+      "type": "shell",
+      "command": "npm start",
+      "problemMatcher": ["$tsc"],
+      "isBackground": true
     },
     {
+      "label": "[API] Debug",
       "options": {
-        "cwd": "${workspaceFolder}/clan.events.client"
+        "cwd": "${workspaceFolder}/clan.events.api"
       },
       "type": "npm",
-      "script": "test",
-      "isBackground": true,
-      "problemMatcher": {
-        "owner": "typescript",
-        "pattern": "$tsc",
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": {
-            "regexp": "(.*?)"
-          },
-          "endsPattern": {
-            "regexp": "bundle generation complete"
-          }
-        }
-      }
+      "script": "start:debug",
+      "problemMatcher": ["$tsc"],
+      "isBackground": true
+    },
+    {
+      "label": "[Common] Watch",
+      "options": {
+        "cwd": "${workspaceFolder}/clan.events.common"
+      },
+      "type": "npm",
+      "script": "watch",
+      "problemMatcher": ["$tsc"],
+      "isBackground": true
+    },
+    {
+      "label": "[All] Start",
+      "dependsOn": ["[Client] Start", "[API] Debug", "[Common] Watch"],
+      "problemMatcher": []
     },
     {
       "label": "CosmosDB Emulator",
-      "options": { "cwd": "C:/Program Files/Azure Cosmos DB Emulator" },
+      "options": {
+        "cwd": "C:/Program Files/Azure Cosmos DB Emulator"
+      },
       "type": "shell",
       "command": "./CosmosDB.Emulator.exe /EnableMongoDBEndpoint=3.6"
     }
