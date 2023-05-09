@@ -41,6 +41,7 @@ export class ClanManagementController {
       if (ex.message === 'Clan not found') {
         throw new NotFoundException(ex.message);
       }
+      throw ex;
     }
   }
 

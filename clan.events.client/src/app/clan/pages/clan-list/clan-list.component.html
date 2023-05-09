@@ -18,8 +18,19 @@
       <td mat-cell *matCellDef="let element"> {{element.role}} </td>
     </ng-container>
 
+    <!-- Disclaimer column -->
+    <ng-container matColumnDef="disclaimer" *ngIf="!clans || !clans.length">
+      <td mat-footer-cell *matFooterCellDef colspan="2">
+        No clans found, join a clan or create your own!
+      </td>
+    </ng-container>
+
     <tr mat-header-row *matHeaderRowDef="['displayName', 'clanRole']"></tr>
     <tr mat-row matRipple class="table-hover" (click)="navigateToClan(row.name)"
       *matRowDef="let row; columns: ['displayName', 'clanRole'];"></tr>
+
+    <ng-container *ngIf="!clans || !clans.length">
+      <tr mat-footer-row *matFooterRowDef="['disclaimer']" class="example-second-footer-row"></tr>
+    </ng-container>
   </table>
 </div>
