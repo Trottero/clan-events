@@ -1,11 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, map, shareReplay, tap } from 'rxjs';
+import { Observable, map, shareReplay, tap } from 'rxjs';
 import { ConfigService } from '../config/config.service';
 import { AuthState } from './auth.state';
+import { AccessTokenResponse } from 'clan.events.common/auth';
 import { hydrate } from '../common/hydrate.pipe';
-import { reducer } from '../common/reduce';
 import { JwtService } from './jwt.service';
+import { State } from '../common/state';
+
+import { Response } from 'clan.events.common/responses';
+
 import { Response } from '@common/responses';
 import { JwtTokenContent } from './jwt.token';
 
@@ -15,9 +19,7 @@ export class AuthService {
     accessToken: '',
   };
 
-  private readonly _authState$ = new BehaviorSubject<AuthState>(
-    this.initialState
-  );
+  private readonly _authState$ = new State<AuthState>(this.initialState);
 
   authState$: Observable<AuthState> = this._authState$.pipe(
     hydrate('authState', this.initialState),
@@ -36,6 +38,7 @@ export class AuthService {
     map(
       decodedToken =>
         !!decodedToken &&
+        !!decodedToken.iat &&
         decodedToken.iat + decodedToken.expiresIn > Date.now() / 1000
     )
   );
@@ -48,7 +51,7 @@ export class AuthService {
 
   redeemCode(code: string): Observable<Response<{ token: string }>> {
     return this.httpClient
-      .post<Response<{ token: string }>>(
+      .post<Response<AccessTokenResponse>>(
         `${this.configService.backEndUrl}/auth/redeem`,
         {
           code,
@@ -59,7 +62,7 @@ export class AuthService {
 
   refreshCode(refreshToken: string): Observable<Response<{ token: string }>> {
     return this.httpClient
-      .post<Response<{ token: string }>>(
+      .post<Response<AccessTokenResponse>>(
         `${this.configService.backEndUrl}/auth/refresh`,
         {
           code: refreshToken,
@@ -69,11 +72,11 @@ export class AuthService {
   }
 
   logout(): void {
-    reducer(this._authState$, this.initialState);
+    this._authState$.next(this.initialState);
   }
 
-  private handleNewToken(res: Response<{ token: string }>): void {
-    reducer(this._authState$, {
+  private handleNewToken(res: Response<AccessTokenResponse>): void {
+    this._authState$.next({
       accessToken: res.data.token,
     });
   }
