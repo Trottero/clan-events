@@ -1,0 +1,41 @@
+<div class="view-container">
+  <mat-toolbar>
+    <button mat-icon-button (click)="drawer.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <span>Clan Events</span>
+
+    <div class="spacer"></div>
+
+    <mat-chip-listbox>
+      <mat-chip-option class="user-chip" [highlighted]="true" color="primary" *ngIf="(userName$ | async)"
+        [selectable]="false" [routerLink]="['/profile']">
+        <mat-icon matChipAvatar>account_circle</mat-icon>
+        {{userName$ | async}}
+      </mat-chip-option>
+    </mat-chip-listbox>
+
+    <a mat-flat-button color="primary" *ngIf="!(userName$ | async)" class="nav-link" [href]="discordLoginUrl">Log in</a>
+    <a mat-flat-button *ngIf="(userName$ | async)" (click)="logout()">Log out</a>
+  </mat-toolbar>
+
+  <mat-drawer-container class="drawer-container" autosize>
+    <mat-drawer #drawer mode="side">
+      <mat-action-list>
+        <app-toggle-theme></app-toggle-theme>
+
+        <a mat-list-item routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}"
+          [routerLink]="'/'">Clan events</a>
+        <a mat-list-item routerLinkActive="active-link" [routerLink]="'counter'">Counter</a>
+        <a mat-list-item routerLinkActive="active-link" [routerLink]="'events'">Events</a>
+      </mat-action-list>
+    </mat-drawer>
+
+    <mat-drawer-content class="view-content-container">
+      <div class="view-content">
+        <router-outlet></router-outlet>
+      </div>
+    </mat-drawer-content>
+  </mat-drawer-container>
+</div>

@@ -1,0 +1,44 @@
+:host {
+  .view-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .user-chip {
+      margin: 0 24px;
+      cursor: pointer !important;
+    }
+
+    .drawer-container {
+      flex: 1;
+      height: 100%;
+      background-color: var(--app-background-color);
+
+      mat-drawer {
+        width: 240px;
+      }
+
+      .active-link {
+        background-color: var(--app-primary-color);
+
+        ::ng-deep {
+          .mdc-list-item__primary-text {
+            color: var(--app-text-primary-color);
+          }
+        }
+      }
+
+      .view-content-container {
+        height: 100%;
+        padding: 16px;
+        background-color: var(--app-background-color-z-3);
+
+        .view-content {
+          height: 100%;
+          padding: 24px;
+          background-color: var(--app-background-color);
+        }
+      }
+    }
+  }
+}

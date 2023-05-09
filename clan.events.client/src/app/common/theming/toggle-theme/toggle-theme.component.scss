@@ -1,0 +1,12 @@
+:host {
+  .toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 12px;
+
+    .toggle-label {
+      font-weight: 500;
+    }
+  }
+}

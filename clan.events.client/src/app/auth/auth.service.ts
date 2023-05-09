@@ -8,6 +8,7 @@ import { reducer } from '../common/reduce';
 import { JwtService } from './jwt.service';
 import { Response } from '@common/responses';
 import { JwtTokenContent } from './jwt.token';
+
 @Injectable()
 export class AuthService {
   private readonly initialState: AuthState = {
