@@ -1,5 +1,17 @@
-<p>event works!</p>
+<button mat-flat-button color="primary" (click)="back()">Back</button>
 
-<p>
-  {{ event$ | async | json }}
-</p>
+<div *ngIf="event$ | async as event" class="event">
+  <h2>{{event.data.name}}</h2>
+
+  <span class="label">Description</span>
+  <span class="value">{{event.data.description}}</span>
+
+  <span class="label">Starts at</span>
+  <span class="value">{{event.data.startsAt | date: 'medium'}}</span>
+
+  <span class="label">Ends at</span>
+  <span class="value">{{event.data.endsAt | date: 'medium'}}</span>
+
+  <span class="label">Board Type</span>
+  <span class="value">{{event.data.board.type}}</span>
+</div>

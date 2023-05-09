@@ -1,0 +1,8 @@
+@mixin app-theme-css-variables($theme) {
+  $is-dark: map-get($theme, is-dark);
+
+  --app-background-color: #{if($is-dark, #303030, #fafafa)};
+  --app-secondary-background-color: #{if($is-dark, #424242, #fff)};
+
+  --app-text-color: #{if($is-dark, #fff, #424242)};
+}

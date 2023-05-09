@@ -1,134 +1,108 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { BoardType } from '@common/events';
+import { CreateEventRequest } from '@common/events';
 import { Model } from 'mongoose';
+import { JwtTokenContent } from 'src/auth/models/jwt.token';
 import { ClanService } from 'src/clan/clan.service';
-import {
-  EventAction,
-  EventActionType,
-  MoveEventAction,
-  RollDiceEventAction,
-} from 'src/database/schemas/event-action.schema';
 import { Event, EventDocument } from 'src/database/schemas/event.schema';
-import {
-  ItemRequirement,
-  RequirementType,
-} from 'src/database/schemas/requirements.schema';
-import { Tile } from 'src/database/schemas/tile.schema';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class EventService {
-  public constructor(
+  constructor(
     @InjectModel(Event.name) private eventModel: Model<Event>,
     private readonly userService: UserService,
     private readonly clanService: ClanService,
   ) {}
 
-  public async createRandomEvent(): Promise<Event> {
-    const finalTile = this.createTile('Final Tile');
-    const nextTile = this.createTile('Next Tile');
-    const startingTile = this.createTile('Starting Tile');
+  async countEventsForUser(user: JwtTokenContent): Promise<number> {
+    const userObj = await this.userService.getUserByUsername(user.username);
 
-    const event = new this.eventModel({
-      description: 'Test Event Description',
-      name: 'Test Event',
-      owner: await this.clanService.createRandomClan(),
-      startsAt: new Date(),
-      endsAt: new Date(),
-      participants: [
-        {
-          name: 'Test Team',
-          members: [await this.userService.createRandomUser()],
-        },
-      ],
-      board: {
-        name: 'Test Board',
-        description: 'Test Board Description',
-        type: BoardType.Tilerace,
-        tiles: [startingTile, nextTile, finalTile],
-      },
-    });
-
-    const result = await event.save();
-
-    result.participants[0].tile = result.board.tiles[0];
-
-    result.board.tiles[0].nextTile = result.board.tiles[1];
-    result.board.tiles[0].challenges.push({
-      nextTile: result.board.tiles[1],
-      requirements: [
-        {
-          type: RequirementType.Item,
-          amount: 1,
-          itemId: 'Twisted Bow',
-        } as ItemRequirement,
-      ],
-    });
-
-    result.board.tiles[1].nextTile = result.board.tiles[2];
-    result.board.tiles[1].challenges.push({
-      nextTile: result.board.tiles[2],
-      requirements: [
-        {
-          type: RequirementType.Item,
-          amount: 1,
-          itemId: 'Fang',
-        } as ItemRequirement,
-      ],
-    });
-
-    result.actions.push({
-      type: EventActionType.RollDice,
-      roll: 2,
-      actor: result.participants[0].members[0],
-      team: result.participants[0],
-      performedAt: new Date(),
-    } as RollDiceEventAction & EventAction);
-
-    result.actions.push({
-      type: EventActionType.Move,
-      destination: result.board.tiles[2],
-      actor: result.participants[0].members[0],
-      team: result.participants[0],
-      performedAt: new Date(),
-    } as MoveEventAction);
-
-    const id = await result.save().then((result) => result._id);
-    return this.eventModel.findById(id).exec();
-  }
-
-  public async countAllEvents(): Promise<number> {
-    return this.eventModel.countDocuments().exec();
-  }
-
-  public async getAllEvents(
-    page: number,
-    pageSize: number,
-  ): Promise<EventDocument[]> {
     return this.eventModel
-      .find()
-      .limit(pageSize)
-      .skip(page * pageSize)
+      .countDocuments({
+        'participants.members': {
+          $eq: userObj.id,
+        },
+      })
       .exec();
   }
 
-  public async getEventById(id: string): Promise<EventDocument> {
+  async getPaginatedEventsForUser(
+    user: JwtTokenContent,
+    page: number,
+    pageSize: number,
+  ): Promise<EventDocument[]> {
+    const userObj = await this.userService.getUserByUsername(user.username);
+
+    const events = await this.eventModel
+      .find({
+        'participants.members': {
+          $eq: userObj.id,
+        },
+      })
+      .sort({ createdAt: -1 })
+      .limit(pageSize)
+      .skip(page * pageSize)
+      .exec();
+
+    return events;
+  }
+
+  async getEventById(
+    user: JwtTokenContent,
+    id: string,
+  ): Promise<EventDocument | null> {
+    const userObj = await this.userService.getUserByUsername(user.username);
+
+    const hasAccess = await this.eventModel.exists({
+      _id: id,
+      'participants.members': {
+        $eq: userObj.id,
+      },
+    });
+
+    if (!hasAccess) return null;
+
     return this.eventModel.findById(id).populate('participants.members').exec();
   }
 
-  private createTile(name: string): Tile {
-    return {
-      name,
-      challenges: [],
-      canvas: {
-        width: 100,
-        height: 100,
-        x: 0,
-        y: 0,
-        borderWidth: 1,
-        borderColor: '#000000',
+  async createEvent(
+    user: JwtTokenContent,
+    event: CreateEventRequest,
+  ): Promise<EventDocument> {
+    const userObj = await this.userService.getUserByUsername(user.username);
+
+    const newEvent = new this.eventModel<Event>({
+      actions: [],
+      board: {
+        type: event.boardType,
+        tiles: [],
       },
-    };
+      description: event.description,
+      startsAt: event.startsAt,
+      endsAt: event.endsAt,
+      name: event.name,
+      participants: [
+        {
+          name: `${user.username}'s Team`,
+          members: [userObj.id],
+        },
+      ],
+    });
+
+    const result: EventDocument = await newEvent.save();
+    result.populate('participants.members');
+
+    return result;
+  }
+
+  /**
+   * Deletes an event by id
+   * @param user the user requesting the event to be deleted
+   * @param id the id of the event to be deleted
+   */
+  deleteEventById(user: JwtTokenContent, id: string) {
+    // TODO: check if user is admin of the clan
+    return this.eventModel.deleteOne({ _id: id }).exec();
   }
 }

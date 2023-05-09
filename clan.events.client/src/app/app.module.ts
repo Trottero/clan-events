@@ -13,6 +13,7 @@ import { ProfileComponent } from './pages/profile/profile.component';
 import { UserModule } from './user/user.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToolbarModule } from './components/toolbar/toolbar.module';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { ToolbarModule } from './components/toolbar/toolbar.module';
     UserModule,
     BrowserAnimationsModule,
     ToolbarModule,
+    MatNativeDateModule,
   ],
   providers: [ConfigService],
   bootstrap: [AppComponent],

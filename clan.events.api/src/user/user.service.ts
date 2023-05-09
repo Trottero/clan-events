@@ -41,6 +41,10 @@ export class UserService {
     return this.userModel.findOne({ discordId: discordId }).exec();
   }
 
+  async getUserByUsername(username: string): Promise<UserDocument> {
+    return this.userModel.findOne({ name: username }).exec();
+  }
+
   async getAllUsers(): Promise<User[]> {
     return this.userModel.find().exec();
   }
