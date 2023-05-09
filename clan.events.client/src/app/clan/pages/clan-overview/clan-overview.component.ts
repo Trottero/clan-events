@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ClanService } from '../../services/clan.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -18,6 +18,7 @@ import {
 import { ClanMemberResponse } from '@common/clan';
 import { ClanRole } from '@common/auth/clan.role';
 import { UserService } from 'src/app/user/user.service';
+import { MatTable } from '@angular/material/table';
 
 @Component({
   selector: 'app-clan-overview',
@@ -41,6 +42,15 @@ export class ClanOverviewComponent implements OnInit {
   );
 
   discordId$ = this.userService.userState$.pipe(map(x => x.discordId));
+
+  role$ = combineLatest([this.clan$, this.discordId$]).pipe(
+    map(([clan, discordId]) => {
+      return (
+        clan.members.find(x => x.discordId === discordId)?.clanRole ??
+        ClanRole.Member
+      );
+    })
+  );
 
   editMode$: BehaviorSubject<boolean> = new BehaviorSubject(false);
   onExitEditMode$ = new Subject<void>();
@@ -66,14 +76,19 @@ export class ClanOverviewComponent implements OnInit {
   );
 
   clanRoles = Object.values(ClanRole);
+  roleEnum = ClanRole;
 
   private readonly _subscription = new Subscription();
+
+  // Please forgive me.
+  @ViewChild(MatTable) table: MatTable<ClanMemberResponse> | undefined;
 
   constructor(
     private readonly clanService: ClanService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -96,7 +111,9 @@ export class ClanOverviewComponent implements OnInit {
       switchMap(([_, clan]) => {
         // Figure out what changed
         const membersToAdd = this.clanMembers.filter(
-          x => !clan.members.some(y => y.discordId === x.discordId)
+          x =>
+            !clan.members.some(y => y.discordId === x.discordId) &&
+            x.discordId > 0
         );
 
         const membersToRemove = clan.members.filter(
@@ -143,5 +160,21 @@ export class ClanOverviewComponent implements OnInit {
 
   enterEditMode() {
     this.editMode$.next(true);
+  }
+
+  addMember() {
+    this.clanMembers.push({
+      name: 'Name will be updated on save',
+      discordId: 0,
+      clanRole: ClanRole.Member,
+    });
+    this.table!.renderRows();
+  }
+
+  isAllowedToEdit(selfRole: ClanRole, other: ClanRole): boolean {
+    if (selfRole === ClanRole.Owner) {
+      return other !== ClanRole.Owner;
+    }
+    return selfRole === ClanRole.Admin && other === ClanRole.Member;
   }
 }

@@ -2,18 +2,20 @@
   <div class="d-flex justify-content-between">
     <h3>{{clan.displayName}}</h3>
     <div>
-      <button mat-button class="me-2" color="primary" *ngIf="!(editMode$ | async)" type="button"
-        (click)="enterEditMode()">Edit</button>
+      <button mat-button class="me-2" color="primary" *ngIf="!(editMode$ | async) && (role$ | async) != roleEnum.Member"
+        type="button" (click)="enterEditMode()">Edit</button>
+      <button mat-button class="me-2" *ngIf="(editMode$ | async)" type="button" (click)="addMember()">Add</button>
       <button mat-button class="me-2" *ngIf="(editMode$ | async)" type="button" (click)="confirmEdit()">Save</button>
       <button mat-button class="me-2" *ngIf="(editMode$ | async)" type="button" (click)="discardEdit()">Discard</button>
-      <button mat-raised-button color="primary" type="button" (click)="deleteClan()">Delete</button>
+      <button mat-raised-button color="primary" type="button" *ngIf="(role$ | async) == roleEnum.Owner"
+        (click)="deleteClan()">Delete</button>
     </div>
   </div>
   <div>
 
   </div>
   <table mat-table [dataSource]="(editMode$ | async) ? clanMembers: clan.members" class="mat-elevation-z8">
-    <ng-container matColumnDef="clanRole">
+    <ng-container matColumnDef="clanRole" *ngIf="role$ |async as role">
       <th mat-header-cell *matHeaderCellDef> Role </th>
       <td mat-cell *matCellDef="let element">
         <span *ngIf="!(editMode$ | async) else elseBlock;">
@@ -21,7 +23,7 @@
         </span>
         <ng-template #elseBlock>
           <select title="Select role" [(ngModel)]="element.clanRole"
-            [disabled]="(discordId$ | async) == element.discordId">
+            [disabled]="(discordId$ | async) == element.discordId || !isAllowedToEdit(role, element.clanRole)">
             <option *ngFor="let role of clanRoles" [value]="role">{{role}}</option>
           </select>
         </ng-template>
@@ -29,9 +31,17 @@
     </ng-container>
 
     <!-- Discord Id Column -->
-    <ng-container matColumnDef="discordId">
+    <ng-container matColumnDef="discordId" *ngIf="role$ |async as role">
       <th mat-header-cell *matHeaderCellDef> DiscordId </th>
-      <td mat-cell *matCellDef="let element"> {{element.discordId}} </td>
+      <td mat-cell *matCellDef="let element">
+        <span *ngIf="!(editMode$ | async) else elseBlock;">
+          {{element.discordId}}
+        </span>
+        <ng-template #elseBlock>
+          <input title="Discord Id" [(ngModel)]="element.discordId" [disabled]="(discordId$ | async) == element.discordId 
+            || !isAllowedToEdit(role, element.clanRole)" />
+        </ng-template>
+      </td>
     </ng-container>
 
     <!-- Name Column -->
@@ -41,10 +51,11 @@
     </ng-container>
 
     <!-- Delete column -->
-    <ng-container matColumnDef="delete">
+    <ng-container matColumnDef="delete" *ngIf="role$ |async as role">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let element">
-        <button mat-icon-button color="primary" (click)="removeMember(element)">
+        <button *ngIf="(discordId$ | async) != element.discordId && isAllowedToEdit(role, element.clanRole)"
+          mat-icon-button color="primary" (click)="removeMember(element)">
           <mat-icon>delete</mat-icon>
         </button>
       </td>
