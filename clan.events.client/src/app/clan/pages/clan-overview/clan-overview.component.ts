@@ -9,14 +9,15 @@ import {
   filter,
   map,
   merge,
+  of,
   shareReplay,
   switchMap,
-  take,
   tap,
   withLatestFrom,
 } from 'rxjs';
 import { ClanMemberResponse } from '@common/clan';
 import { ClanRole } from '@common/auth/clan.role';
+import { UserService } from 'src/app/user/user.service';
 
 @Component({
   selector: 'app-clan-overview',
@@ -39,6 +40,8 @@ export class ClanOverviewComponent implements OnInit {
     shareReplay(1)
   );
 
+  discordId$ = this.userService.userState$.pipe(map(x => x.discordId));
+
   editMode$: BehaviorSubject<boolean> = new BehaviorSubject(false);
   onExitEditMode$ = new Subject<void>();
 
@@ -57,7 +60,7 @@ export class ClanOverviewComponent implements OnInit {
     filter(x => x),
     switchMap(() => this.clan$),
     tap(x => {
-      this.clanMembers = [...x.members];
+      this.clanMembers = JSON.parse(JSON.stringify(x.members));
       this.clanDisplayName = x.displayName;
     })
   );
@@ -69,7 +72,8 @@ export class ClanOverviewComponent implements OnInit {
   constructor(
     private readonly clanService: ClanService,
     private readonly route: ActivatedRoute,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -100,12 +104,13 @@ export class ClanOverviewComponent implements OnInit {
         );
 
         const membersToUpdate = this.clanMembers.filter(x =>
-          clan.members.some(y => y.discordId === x.discordId)
+          clan.members.some(
+            y => y.discordId === x.discordId && y.clanRole !== x.clanRole
+          )
         );
 
-        console.log(membersToAdd, membersToRemove, membersToUpdate);
-
         return combineLatest([
+          of(clan),
           ...membersToAdd.map(x =>
             this.clanService.addMember(clan.name, x.clanRole, x.discordId)
           ),
@@ -117,9 +122,7 @@ export class ClanOverviewComponent implements OnInit {
           ),
         ]);
       }),
-      switchMap(() => this.clan$),
-      take(1),
-      tap(c => this.retrieveClan$.next(c.name)),
+      tap(([clan]) => this.retrieveClan$.next(clan.name)),
       tap(() => this.editMode$.next(false))
     );
   }

@@ -26,6 +26,7 @@ export class RoleInClanGuard implements CanActivate {
     const token = request.user as JwtTokenContent;
     const roles = await this.cachedRolesService.getRoles(token.sub);
     const roleInClan = roles[clanName.id];
+    request['user']['clanRole'] = roleInClan;
 
     return !!roleInClan && requiredRoles.some((role) => roleInClan == role);
   }

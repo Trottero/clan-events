@@ -20,7 +20,8 @@
           {{element.clanRole}}
         </span>
         <ng-template #elseBlock>
-          <select title="Select role" [(ngModel)]="element.clanRole">
+          <select title="Select role" [(ngModel)]="element.clanRole"
+            [disabled]="(discordId$ | async) == element.discordId">
             <option *ngFor="let role of clanRoles" [value]="role">{{role}}</option>
           </select>
         </ng-template>
