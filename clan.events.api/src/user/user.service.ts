@@ -16,7 +16,19 @@ export class UserService {
     return user.save();
   }
 
-  async createUser(discordId: number, name: string): Promise<User> {
+  async getUserById(id: string): Promise<UserDocument> {
+    return await this.userModel.findById(id).exec();
+  }
+
+  async getOrCreateUser(
+    discordId: number,
+    name: string,
+  ): Promise<UserDocument> {
+    const existingUser = await this.getUserForDiscordId(discordId);
+    if (existingUser) {
+      return existingUser;
+    }
+
     const user = new this.userModel({
       discordId: discordId,
       name: name,
@@ -25,7 +37,7 @@ export class UserService {
     return user.save();
   }
 
-  async getUserForDiscordId(discordId: number): Promise<User> {
+  async getUserForDiscordId(discordId: number): Promise<UserDocument> {
     return this.userModel.findOne({ discordId: discordId }).exec();
   }
 

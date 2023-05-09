@@ -1,12 +1,12 @@
-import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { DiscordAuthService } from 'src/discord/discord.auth.service';
 import { DiscordUserService } from 'src/discord/discord.user.service';
 import { DiscordAccessTokenResponse } from 'src/discord/models/discord.token.response';
-import { JwtTokenContent as JwtTokenPayload } from './models/jwt.token';
-import { AuthConfig } from './auth.config';
+import { AuthConfig } from '../auth.config';
+import { UserService } from 'src/user/user.service';
+import { JwtTokenContent } from '@common/auth';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +14,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly discordAuthService: DiscordAuthService,
     private readonly discordUserService: DiscordUserService,
+    private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -41,13 +42,19 @@ export class AuthService {
       discordToken.access_token,
     );
 
+    const databaseUser = await this.userService.getOrCreateUser(
+      discordUser.id,
+      discordUser.username,
+    );
+
     const authConfig = this.configService.get<AuthConfig>('auth');
-    const tokenPayload: JwtTokenPayload = {
+    const tokenPayload: JwtTokenContent = {
       username: discordUser.username,
-      sub: discordUser.id,
+      sub: databaseUser.id,
       discordToken: discordToken.access_token,
       discordRefreshToken: discordToken.refresh_token,
       expiresIn: authConfig.jwtLifetime,
+      discordId: Number(discordUser.id),
     };
 
     const jwt = await this.jwtService.signAsync(tokenPayload);

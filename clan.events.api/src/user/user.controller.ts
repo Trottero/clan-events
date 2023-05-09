@@ -1,31 +1,30 @@
-import { Controller, Get, Post, Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { User } from 'src/database/schemas/user.schema';
+import { User as UserDecorator } from 'src/common/decorators/user.decorator';
 import { UserService } from './user.service';
-import { JwtTokenContent } from 'src/auth/models/jwt.token';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { ApiTokenGuard } from 'src/auth/guards/api-token.guard';
+import { JwtTokenContent } from '@common/auth';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly clanService: UserService) {}
+  constructor(private readonly userService: UserService) {}
 
   @Get()
   async getAllUsers(): Promise<User[]> {
-    return await this.clanService.getAllUsers();
-  }
-
-  @Post()
-  async createUser(): Promise<User> {
-    return await this.clanService.createUser(0, 'Test');
+    return await this.userService.getAllUsers();
   }
 
   @Get('random')
   async createRandomUser(): Promise<User> {
-    return await this.clanService.createRandomUser();
+    return await this.userService.createRandomUser();
   }
 
-  @UseGuards(AuthGuard)
-  @Get('info')
-  async getUserInfo(@Request() req): Promise<JwtTokenContent> {
-    return req['user'];
+  @UseGuards(ApiTokenGuard)
+  @Get('me')
+  async getSelf(@UserDecorator() user: JwtTokenContent): Promise<User> {
+    return await this.userService.getOrCreateUser(
+      user.discordId,
+      user.username,
+    );
   }
 }

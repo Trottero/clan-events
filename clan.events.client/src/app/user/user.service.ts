@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
 import { UserState } from './user.state';
-import { BehaviorSubject, Observable, map, shareReplay } from 'rxjs';
+import { Observable, map, shareReplay } from 'rxjs';
 import { hydrate } from '../common/hydrate.pipe';
-import { reducer } from '../common/reduce';
 import { AuthService } from '../auth/auth.service';
+import { State } from '../common/state';
 
 @Injectable()
 export class UserService {
-  private readonly initialState: UserState = {
+  readonly initialState: UserState = {
     id: '',
+    discordId: 0,
     username: '',
   };
 
-  private readonly _userState$: BehaviorSubject<UserState> =
-    new BehaviorSubject<UserState>(this.initialState);
+  private readonly _userState$ = new State<UserState>(this.initialState);
 
   userState$: Observable<UserState> = this._userState$.pipe(
     hydrate('userState', this.initialState),
@@ -30,18 +30,18 @@ export class UserService {
         this.infoReceived({
           id: decodedToken.sub,
           username: decodedToken.username,
+          discordId: decodedToken.discordId,
         });
       }
     });
   }
 
-  infoReceived(userState: UserState): void {
-    reducer(this._userState$, userState);
+  infoReceived(userState: UserState) {
+    this._userState$.next(userState);
   }
 
-  logout(): void {
-    reducer(this._userState$, this.initialState);
-
+  logout() {
+    this._userState$.next(this.initialState);
     this.authService.logout();
   }
 }
