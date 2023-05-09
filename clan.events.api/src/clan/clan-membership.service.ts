@@ -33,8 +33,6 @@ export class ClanMembershipService {
       throw new Error('User not found');
     }
 
-    console.log('addMemberToClan', user.discordId, discordUserId);
-
     this.cachedRolesService.invalidateCache(user.id);
 
     const membership = new this.clanMembershipModel({

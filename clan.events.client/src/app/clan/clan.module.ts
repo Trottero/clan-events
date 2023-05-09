@@ -7,11 +7,19 @@ import { ClanService } from './services/clan.service';
 import { AuthModule } from '../auth/auth.module';
 import { ClanOverviewComponent } from './pages/clan-overview/clan-overview.component';
 import { FormsModule } from '@angular/forms';
+import { MatCommonModule } from '@angular/material/core';
+import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
+    MatCommonModule,
+    MatTableModule,
+    MatButtonModule,
+    MatIconModule,
     RouterModule.forChild([
       {
         path: '',

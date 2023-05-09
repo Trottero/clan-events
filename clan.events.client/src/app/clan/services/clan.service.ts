@@ -56,7 +56,12 @@ export class ClanService {
   removeMember(clanName: string, discordId: number) {
     return this.httpClient
       .delete<Response<void>>(
-        `${this.configService.backEndUrl}/clan/${clanName}/members`
+        `${this.configService.backEndUrl}/clan/${clanName}/members`,
+        {
+          body: {
+            discordId,
+          },
+        }
       )
       .pipe(map(x => x.data));
   }

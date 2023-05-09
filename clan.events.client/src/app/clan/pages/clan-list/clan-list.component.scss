@@ -1,0 +1,11 @@
+tr.table-hover:not(.example-expanded-row):hover {
+  background: #474747;
+}
+
+tr.table-hover:not(.example-expanded-row):active {
+  background: #474747;
+}
+
+:host {
+  width: 100%;
+}
