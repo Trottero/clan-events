@@ -1,0 +1,48 @@
+@use 'theme/variables' as variables;
+
+:host {
+  width: 100%;
+  padding: 32px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .pagination {
+    margin-top: 16px;
+  }
+
+  .events {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    row-gap: 8px;
+
+    .event {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      background-color: var(--app-secondary-background-color);
+      padding: 16px;
+      border-radius: 4px;
+
+      .event__left {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .event__middle {
+        display: flex;
+        column-gap: 16px;
+      }
+
+      .event__right {
+        display: flex;
+        column-gap: 8px;
+      }
+    }
+  }
+}

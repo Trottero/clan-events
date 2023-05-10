@@ -3,12 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map, shareReplay, tap } from 'rxjs';
 import { ConfigService } from '../config/config.service';
 import { AuthState } from './auth.state';
+import { JwtTokenContent, AccessTokenResponse } from '@common/auth';
 import { hydrate } from '../common/hydrate.pipe';
 import { JwtService } from './jwt.service';
 import { State } from '../common/state';
 import { Response } from '@common/responses';
-import { JwtTokenContent } from '@common/auth';
-import { AccessTokenResponse } from '@common/auth';
 
 @Injectable()
 export class AuthService {

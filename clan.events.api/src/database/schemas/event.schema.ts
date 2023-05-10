@@ -10,7 +10,7 @@ import {
 
 export type EventDocument = mongoose.HydratedDocument<Event>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Event {
   @Prop()
   name: string;
@@ -26,6 +26,12 @@ export class Event {
 
   @Prop()
   endsAt: Date;
+
+  @Prop()
+  createdAt?: Date;
+
+  @Prop()
+  updatedAt?: Date;
 
   @Prop({ type: [EventTeamSchema] })
   participants: EventTeam[];

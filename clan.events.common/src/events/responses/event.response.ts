@@ -1,3 +1,5 @@
+import { BoardType } from '../enums/board-type.enum';
+
 export interface EventResponse {
   id: string;
   name: string;
@@ -8,7 +10,9 @@ export interface EventResponse {
   board: BoardDto;
 }
 
-export interface BoardDto {}
+export interface BoardDto {
+  type: BoardType;
+}
 
 export interface EventTeamDto {
   name: string;

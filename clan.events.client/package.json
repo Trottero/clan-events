@@ -11,9 +11,9 @@
     "clean": "gts clean",
     "compile": "tsc",
     "fix": "gts fix",
-    "prepare": "npm.cmd run compile",
-    "pretest": "npm.cmd run compile",
-    "posttest": "npm.cmd run lint"
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run lint"
   },
   "private": true,
   "dependencies": {
@@ -27,6 +27,7 @@
     "@angular/platform-browser": "^15.2.0",
     "@angular/platform-browser-dynamic": "^15.2.0",
     "@angular/router": "^15.2.0",
+    "@ngneat/reactive-forms": "^5.0.2",
     "bootstrap": "^5.2.3",
     "buffer": "^6.0.3",
     "clan.events.common": "file:../clan.events.common",

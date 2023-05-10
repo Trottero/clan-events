@@ -14,6 +14,7 @@ import { UserModule } from './user/user.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToolbarModule } from './components/toolbar/toolbar.module';
 import { ConfigModule } from './config/config.module';
+import { MatNativeDateModule } from '@angular/material/core';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { ConfigModule } from './config/config.module';
     BrowserAnimationsModule,
     ToolbarModule,
     ConfigModule,
+    MatNativeDateModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
