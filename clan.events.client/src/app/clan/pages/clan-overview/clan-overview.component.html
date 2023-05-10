@@ -25,8 +25,8 @@
           <mat-form-field subscriptSizing="dynamic">
             <mat-select title="Select role" [(ngModel)]="element.clanRole"
               [disabled]="(discordId$ | async) == element.discordId || !isAllowedToEdit(role, element.clanRole)">
-              <mat-option *ngFor="let role of clanRoles" [value]="role"
-                [disabled]="!isAllowedToEdit(role, element.clanRole)">{{role}}</mat-option>
+              <mat-option *ngFor="let availableRole of clanRoles" [value]="availableRole"
+                [disabled]="!isAllowedToEdit(role, availableRole)">{{availableRole}}</mat-option>
             </mat-select>
           </mat-form-field>
         </ng-template>
