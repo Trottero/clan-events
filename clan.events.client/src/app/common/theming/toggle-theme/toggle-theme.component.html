@@ -1,1 +1,5 @@
-<mat-slide-toggle [checked]="isToggleChecked$ | async" (toggleChange)="onToggleChange()"></mat-slide-toggle>
+<span class="toggle-container">
+  <mat-slide-toggle color="accent" [checked]="isToggleChecked$ | async"
+    (toggleChange)="onToggleChange()"></mat-slide-toggle>
+  <label class="toggle-label">Toggle theme</label>
+</span>

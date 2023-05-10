@@ -12,9 +12,9 @@ import { ConfigService } from './config/config.service';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { UserModule } from './user/user.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ToolbarModule } from './components/toolbar/toolbar.module';
 import { ConfigModule } from './config/config.module';
 import { MatNativeDateModule } from '@angular/material/core';
+import { LayoutModule } from './components/layout/layout.module';
 
 @NgModule({
   declarations: [
@@ -31,8 +31,8 @@ import { MatNativeDateModule } from '@angular/material/core';
     AuthModule,
     UserModule,
     BrowserAnimationsModule,
-    ToolbarModule,
     ConfigModule,
+    LayoutModule,
     MatNativeDateModule,
   ],
   providers: [],

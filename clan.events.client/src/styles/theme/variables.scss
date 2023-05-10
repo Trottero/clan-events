@@ -1,8 +1,90 @@
+@use 'theme' as theme;
+
 @mixin app-theme-css-variables($theme) {
   $is-dark: map-get($theme, is-dark);
 
-  --app-background-color: #{if($is-dark, #303030, #fafafa)};
-  --app-secondary-background-color: #{if($is-dark, #424242, #fff)};
+  --app-background-color-z-3: #{if($is-dark, lighten(#151420, 10%), #fefefe)};
+  --app-background-color-z-2: #{if(
+      $is-dark,
+      lighten(#151420, 5%),
+      darken(#fefefe, 3%)
+    )};
+  --app-background-color: #{if($is-dark, #151420, darken(#fefefe, 10%))};
 
-  --app-text-color: #{if($is-dark, #fff, #424242)};
+  --app-border-color: #{if($is-dark, #302c52, #d4d4d4)};
+  --app-border-color-z-2: #{if($is-dark, #454160, #d1d1d1)};
+  --app-border-color-z-3: #{if($is-dark, #524f6a, #e4e4e4)};
+
+  --app-text-color: #{if($is-dark, #f3eff4, #333333)};
+
+  --app-success-color: #34eb27;
+
+  --app-border-radius: 4px;
+  --app-border-radius-large: 8px;
+
+  --app-primary-color: #{map-get(map-get(map-get($theme, color), primary), main)};
+  --app-primary-lighter-color: #{map-get(
+      map-get(map-get($theme, color), primary),
+      lighter
+    )};
+  --app-primary-darker-color: #{map-get(
+      map-get(map-get($theme, color), primary),
+      darker
+    )};
+  --app-text-primary-color: #{map-get(
+      map-get(map-get(map-get($theme, color), primary), contrast),
+      main
+    )};
+  --app-text-primary-lighter-color: #{map-get(
+      map-get(map-get(map-get($theme, color), primary), contrast),
+      lighter
+    )};
+  --app-text-primary-darker-color: #{map-get(
+      map-get(map-get(map-get($theme, color), primary), contrast),
+      darker
+    )};
+
+  --app-accent-color: #{map-get(map-get(map-get($theme, color), accent), main)};
+  --app-accent-lighter-color: #{map-get(
+      map-get(map-get($theme, color), accent),
+      lighter
+    )};
+  --app-accent-darker-color: #{map-get(
+      map-get(map-get($theme, color), accent),
+      darker
+    )};
+  --app-text-accent-color: #{map-get(
+      map-get(map-get(map-get($theme, color), accent), contrast),
+      main
+    )};
+  --app-text-accent-lighter-color: #{map-get(
+      map-get(map-get(map-get($theme, color), accent), contrast),
+      lighter
+    )};
+  --app-text-accent-darker-color: #{map-get(
+      map-get(map-get(map-get($theme, color), accent), contrast),
+      darker
+    )};
+
+  --app-warn-color: #{map-get(map-get(map-get($theme, color), warn), main)};
+  --app-warn-lighter-color: #{map-get(
+      map-get(map-get($theme, color), warn),
+      lighter
+    )};
+  --app-warn-darker-color: #{map-get(
+      map-get(map-get($theme, color), warn),
+      darker
+    )};
+  --app-text-warn-color: #{map-get(
+      map-get(map-get(map-get($theme, color), warn), contrast),
+      main
+    )};
+  --app-text-warn-lighter-color: #{map-get(
+      map-get(map-get(map-get($theme, color), warn), contrast),
+      lighter
+    )};
+  --app-text-warn-darker-color: #{map-get(
+      map-get(map-get(map-get($theme, color), warn), contrast),
+      darker
+    )};
 }

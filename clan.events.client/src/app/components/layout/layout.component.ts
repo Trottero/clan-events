@@ -1,14 +1,14 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { ConfigService } from 'src/app/config/config.service';
 import { UserService } from 'src/app/user/user.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-toolbar',
-  templateUrl: './toolbar.component.html',
-  styleUrls: ['./toolbar.component.scss'],
+  selector: 'app-layout',
+  templateUrl: './layout.component.html',
+  styleUrls: ['./layout.component.scss'],
 })
-export class ToolbarComponent {
+export class LayoutComponent {
   discordLoginUrl = this.configService.discordLoginUrl;
 
   userName$ = this.userService.userName$;

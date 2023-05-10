@@ -1,0 +1,45 @@
+.mat-mdc-slide-toggle .mdc-switch .mdc-switch__icons {
+  display: none;
+}
+
+.mat-mdc-slide-toggle .mdc-switch {
+  width: 40px !important;
+  margin: 2px;
+}
+
+.mat-mdc-slide-toggle .mdc-switch .mdc-switch__track {
+  height: 24px !important;
+  border-radius: 12px !important;
+}
+
+.mdc-switch__handle-track {
+  left: 2px !important;
+}
+
+.mat-mdc-slide-toggle .mdc-switch .mdc-switch__handle-track {
+  width: calc(100% - 24px) !important;
+}
+
+.mat-mdc-slide-toggle .mdc-switch:enabled .mdc-switch__track::before {
+  background-color: var(--app-primary-lighter-color) !important;
+}
+
+.mat-mdc-slide-toggle .mdc-switch:enabled .mdc-switch__track::after {
+  background-color: var(--app-primary-color) !important;
+}
+
+.mat-mdc-slide-toggle .mdc-switch .mdc-switch__handle::before {
+  background: var(--app-primary-lighter-color) !important;
+}
+
+.mat-mdc-slide-toggle
+  .mdc-switch.mdc-switch--unselected:enabled
+  .mdc-switch__handle::after {
+  background: white !important;
+}
+
+.mat-mdc-slide-toggle
+  .mdc-switch.mdc-switch--selected:enabled
+  .mdc-switch__handle::after {
+  background: white !important;
+}
