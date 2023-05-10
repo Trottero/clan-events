@@ -67,15 +67,4 @@ export class EventsComponent implements OnDestroy {
       pageSize: event.pageSize,
     });
   }
-
-  delete(eventId: string): void {
-    this.subscriptions.add(
-      this.eventsService.deleteEventById(eventId).subscribe(() => {
-        this.triggerRefreshSubject.next({
-          page: this.page,
-          pageSize: this.pageSize,
-        });
-      })
-    );
-  }
 }

@@ -1,8 +1,6 @@
 <span class="header">
   <h2>Events</h2>
-  <a [routerLink]="['/events', 'create']" mat-flat-button color="primary"
-    >Create new Event</a
-  >
+  <a [routerLink]="['/events', 'create']" mat-flat-button color="primary">Create new Event</a>
 </span>
 
 <ul *ngIf="events$ | async as events" class="events">
@@ -14,28 +12,18 @@
     <span class="event__middle">
       <span class="event__starts-at">{{
         event.startsAt | date : 'short'
-      }}</span>
+        }}</span>
       <span class="event__ends-at">{{ event.endsAt | date : 'short' }}</span>
     </span>
 
     <span class="event__right">
-      <button mat-flat-button color="warn" (click)="delete(event.id)">
-        Delete
-      </button>
-      <a [routerLink]="['/events', event.id]" mat-flat-button color="primary"
-        >View</a
-      >
+      <a [routerLink]="['/events', event.id]" mat-flat-button color="primary">View</a>
     </span>
   </li>
 </ul>
 
 <div class="pagination">
-  <mat-paginator
-    [length]="length$ | async"
-    [pageSize]="pageSize$ | async"
-    (page)="onPageChange($event)"
-    [pageSizeOptions]="pageSizeOptions"
-    aria-label="Select page"
-  >
+  <mat-paginator [length]="length$ | async" [pageSize]="pageSize$ | async" (page)="onPageChange($event)"
+    [pageSizeOptions]="pageSizeOptions" aria-label="Select page">
   </mat-paginator>
 </div>

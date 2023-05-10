@@ -19,6 +19,13 @@ const ROUTES = [
       ),
   },
   {
+    path: ':id/edit',
+    loadChildren: () =>
+      import('./modules/edit-event/edit-event.module').then(
+        m => m.EditEventModule
+      ),
+  },
+  {
     path: ':id',
     loadChildren: () =>
       import('./modules/event/event.module').then(m => m.EventModule),

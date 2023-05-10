@@ -1,4 +1,9 @@
 :host {
+  .actions {
+    display: flex;
+    column-gap: 8px;
+  }
+
   .event {
     display: flex;
     flex-direction: column;

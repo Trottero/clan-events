@@ -5,6 +5,7 @@ import {
   EventListItem,
   EventResponse,
   GetEventsRequest,
+  UpdateEventRequest,
 } from '@common/events';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -50,6 +51,16 @@ export class EventsService {
   deleteEventById(id: string): Observable<void> {
     return this.http.delete<void>(
       `${this.configService.backEndUrl}/events/${id}`
+    );
+  }
+
+  updateEvent(
+    id: string,
+    request: UpdateEventRequest
+  ): Observable<Response<EventResponse>> {
+    return this.http.put<Response<EventResponse>>(
+      `${this.configService.backEndUrl}/events/${id}`,
+      request
     );
   }
 }

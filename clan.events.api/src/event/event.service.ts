@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateEventRequest } from '@common/events';
+import { CreateEventRequest, UpdateEventRequest } from '@common/events';
 import { Model } from 'mongoose';
 import { JwtTokenContent } from '@common/auth';
 import { ClanService } from 'src/clan/clan.service';
@@ -104,5 +104,27 @@ export class EventService {
   deleteEventById(user: JwtTokenContent, id: string) {
     // TODO: check if user is admin of the clan
     return this.eventModel.deleteOne({ _id: id }).exec();
+  }
+
+  async updateEvent(
+    id: string,
+    event: UpdateEventRequest,
+  ): Promise<EventDocument> {
+    const oldEvent = await this.eventModel.findById(id).exec();
+
+    if (!oldEvent) {
+      throw new NotFoundException('Event not found');
+    }
+
+    oldEvent.name = event.name;
+    oldEvent.description = event.description;
+    oldEvent.startsAt = event.startsAt;
+    oldEvent.endsAt = event.endsAt;
+    oldEvent.board.type = event.boardType;
+
+    const result: EventDocument = await oldEvent.save();
+    result.populate('participants.members');
+
+    return result;
   }
 }

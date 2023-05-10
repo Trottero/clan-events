@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EventResponse } from '@common/events';
-import { Observable, map, switchMap } from 'rxjs';
+import { Observable, Subscription, map, switchMap } from 'rxjs';
 import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
 import { Response } from '@common/responses';
 import { EventsService } from '../../events.service';
@@ -22,6 +22,8 @@ export class EventComponent {
     switchMap(id => this.eventsService.getEventById(id))
   );
 
+  private subscriptions = new Subscription();
+
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
@@ -30,5 +32,13 @@ export class EventComponent {
 
   back() {
     this.router.navigate(['../'], { relativeTo: this.route });
+  }
+
+  delete(eventId: string): void {
+    this.subscriptions.add(
+      this.eventsService.deleteEventById(eventId).subscribe(() => {
+        this.back();
+      })
+    );
   }
 }

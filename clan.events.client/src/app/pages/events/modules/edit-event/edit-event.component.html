@@ -1,6 +1,9 @@
 <h2>Create new Event</h2>
 
-<form class="create-event-form" [formGroup]="formGroup" (ngSubmit)="create()">
+<button mat-flat-button (click)="back()">Back</button>
+
+
+<form class="edit-event-form" [formGroup]="formGroup" (ngSubmit)="update()">
   <mat-form-field appearance="fill">
     <mat-label>Name</mat-label>
     <input matInput [formControl]="name" />
@@ -34,5 +37,7 @@
     </mat-select>
   </mat-form-field>
 
-  <button mat-flat-button color="primary" type="submit" [disabled]="!(formGroup.valid$ | async)">Create</button>
+  <button mat-flat-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" type="submit"
+    [disabled]="!(formGroup.valid$ | async) || !(formGroup.dirty$ | async)">Update</button>
 </form>
