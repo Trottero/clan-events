@@ -225,6 +225,7 @@ $light-theme: mat.define-light-theme(
       background: $mat-light-theme-background,
     ),
     typography: $fonts,
+    density: -1,
   )
 );
 
@@ -239,6 +240,7 @@ $dark-theme: mat.define-dark-theme(
       background: $mat-dark-theme-background,
     ),
     typography: $fonts,
+    density: -1,
   )
 );
 
