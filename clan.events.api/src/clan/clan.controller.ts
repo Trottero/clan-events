@@ -53,13 +53,11 @@ export class ClanController {
       return {
         name: result.name,
         displayName: result.displayName,
-        members: result.members.map((x) => {
-          return {
-            clanRole: x.role,
-            discordId: x.user.discordId,
-            name: x.user.name,
-          };
-        }),
+        members: result.members.map((x) => ({
+          clanRole: x.role,
+          discordId: x.user.discordId,
+          name: x.user.name,
+        })),
       };
     } catch (ex: any) {
       if (ex.code === MongoErrorCode.DuplicateKey) {
