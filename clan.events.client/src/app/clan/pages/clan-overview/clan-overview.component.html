@@ -1,7 +1,7 @@
 <div *ngIf="clan$ | async as clan" class="d-flex flex-column flex-grow-1">
-  <div class="d-flex justify-content-between">
-    <h3>{{clan.displayName}}</h3>
-    <div>
+  <div class="d-flex justify-content-between flex-row">
+    <h3 class="d-flex">{{clan.displayName}}</h3>
+    <div class="d-flex">
       <button mat-button class="me-2" color="primary" *ngIf="!(editMode$ | async) && (role$ | async) != roleEnum.Member"
         type="button" (click)="enterEditMode()">Edit</button>
       <button mat-button class="me-2" *ngIf="(editMode$ | async)" type="button" (click)="addMember()">Add</button>
@@ -22,10 +22,13 @@
           {{element.clanRole}}
         </span>
         <ng-template #elseBlock>
-          <select title="Select role" [(ngModel)]="element.clanRole"
-            [disabled]="(discordId$ | async) == element.discordId || !isAllowedToEdit(role, element.clanRole)">
-            <option *ngFor="let role of clanRoles" [value]="role">{{role}}</option>
-          </select>
+          <mat-form-field subscriptSizing="dynamic">
+            <mat-select title="Select role" [(ngModel)]="element.clanRole"
+              [disabled]="(discordId$ | async) == element.discordId || !isAllowedToEdit(role, element.clanRole)">
+              <mat-option *ngFor="let role of clanRoles" [value]="role"
+                [disabled]="!isAllowedToEdit(role, element.clanRole)">{{role}}</mat-option>
+            </mat-select>
+          </mat-form-field>
         </ng-template>
       </td>
     </ng-container>
@@ -38,8 +41,11 @@
           {{element.discordId}}
         </span>
         <ng-template #elseBlock>
-          <input title="Discord Id" [(ngModel)]="element.discordId" [disabled]="(discordId$ | async) == element.discordId 
-            || !isAllowedToEdit(role, element.clanRole)" />
+          <mat-form-field subscriptSizing="dynamic">
+            <input title="Discord Id" matInput placeholder="Simple placeholder" [(ngModel)]="element.discordId"
+              [disabled]="(discordId$ | async) == element.discordId 
+          || !isAllowedToEdit(role, element.clanRole)" />
+          </mat-form-field>
         </ng-template>
       </td>
     </ng-container>

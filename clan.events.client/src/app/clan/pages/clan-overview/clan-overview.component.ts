@@ -5,6 +5,7 @@ import {
   BehaviorSubject,
   Subject,
   Subscription,
+  catchError,
   combineLatest,
   filter,
   map,
@@ -129,13 +130,19 @@ export class ClanOverviewComponent implements OnInit {
         return combineLatest([
           of(clan),
           ...membersToAdd.map(x =>
-            this.clanService.addMember(clan.name, x.clanRole, x.discordId)
+            this.clanService
+              .addMember(clan.name, x.clanRole, x.discordId)
+              .pipe(catchError(err => of(null)))
           ),
           ...membersToRemove.map(x =>
-            this.clanService.removeMember(clan.name, x.discordId)
+            this.clanService
+              .removeMember(clan.name, x.discordId)
+              .pipe(catchError(err => of(null)))
           ),
           ...membersToUpdate.map(x =>
-            this.clanService.updateMember(clan.name, x.clanRole, x.discordId)
+            this.clanService
+              .updateMember(clan.name, x.clanRole, x.discordId)
+              .pipe(catchError(err => of(null)))
           ),
         ]);
       }),
