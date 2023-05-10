@@ -11,8 +11,13 @@ import { Validators } from '@angular/forms';
   styleUrls: ['./create-clan.component.scss'],
 })
 export class CreateClanComponent {
+  name = new FormControl<string>('', [
+    Validators.required,
+    Validators.minLength(3),
+  ]);
+
   formGroup = new FormGroup({
-    name: new FormControl('', [Validators.required, Validators.minLength(3)]),
+    name: this.name,
   });
 
   private readonly _clanService = inject(ClanService);

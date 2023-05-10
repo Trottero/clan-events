@@ -6,7 +6,7 @@
   <div class="d-flex flex-column">
 
     <mat-form-field subscriptSizing="dynamic">
-      <input type="text" matInput formControlName="name" placeholder="Clan Name" />
+      <input type="text" matInput [formControl]="name" placeholder="Clan Name" />
     </mat-form-field>
 
     <button type="submit" mat-raised-button color="primary" [disabled]="!(formGroup.valid$ | async)">
