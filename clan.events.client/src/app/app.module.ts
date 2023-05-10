@@ -12,8 +12,14 @@ import { ConfigService } from './config/config.service';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { UserModule } from './user/user.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatNativeDateModule } from '@angular/material/core';
+import { ConfigModule } from './config/config.module';
+import { MatCommonModule, MatNativeDateModule } from '@angular/material/core';
 import { LayoutModule } from './components/layout/layout.module';
+import { CustomSnackbarComponent } from './common/snackbar/custom-snackbar/custom-snackbar.component';
+import { SnackbarTestComponent } from './common/snackbar/snackbar-test/snackbar-test.component';
+import { SnackbarService } from './common/snackbar/snackbar-service';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   declarations: [
@@ -22,6 +28,8 @@ import { LayoutModule } from './components/layout/layout.module';
     NotFoundComponent,
     CounterComponent,
     ProfileComponent,
+    CustomSnackbarComponent,
+    SnackbarTestComponent,
   ],
   imports: [
     BrowserModule,
@@ -30,10 +38,14 @@ import { LayoutModule } from './components/layout/layout.module';
     AuthModule,
     UserModule,
     BrowserAnimationsModule,
+    ConfigModule,
     LayoutModule,
+    MatCommonModule,
+    MatButtonModule,
     MatNativeDateModule,
+    MatSnackBarModule,
   ],
-  providers: [ConfigService],
+  providers: [SnackbarService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

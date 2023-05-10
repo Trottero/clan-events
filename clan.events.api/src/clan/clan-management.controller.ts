@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ClanService } from './clan.service';
 import { ClanMembershipService } from './clan-membership.service';
@@ -21,6 +22,7 @@ import {
   DeleteClanMemberRequest,
   UpdateClanMemberRequest,
 } from '@common/clan';
+import { UserClanContext } from 'src/auth/user-clan-context';
 
 @Controller('clan/:clanName')
 export class ClanManagementController {
@@ -41,6 +43,7 @@ export class ClanManagementController {
       if (ex.message === 'Clan not found') {
         throw new NotFoundException(ex.message);
       }
+      throw ex;
     }
   }
 
@@ -51,41 +54,79 @@ export class ClanManagementController {
     if (!result) {
       throw new NotFoundException('Clan not found');
     }
-    return result;
+    return {
+      name: result.name,
+      displayName: result.displayName,
+      members: result.members.map((x) => {
+        return {
+          name: x.user.name,
+          discordId: x.user.discordId,
+          clanRole: x.role,
+        };
+      }),
+    };
   }
 
   @Post('members')
   @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
   async addMemberToClan(
     @Param('clanName') clanName: string,
+    @User() user: UserClanContext,
     @Body() body: AddClanMemberRequest,
   ): Promise<ClanMemberResponse> {
+    if (!this.isAllowedToAssignRole(user.clanRole, body.clanRole)) {
+      throw new UnauthorizedException('Not allowed to assign role');
+    }
+
     const clan = await this.clanService.getClanByName(clanName);
     if (!clan) {
       throw new NotFoundException('Clan not found');
     }
+    try {
+      const membership = await this.clanMembershipService.addMemberToClan(
+        clan,
+        body.discordId,
+        body.clanRole as ClanRole,
+      );
 
-    await this.clanMembershipService.addMemberToClan(
-      clan,
-      body.discordId,
-      body.clanRole as ClanRole,
-    );
-
-    return {
-      clanRole: body.clanRole as ClanRole,
-      discordId: body.discordId,
-    };
+      return {
+        name: membership.user.name,
+        discordId: membership.user.discordId,
+        clanRole: membership.role,
+      };
+    } catch (ex: any) {
+      if (ex.message == 'User not found') {
+        throw new NotFoundException(ex.message);
+      }
+      throw ex;
+    }
   }
 
   @Delete('members')
   @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
   async removeMemberToClan(
     @Param('clanName') clanName: string,
+    @User() user: UserClanContext,
     @Body() body: DeleteClanMemberRequest,
   ): Promise<void> {
     const clan = await this.clanService.getClanByName(clanName);
     if (!clan) {
       throw new NotFoundException('Clan not found');
+    }
+
+    if (user.discordId == body.discordId) {
+      throw new UnauthorizedException('Cannot remove yourself');
+    }
+
+    const memberToDelete = clan.members.find(
+      (x) => x.user.discordId === body.discordId,
+    );
+    if (!memberToDelete) {
+      throw new NotFoundException('Member not found');
+    }
+
+    if (!this.isAllowedToAssignRole(user.clanRole, memberToDelete.role)) {
+      throw new UnauthorizedException('Not allowed to assign role');
     }
 
     await this.clanMembershipService.removeMemberFromClan(clan, body.discordId);
@@ -95,22 +136,42 @@ export class ClanManagementController {
   @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
   async updateMemberToClan(
     @Param('clanName') clanName: string,
+    @User() user: UserClanContext,
     @Body() body: UpdateClanMemberRequest,
   ): Promise<ClanMemberResponse> {
+    if (!this.isAllowedToAssignRole(user.clanRole, body.clanRole)) {
+      throw new UnauthorizedException('Not allowed to assign role');
+    }
+
+    if (user.discordId == body.discordId) {
+      throw new UnauthorizedException('Cannot update yourself');
+    }
+
     const clan = await this.clanService.getClanByName(clanName);
     if (!clan) {
       throw new NotFoundException('Clan not found');
     }
 
-    await this.clanMembershipService.updateMemberRole(
+    const membership = await this.clanMembershipService.updateMemberRole(
       clan,
       body.discordId,
       body.clanRole as ClanRole,
     );
 
     return {
-      clanRole: body.clanRole as ClanRole,
-      discordId: body.discordId,
+      name: membership.user.name,
+      discordId: membership.user.discordId,
+      clanRole: membership.role,
     };
+  }
+
+  private isAllowedToAssignRole(
+    selfRole: ClanRole,
+    assignedRole: ClanRole,
+  ): boolean {
+    if (selfRole === ClanRole.Owner) {
+      return assignedRole !== ClanRole.Owner;
+    }
+    return selfRole === ClanRole.Admin && assignedRole === ClanRole.Member;
   }
 }

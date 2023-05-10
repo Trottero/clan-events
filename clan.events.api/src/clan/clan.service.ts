@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { ClanMembership } from 'src/database/schemas/clan-membership.schema';
 import { Clan, ClanDocument } from 'src/database/schemas/clan.schema';
 import { User } from 'src/database/schemas/user.schema';
 import { UserService } from 'src/user/user.service';
 import { ClanMembershipService } from './clan-membership.service';
 import { ClanRole } from '@common/auth/clan.role';
+import { ClanWithRole } from '@common/clan';
 
 @Injectable()
 export class ClanService {
@@ -17,9 +17,22 @@ export class ClanService {
     private readonly membershipService: ClanMembershipService,
   ) {}
 
-  async listMemberships(userId: string): Promise<ClanMembership[]> {
-    const user = await this.userService.getUserById(userId);
-    return user.clans;
+  async getClansForUser(userId: string): Promise<ClanWithRole[]> {
+    const user = await (
+      await this.userService.getUserById(userId)
+    ).populate({
+      path: 'clans',
+      populate: { path: 'clan', model: this.clanModel, select: '-members' },
+    });
+
+    return user.clans.map((x) => {
+      return {
+        name: x.clan.name,
+        displayName: x.clan.displayName,
+        role: x.role,
+        members: null,
+      };
+    });
   }
 
   async createRandomClan(): Promise<Clan> {
@@ -83,10 +96,6 @@ export class ClanService {
       .exec();
 
     await this.clanModel.deleteOne({ name: safeName }).exec();
-  }
-
-  async getAllClans(): Promise<Clan[]> {
-    return this.clanModel.find().exec();
   }
 
   async getClanByName(clanName: string): Promise<ClanDocument> {

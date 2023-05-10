@@ -6,6 +6,7 @@ import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { CodeRedirectComponent } from './auth/components/code-redirect/code-redirect.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { EventsModule } from './pages/events/events.module';
+import { SnackbarTestComponent } from './common/snackbar/snackbar-test/snackbar-test.component';
 
 const routes: Routes = [
   {
@@ -27,7 +28,15 @@ const routes: Routes = [
   {
     path: 'events',
     loadChildren: () =>
-      import('./pages/events/events.module').then((m) => m.EventsModule),
+      import('./pages/events/events.module').then(m => m.EventsModule),
+  },
+  {
+    path: 'clan',
+    loadChildren: () => import('./clan/clan.module').then(m => m.ClanModule),
+  },
+  {
+    path: 'test/snackbar',
+    component: SnackbarTestComponent,
   },
   {
     path: '**',

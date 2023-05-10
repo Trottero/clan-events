@@ -1,4 +1,4 @@
-import { ClanRole } from 'src/auth/clan.role';
+import { ClanRole } from '../../auth/clan.role';
 
 export interface AddClanMemberRequest {
   discordId: number;

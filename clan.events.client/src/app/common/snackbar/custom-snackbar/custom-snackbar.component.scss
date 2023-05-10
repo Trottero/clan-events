@@ -1,0 +1,17 @@
+::ng-deep.mat-mdc-snack-bar-container {
+  &.warning {
+    --mdc-snackbar-container-color: var(--app-warn-color);
+    --mat-mdc-snack-bar-button-color: var(--app-text-primary-color);
+    --mdc-snackbar-supporting-text-color: var(--app-text-primary-color);
+  }
+  &.error {
+    --mdc-snackbar-container-color: var(--app-error-color);
+    --mat-mdc-snack-bar-button-color: var(--app-text-primary-color);
+    --mdc-snackbar-supporting-text-color: var(--app-text-primary-color);
+  }
+  &.success {
+    --mdc-snackbar-container-color: var(--app-success-color);
+    --mat-mdc-snack-bar-button-color: var(--app-text-primary-darker-color);
+    --mdc-snackbar-supporting-text-color: var(--app-text-primary-darker-color);
+  }
+}

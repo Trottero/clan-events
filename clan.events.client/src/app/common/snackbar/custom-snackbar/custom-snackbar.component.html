@@ -1,0 +1,10 @@
+<div [class]="'d-flex'">
+  <span matSnackBarLabel>
+    {{data.message}}
+  </span>
+  <span matSnackBarActions>
+    <button mat-button matSnackBarAction type="button" (click)="snackbarRef.dismissWithAction()">
+      {{data.action}}
+    </button>
+  </span>
+</div>

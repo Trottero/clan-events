@@ -9,9 +9,10 @@ export class UserService {
 
   async createRandomUser(): Promise<User> {
     const user = new this.userModel({
-      discordId: 1234,
+      discordId: Math.floor(Math.random() * 100000000),
       name: 'User ' + Math.floor(Math.random() * 1000),
       primaryClan: null,
+      clans: [],
     });
     return user.save();
   }

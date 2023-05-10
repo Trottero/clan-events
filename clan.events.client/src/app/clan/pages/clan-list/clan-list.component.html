@@ -1,0 +1,36 @@
+<div class="d-flex justify-content-between">
+  <h2 class="mr-2">Your Clans</h2>
+  <a [routerLink]="['/clan', 'new']">
+    <button mat-raised-button color="primary" type="button">Create</button>
+  </a>
+</div>
+
+<div *ngIf="clans$ | async as clans">
+  <table mat-table [dataSource]="clans" class="mat-elevation-z8">
+    <ng-container matColumnDef="displayName">
+      <th mat-header-cell *matHeaderCellDef> Clan </th>
+      <td mat-cell *matCellDef="let element"> {{element.displayName}} </td>
+    </ng-container>
+
+    <!-- Discord Id Column -->
+    <ng-container matColumnDef="clanRole">
+      <th mat-header-cell *matHeaderCellDef> Role </th>
+      <td mat-cell *matCellDef="let element"> {{element.role}} </td>
+    </ng-container>
+
+    <!-- Disclaimer column -->
+    <ng-container matColumnDef="disclaimer" *ngIf="!clans || !clans.length">
+      <td mat-footer-cell *matFooterCellDef colspan="2">
+        No clans found, join a clan or create your own!
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="['displayName', 'clanRole']"></tr>
+    <tr mat-row matRipple (click)="navigateToClan(row.name)"
+      *matRowDef="let row; columns: ['displayName', 'clanRole'];"></tr>
+
+    <ng-container *ngIf="!clans || !clans.length">
+      <tr mat-footer-row *matFooterRowDef="['disclaimer']" class="example-second-footer-row"></tr>
+    </ng-container>
+  </table>
+</div>

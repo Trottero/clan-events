@@ -6,3 +6,5 @@ export * from './requests/update-clan-member.requests';
 export * from './requests/add-clan-member.requests';
 export * from './requests/delete-clan-member.requests';
 export * from './responses/clan-member.response';
+export * from './models/clan-with-role';
+export * from './models/clan';
