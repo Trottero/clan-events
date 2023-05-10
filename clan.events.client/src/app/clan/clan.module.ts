@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { ClanService } from './services/clan.service';
 import { AuthModule } from '../auth/auth.module';
 import { ClanOverviewComponent } from './pages/clan-overview/clan-overview.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCommonModule } from '@angular/material/core';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -24,6 +24,7 @@ import { MatSelectModule } from '@angular/material/select';
     MatIconModule,
     MatInputModule,
     MatSelectModule,
+    ReactiveFormsModule,
     RouterModule.forChild([
       {
         path: '',
