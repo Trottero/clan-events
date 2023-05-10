@@ -1,8 +1,47 @@
-@import './theme/theme';
+@use 'theme/theme' as theme;
+@use 'theme/variables' as variables;
+
+@import 'overrides';
+
+html {
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ol,
+ul {
+  margin: 0;
+  padding: 0;
+  font-weight: normal;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
 
 body {
-  font-family: 'Lato', sans-serif;
-  font-size: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
   color: var(--app-text-color);
   background-color: var(--app-background-color);
   box-sizing: border-box;
@@ -19,4 +58,18 @@ body {
   margin: 0;
   height: 100%;
   width: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+// include variables of the theme
+
+.dark-theme {
+  @include variables.app-theme-css-variables(theme.$dark-theme);
+}
+
+.light-theme {
+  @include variables.app-theme-css-variables(theme.$light-theme);
 }

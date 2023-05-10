@@ -1,0 +1,52 @@
+:host {
+  .view-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    mat-toolbar {
+      background-color: var(--app-primary-darker-color);
+      color: var(--app-text-primary-darker-color);
+    }
+
+    .user-chip {
+      margin: 0 24px;
+      cursor: pointer !important;
+    }
+
+    .drawer-container {
+      flex: 1;
+      height: 100%;
+
+      mat-drawer {
+        width: 240px;
+        background-color: var(--app-background-color-z-2);
+        border-right: 1px solid var(--app-border-color-z-2);
+      }
+
+      .active-link {
+        background-color: var(--app-primary-color);
+
+        ::ng-deep {
+          .mdc-list-item__primary-text {
+            color: var(--app-text-primary-color);
+          }
+        }
+      }
+
+      .view-content-container {
+        height: 100%;
+        padding: 16px;
+        background-color: var(--app-background-color);
+
+        .view-content {
+          height: 100%;
+          padding: 24px;
+          background-color: var(--app-background-color-z-2);
+          border: 1px solid var(--app-border-color-z-2);
+          border-radius: var(--app-border-radius);
+        }
+      }
+    }
+  }
+}
