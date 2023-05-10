@@ -1,7 +1,12 @@
-<p>
+<h2>
   Create your own clan!
-</p>
+</h2>
 
-<input type="text" [(ngModel)]="clanModel.name" placeholder="Clan Name" />
+<div class="d-flex flex-column">
 
-<button type="submit" (click)="createClan()">Create</button>
+  <mat-form-field subscriptSizing="dynamic">
+    <input type="text" matInput [(ngModel)]="clanModel.name" placeholder="Clan Name" />
+  </mat-form-field>
+
+  <button type="submit" mat-raised-button color="primary" (click)="createClan()">Create</button>
+</div>

@@ -1,6 +1,6 @@
 <div *ngIf="clan$ | async as clan" class="d-flex flex-column flex-grow-1">
   <div class="d-flex justify-content-between flex-row">
-    <h3 class="d-flex">{{clan.displayName}}</h3>
+    <h2 class="d-flex">{{clan.displayName}}</h2>
     <div class="d-flex">
       <button mat-button class="me-2" color="primary" *ngIf="!(editMode$ | async) && (role$ | async) != roleEnum.Member"
         type="button" (click)="enterEditMode()">Edit</button>

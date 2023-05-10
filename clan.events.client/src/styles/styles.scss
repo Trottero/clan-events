@@ -1,6 +1,7 @@
 @use 'theme/theme' as theme;
 @use 'theme/variables' as variables;
 
+@import '~bootstrap/dist/css/bootstrap.css';
 @import 'overrides';
 
 html {
