@@ -6,7 +6,7 @@ import { SnackbarData } from './snackbar-data';
 @Injectable()
 export class SnackbarService {
   private readonly _snackbar = inject(MatSnackBar);
-  private readonly _snackbarDuration = 100000;
+  private readonly _snackbarDuration = 5000;
 
   info(message: string, action: string = 'Dismiss') {
     this._snackbar.openFromComponent<CustomSnackbarComponent, SnackbarData>(

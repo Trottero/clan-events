@@ -1,16 +1,33 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ClanService } from '../../services/clan.service';
-import { switchMap } from 'rxjs';
+import {
+  Subject,
+  Subscription,
+  catchError,
+  delay,
+  map,
+  of,
+  switchMap,
+  tap,
+  withLatestFrom,
+} from 'rxjs';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup } from '@ngneat/reactive-forms';
 import { Validators } from '@angular/forms';
+import { sanitizeClanName } from '@common/clan';
+import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
+import { SnackbarService } from 'src/app/common/snackbar/snackbar-service';
 
 @Component({
   selector: 'app-create-clan',
   templateUrl: './create-clan.component.html',
   styleUrls: ['./create-clan.component.scss'],
 })
-export class CreateClanComponent {
+export class CreateClanComponent implements OnInit, OnDestroy {
+  private readonly clanService = inject(ClanService);
+  private readonly router = inject(Router);
+  private readonly snackbarService = inject(SnackbarService);
+
   name = new FormControl<string>('', [
     Validators.required,
     Validators.minLength(3),
@@ -20,15 +37,39 @@ export class CreateClanComponent {
     name: this.name,
   });
 
-  private readonly _clanService = inject(ClanService);
-  private readonly _router = inject(Router);
+  clanId$ = this.formGroup.value$.pipe(
+    notNullOrUndefined(),
+    map(value => sanitizeClanName(value.name))
+  );
+
+  private readonly createClanSubmit$ = new Subject<void>();
+  private readonly createClan$ = this.createClanSubmit$.pipe(
+    withLatestFrom(this.clanId$),
+    switchMap(([_, clanId]) => this.clanService.createClan(clanId))
+  );
+
+  private readonly subscriptions = new Subscription();
+
+  ngOnInit(): void {
+    this.subscriptions.add(
+      this.createClan$.subscribe({
+        next: result => {
+          this.snackbarService.success('Clan created');
+          this.router.navigate(['/clan', result.name]);
+        },
+        error: error => {
+          console.log(error);
+          this.snackbarService.error(error.error.message);
+        },
+      })
+    );
+  }
 
   createClan() {
-    this.formGroup.value$
-      .pipe(
-        switchMap(value => this._clanService.createClan(value.name)),
-        switchMap(result => this._router.navigate(['/clan', result.name]))
-      )
-      .subscribe();
+    this.createClanSubmit$.next();
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

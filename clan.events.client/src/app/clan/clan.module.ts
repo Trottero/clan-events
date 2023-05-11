@@ -13,6 +13,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { ApplyToClanComponent } from './pages/apply-to-clan/apply-to-clan.component';
+import { AddClanComponent } from './pages/add-clan/add-clan.component';
+import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule } from '@angular/material/divider';
 
 @NgModule({
   imports: [
@@ -24,6 +28,8 @@ import { MatSelectModule } from '@angular/material/select';
     MatIconModule,
     MatInputModule,
     MatSelectModule,
+    MatCardModule,
+    MatDividerModule,
     ReactiveFormsModule,
     RouterModule.forChild([
       {
@@ -32,7 +38,7 @@ import { MatSelectModule } from '@angular/material/select';
       },
       {
         path: 'new',
-        component: CreateClanComponent,
+        component: AddClanComponent,
       },
       {
         path: ':clanName',
@@ -42,6 +48,12 @@ import { MatSelectModule } from '@angular/material/select';
     AuthModule,
   ],
   providers: [ClanService],
-  declarations: [ClanListComponent, CreateClanComponent, ClanOverviewComponent],
+  declarations: [
+    ClanListComponent,
+    CreateClanComponent,
+    ClanOverviewComponent,
+    ApplyToClanComponent,
+    AddClanComponent,
+  ],
 })
 export class ClanModule {}

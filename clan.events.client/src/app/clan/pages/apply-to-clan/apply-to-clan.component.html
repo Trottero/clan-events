@@ -1,0 +1,23 @@
+<mat-card class="w-100 h-100">
+  <mat-card-header>
+    <mat-card-title>Apply to an existing Clan</mat-card-title>
+    <mat-card-subtitle>Happy to follow</mat-card-subtitle>
+  </mat-card-header>
+  <form [formGroup]="formGroup" (ngSubmit)="applyToClan()">
+    <mat-card-content>
+      <p>Enter the <i>name</i> or the <i>clan ID</i> of the clan you want to join.</p>
+      <p>Is your clan not found? Ask your clan owner to create their
+        clan
+        on the website.
+      </p>
+      <mat-form-field subscriptSizing="dynamic">
+        <input matInput title="clanName" [formControl]="clanName" placeholder="Clan Name" />
+      </mat-form-field>
+    </mat-card-content>
+    <mat-card-actions>
+      <button type="submit" mat-raised-button color="primary" [disabled]="!(formGroup.valid$ | async)">
+        Apply
+      </button>
+    </mat-card-actions>
+  </form>
+</mat-card>
