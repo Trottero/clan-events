@@ -21,6 +21,11 @@ import { UserService } from 'src/app/user/user.service';
   styleUrls: ['./layout.component.scss'],
 })
 export class LayoutComponent implements OnInit, OnDestroy {
+  private readonly configService = inject(ConfigService);
+  private readonly userService = inject(UserService);
+  private readonly selectedClanService = inject(SelectedClanService);
+  private readonly authService = inject(AuthService);
+
   discordLoginUrl = this.configService.discordLoginUrl;
   userName$ = this.userService.userName$;
   isAuthenticated$ = this.authService.isAuthenticated$;
@@ -30,13 +35,6 @@ export class LayoutComponent implements OnInit, OnDestroy {
   selectedClanControl = new FormControl<string | undefined>(undefined);
 
   private readonly subscriptions = new Subscription();
-
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly userService: UserService,
-    private readonly selectedClanService: SelectedClanService,
-    private readonly authService: AuthService
-  ) {}
 
   ngOnInit(): void {
     this.subscriptions.add(

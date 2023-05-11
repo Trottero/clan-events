@@ -8,6 +8,7 @@ import {
   Subscription,
   map,
   of,
+  shareReplay,
   switchMap,
   withLatestFrom,
 } from 'rxjs';
@@ -16,25 +17,35 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { notNullOrUndefined } from 'src/app/shared/operators/not-undefined';
 import { SelectedClanStream } from 'src/app/shared/streams';
 
+const INITIAL_START_DATE = new Date();
+const INITIAL_END_DATE = new Date();
+
+INITIAL_END_DATE.setDate(INITIAL_END_DATE.getDate() + 7);
+
 @Component({
   selector: 'app-create-event',
   templateUrl: './create-event.component.html',
   styleUrls: ['./create-event.component.scss'],
 })
 export class CreateEventComponent implements OnInit, OnDestroy {
-  private selectedClan$ = inject(SelectedClanStream).pipe(notNullOrUndefined());
+  private readonly selectedClan$ = inject(SelectedClanStream).pipe(
+    notNullOrUndefined()
+  );
+  private readonly eventsService = inject(EventsService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   boardTypeOptions$ = of(
-    Object.values(BoardType).map(value => ({ label: value, value }))
-  );
+    Object.values(BoardType)
+      .map(value => ({ label: value, value }))
+      .filter(value => value.value !== BoardType.Unknown)
+  ).pipe(shareReplay(1));
 
   name = new FormControl<string>('', [Validators.required]);
   description = new FormControl<string>('', [Validators.required]);
-  startsAt = new FormControl<Date | undefined>(undefined, [
-    Validators.required,
-  ]);
-  endsAt = new FormControl<Date | undefined>(undefined, [Validators.required]);
-  boardType = new FormControl<BoardType | undefined>(undefined, [
+  startsAt = new FormControl<Date>(INITIAL_START_DATE, [Validators.required]);
+  endsAt = new FormControl<Date>(INITIAL_END_DATE, [Validators.required]);
+  boardType = new FormControl<BoardType>(BoardType.Tilerace, [
     Validators.required,
   ]);
 
@@ -50,14 +61,33 @@ export class CreateEventComponent implements OnInit, OnDestroy {
 
   private readonly subscription = new Subscription();
 
-  constructor(
-    private readonly eventsService: EventsService,
-    private readonly router: Router,
-    private readonly route: ActivatedRoute
-  ) {}
-
   ngOnInit(): void {
-    this.addCreateEventSubscription();
+    this.subscription.add(
+      this.createEventSubject
+        .pipe(
+          withLatestFrom(this.formGroup.value$, this.selectedClan$),
+          switchMap(([_, value, clan]) =>
+            this.eventsService
+              .createEvent(clan.name, {
+                name: value.name,
+                description: value.description,
+                startsAt: value.startsAt,
+                endsAt: value.endsAt,
+                boardType: value.boardType,
+              })
+              .pipe(
+                map(event => ({
+                  event,
+                  clan,
+                }))
+              )
+          ),
+          switchMap(({ event, clan }) =>
+            this.router.navigate(['/', clan.name, 'events', event.data.id])
+          )
+        )
+        .subscribe()
+    );
   }
 
   ngOnDestroy(): void {
@@ -70,27 +100,5 @@ export class CreateEventComponent implements OnInit, OnDestroy {
 
   cancel(): void {
     this.router.navigate(['../'], { relativeTo: this.route });
-  }
-
-  private addCreateEventSubscription(): void {
-    this.subscription.add(
-      this.createEventSubject
-        .pipe(
-          withLatestFrom(this.formGroup.value$, this.selectedClan$),
-          switchMap(([_, value, clan]) =>
-            this.eventsService.createEvent(clan.name, {
-              name: value.name,
-              description: value.description,
-              startsAt: value.startsAt ?? new Date(),
-              endsAt: value.endsAt ?? new Date(),
-              boardType: value.boardType ?? BoardType.Unknown,
-            })
-          )
-        )
-        .subscribe(event =>
-          // navigate to event page
-          this.router.navigate(['/events', event.data.id])
-        )
-    );
   }
 }

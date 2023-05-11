@@ -14,12 +14,16 @@ import { SelectedClanStream } from 'src/app/shared/streams';
   styleUrls: ['./event.component.scss'],
 })
 export class EventComponent {
+  selectedClan$ = inject(SelectedClanStream).pipe(notNullOrUndefined());
+
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly eventsService = inject(EventsService);
+
   id$: Observable<string> = this.route.paramMap.pipe(
     map(params => params.get('id')),
     notNullOrUndefined()
   );
-
-  selectedClan$ = inject(SelectedClanStream).pipe(notNullOrUndefined());
 
   event$: Observable<Response<EventResponse>> = combineLatest([
     this.id$,
@@ -32,14 +36,8 @@ export class EventComponent {
 
   private subscriptions = new Subscription();
 
-  constructor(
-    private readonly route: ActivatedRoute,
-    private readonly router: Router,
-    private readonly eventsService: EventsService
-  ) {}
-
   back() {
-    this.router.navigate(['../'], { relativeTo: this.route });
+    return this.router.navigate(['../'], { relativeTo: this.route });
   }
 
   delete(eventId: string): void {
@@ -48,11 +46,10 @@ export class EventComponent {
         .pipe(
           switchMap(clan =>
             this.eventsService.deleteEventById(eventId, clan.name)
-          )
+          ),
+          switchMap(() => this.back())
         )
-        .subscribe(() => {
-          this.back();
-        })
+        .subscribe()
     );
   }
 }

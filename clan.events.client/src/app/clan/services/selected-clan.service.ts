@@ -93,11 +93,6 @@ export class SelectedClanService implements OnDestroy {
     clans: ClanWithRole[]
   ): ClanWithRole | undefined {
     const clan = clans.find(clan => clan.name === selectedClan);
-
-    if (clan) {
-      return clan;
-    }
-
-    return clans.length > 0 ? clans[0] : undefined;
+    return clan || clans?.[0];
   }
 }

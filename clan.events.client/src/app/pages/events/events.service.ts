@@ -39,7 +39,7 @@ export class EventsService {
     clanName: string
   ): Observable<Response<EventResponse>> {
     return this.http.get<Response<EventResponse>>(
-      `${this.configService.backEndUrl}/${clanName}/events/${id}?clanName=${clanName}`
+      `${this.configService.backEndUrl}/${clanName}/events/${id}`
     );
   }
 

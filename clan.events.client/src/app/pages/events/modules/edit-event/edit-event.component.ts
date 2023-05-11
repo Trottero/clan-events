@@ -10,6 +10,7 @@ import {
   Subscription,
   Observable,
   map,
+  shareReplay,
 } from 'rxjs';
 import { EventsService } from '../../events.service';
 import { FormControl, FormGroup } from '@ngneat/reactive-forms';
@@ -23,7 +24,12 @@ import { SelectedClanStream } from 'src/app/shared/streams';
   styleUrls: ['./edit-event.component.scss'],
 })
 export class EditEventComponent implements OnInit, OnDestroy {
-  private selectedClan$ = inject(SelectedClanStream).pipe(notNullOrUndefined());
+  private readonly selectedClan$ = inject(SelectedClanStream).pipe(
+    notNullOrUndefined()
+  );
+  private readonly eventsService = inject(EventsService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   id$: Observable<string> = this.route.paramMap.pipe(
     map(params => params.get('id')),
@@ -36,16 +42,16 @@ export class EditEventComponent implements OnInit, OnDestroy {
   );
 
   boardTypeOptions$ = of(
-    Object.values(BoardType).map(value => ({ label: value, value }))
-  );
+    Object.values(BoardType)
+      .map(value => ({ label: value, value }))
+      .filter(value => value.value !== BoardType.Unknown)
+  ).pipe(shareReplay(1));
 
   name = new FormControl<string>('', [Validators.required]);
   description = new FormControl<string>('', [Validators.required]);
-  startsAt = new FormControl<Date | undefined>(undefined, [
-    Validators.required,
-  ]);
-  endsAt = new FormControl<Date | undefined>(undefined, [Validators.required]);
-  boardType = new FormControl<BoardType | undefined>(undefined, [
+  startsAt = new FormControl<Date>(new Date(), [Validators.required]);
+  endsAt = new FormControl<Date>(new Date(), [Validators.required]);
+  boardType = new FormControl<BoardType>(BoardType.Unknown, [
     Validators.required,
   ]);
 
@@ -60,12 +66,6 @@ export class EditEventComponent implements OnInit, OnDestroy {
   private updateEventSubject = new Subject<void>();
 
   private readonly subscription = new Subscription();
-
-  constructor(
-    private readonly eventsService: EventsService,
-    private readonly router: Router,
-    private readonly route: ActivatedRoute
-  ) {}
 
   ngOnInit(): void {
     this.addLoadFormDataSubscription();
@@ -111,19 +111,21 @@ export class EditEventComponent implements OnInit, OnDestroy {
         .pipe(
           withLatestFrom(this.formGroup.value$, this.id$, this.selectedClan$),
           switchMap(([_, value, id, clan]) =>
-            this.eventsService.updateEvent(id, clan.name, {
-              name: value.name,
-              description: value.description,
-              startsAt: value.startsAt ?? new Date(),
-              endsAt: value.endsAt ?? new Date(),
-              boardType: value.boardType ?? BoardType.Unknown,
-            })
+            this.eventsService
+              .updateEvent(id, clan.name, {
+                name: value.name,
+                description: value.description,
+                startsAt: value.startsAt ?? new Date(),
+                endsAt: value.endsAt ?? new Date(),
+                boardType: value.boardType ?? BoardType.Unknown,
+              })
+              .pipe(map(event => ({ event, clan })))
+          ),
+          switchMap(({ event, clan }) =>
+            this.router.navigate(['/', clan.name, 'events', event.data.id])
           )
         )
-        .subscribe(event =>
-          // navigate to event page
-          this.router.navigate(['/events', event.data.id])
-        )
+        .subscribe()
     );
   }
 }
