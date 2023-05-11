@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BoardType, EventResponse } from '@common/events';
 import { Response } from '@common/responses';
@@ -14,7 +14,8 @@ import {
 import { EventsService } from '../../events.service';
 import { FormControl, FormGroup } from '@ngneat/reactive-forms';
 import { Validators } from '@angular/forms';
-import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
+import { notNullOrUndefined } from 'src/app/shared/operators/not-undefined';
+import { SelectedClanStream } from 'src/app/shared/streams';
 
 @Component({
   selector: 'app-edit-event',
@@ -22,13 +23,16 @@ import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
   styleUrls: ['./edit-event.component.scss'],
 })
 export class EditEventComponent implements OnInit, OnDestroy {
+  private selectedClan$ = inject(SelectedClanStream).pipe(notNullOrUndefined());
+
   id$: Observable<string> = this.route.paramMap.pipe(
     map(params => params.get('id')),
     notNullOrUndefined()
   );
 
   event$: Observable<Response<EventResponse>> = this.id$.pipe(
-    switchMap(id => this.eventsService.getEventById(id))
+    withLatestFrom(this.selectedClan$),
+    switchMap(([id, clan]) => this.eventsService.getEventById(id, clan.name))
   );
 
   boardTypeOptions$ = of(
@@ -105,9 +109,9 @@ export class EditEventComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.updateEventSubject
         .pipe(
-          withLatestFrom(this.formGroup.value$, this.id$),
-          switchMap(([_, value, id]) =>
-            this.eventsService.updateEvent(id, {
+          withLatestFrom(this.formGroup.value$, this.id$, this.selectedClan$),
+          switchMap(([_, value, id, clan]) =>
+            this.eventsService.updateEvent(id, clan.name, {
               name: value.name,
               description: value.description,
               startsAt: value.startsAt ?? new Date(),

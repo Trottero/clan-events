@@ -18,16 +18,16 @@ export function filterMap<T, U>(
   f: (value: T) => U | FILTERED
 ): OperatorFunction<T, U> {
   return (source$: Observable<T>) =>
-    new Observable<U>((observer) =>
+    new Observable<U>(observer =>
       source$.subscribe(
-        (value) => {
+        value => {
           const result = f(value);
 
           if (result !== FILTERED) {
             observer.next(result);
           }
         },
-        (error) => observer.error(error),
+        error => observer.error(error),
         () => observer.complete()
       )
     );

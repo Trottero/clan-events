@@ -7,6 +7,8 @@ import { CodeRedirectComponent } from './auth/components/code-redirect/code-redi
 import { ProfileComponent } from './pages/profile/profile.component';
 import { EventsModule } from './pages/events/events.module';
 import { SnackbarTestComponent } from './common/snackbar/snackbar-test/snackbar-test.component';
+import { NAVIGATION_PARAMS, NAVIGATION_PATHS } from './config/navigation';
+import { authGuard } from './auth/auth.guard';
 
 const routes: Routes = [
   {
@@ -26,9 +28,10 @@ const routes: Routes = [
     component: ProfileComponent,
   },
   {
-    path: 'events',
+    path: `:${NAVIGATION_PARAMS.CLAN_NAME}/${NAVIGATION_PATHS.EVENTS}`,
     loadChildren: () =>
       import('./pages/events/events.module').then(m => m.EventsModule),
+    canActivate: [authGuard],
   },
   {
     path: 'clan',

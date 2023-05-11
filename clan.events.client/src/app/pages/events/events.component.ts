@@ -1,16 +1,26 @@
-import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  inject,
+} from '@angular/core';
 import { EventsService } from './events.service';
 import {
   Observable,
   Subject,
   Subscription,
+  combineLatest,
   map,
   startWith,
   switchMap,
+  tap,
+  withLatestFrom,
 } from 'rxjs';
 import { EventListItem } from '@common/events';
 import { PaginatedResponse } from '@common/responses';
 import { PageEvent } from '@angular/material/paginator';
+import { SelectedClanStream } from 'src/app/shared/streams';
+import { notNullOrUndefined } from 'src/app/shared/operators/not-undefined';
 
 interface FetchEventsOptions {
   page: number;
@@ -32,16 +42,21 @@ export class EventsComponent implements OnDestroy {
   private triggerRefreshSubject = new Subject<FetchEventsOptions>();
   private subscriptions = new Subscription();
 
-  events$: Observable<PaginatedResponse<EventListItem>> =
+  selectedClan$ = inject(SelectedClanStream);
+
+  events$: Observable<PaginatedResponse<EventListItem>> = combineLatest([
     this.triggerRefreshSubject.pipe(
-      startWith({ page: this.page, pageSize: this.pageSize }),
-      switchMap(({ page, pageSize }) =>
-        this.eventsService.getEvents({
-          page,
-          pageSize,
-        })
-      )
-    );
+      startWith({ page: this.page, pageSize: this.pageSize })
+    ),
+    this.selectedClan$.pipe(notNullOrUndefined()),
+  ]).pipe(
+    switchMap(([{ page, pageSize }, selectedClan]) =>
+      this.eventsService.getEvents(selectedClan.name, {
+        page,
+        pageSize,
+      })
+    )
+  );
 
   length$: Observable<number> = this.events$.pipe(
     map(response => response.data.totalItems)

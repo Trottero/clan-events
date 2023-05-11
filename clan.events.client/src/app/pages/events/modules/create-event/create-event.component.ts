@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { BoardType, CreateEventRequest } from '@common/events';
 import { FormControl, FormGroup } from '@ngneat/reactive-forms';
@@ -12,7 +12,9 @@ import {
   withLatestFrom,
 } from 'rxjs';
 import { EventsService } from '../../events.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { notNullOrUndefined } from 'src/app/shared/operators/not-undefined';
+import { SelectedClanStream } from 'src/app/shared/streams';
 
 @Component({
   selector: 'app-create-event',
@@ -20,6 +22,8 @@ import { Router } from '@angular/router';
   styleUrls: ['./create-event.component.scss'],
 })
 export class CreateEventComponent implements OnInit, OnDestroy {
+  private selectedClan$ = inject(SelectedClanStream).pipe(notNullOrUndefined());
+
   boardTypeOptions$ = of(
     Object.values(BoardType).map(value => ({ label: value, value }))
   );
@@ -48,7 +52,8 @@ export class CreateEventComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly eventsService: EventsService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -63,13 +68,17 @@ export class CreateEventComponent implements OnInit, OnDestroy {
     this.createEventSubject.next();
   }
 
+  cancel(): void {
+    this.router.navigate(['../'], { relativeTo: this.route });
+  }
+
   private addCreateEventSubscription(): void {
     this.subscription.add(
       this.createEventSubject
         .pipe(
-          withLatestFrom(this.formGroup.value$),
-          switchMap(([_, value]) =>
-            this.eventsService.createEvent({
+          withLatestFrom(this.formGroup.value$, this.selectedClan$),
+          switchMap(([_, value, clan]) =>
+            this.eventsService.createEvent(clan.name, {
               name: value.name,
               description: value.description,
               startsAt: value.startsAt ?? new Date(),

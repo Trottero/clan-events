@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EventResponse } from '@common/events';
-import { Observable, Subscription, map, switchMap } from 'rxjs';
-import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
+import { Observable, Subscription, combineLatest, map, switchMap } from 'rxjs';
+import { notNullOrUndefined } from 'src/app/shared/operators/not-undefined';
 import { Response } from '@common/responses';
 import { EventsService } from '../../events.service';
+import { SelectedClanStream } from 'src/app/shared/streams';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -18,8 +19,15 @@ export class EventComponent {
     notNullOrUndefined()
   );
 
-  event$: Observable<Response<EventResponse>> = this.id$.pipe(
-    switchMap(id => this.eventsService.getEventById(id))
+  selectedClan$ = inject(SelectedClanStream).pipe(notNullOrUndefined());
+
+  event$: Observable<Response<EventResponse>> = combineLatest([
+    this.id$,
+    this.selectedClan$,
+  ]).pipe(
+    switchMap(([id, selectedClan]) =>
+      this.eventsService.getEventById(id, selectedClan.name)
+    )
   );
 
   private subscriptions = new Subscription();
@@ -36,9 +44,15 @@ export class EventComponent {
 
   delete(eventId: string): void {
     this.subscriptions.add(
-      this.eventsService.deleteEventById(eventId).subscribe(() => {
-        this.back();
-      })
+      this.selectedClan$
+        .pipe(
+          switchMap(clan =>
+            this.eventsService.deleteEventById(eventId, clan.name)
+          )
+        )
+        .subscribe(() => {
+          this.back();
+        })
     );
   }
 }
