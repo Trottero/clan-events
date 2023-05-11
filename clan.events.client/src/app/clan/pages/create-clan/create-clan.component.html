@@ -1,16 +1,31 @@
-<h2>
-  Create your own clan!
-</h2>
+<mat-card class="w-100 h-100">
+  <mat-card-header>
+    <mat-card-title>Create your own Clan</mat-card-title>
+    <mat-card-subtitle>If you are a born leader</mat-card-subtitle>
+  </mat-card-header>
+  <form [formGroup]="formGroup" (ngSubmit)="createClan()">
+    <mat-card-content>
+      <p>Enter the name of the clan that you want to create below. The clan name gets converted to something that our
+        systems can work with (It will also be easier to share!) But don't worry, the displayed name will be exactly
+        like you entered in this box!</p>
+      <mat-form-field subscriptSizing="dynamic">
+        <input type="text" matInput [formControl]="name" placeholder="Clan Name" />
+      </mat-form-field>
+      <p *ngIf="clanId$ | async as clanId">
+        Your unique <i>clan ID</i>: <strong>{{clanId}}</strong>
+      </p>
 
-<form [formGroup]="formGroup" (ngSubmit)="createClan()">
-  <div class="d-flex flex-column">
-
-    <mat-form-field subscriptSizing="dynamic">
-      <input type="text" matInput [formControl]="name" placeholder="Clan Name" />
-    </mat-form-field>
-
-    <button type="submit" mat-raised-button color="primary" [disabled]="!(formGroup.valid$ | async)">
-      Create
-    </button>
-  </div>
-</form>
+    </mat-card-content>
+    <mat-card-actions class="d-flex align-items-center">
+      <button type="submit" mat-raised-button color="primary" [disabled]="!(formGroup.valid$ | async)">
+        Create
+      </button>
+      <span class="ms-3" *ngIf="clanId$ | async as clanId">
+        <span class="d-flex align-items-center icon-with-text">
+          <mat-icon>{{name.pending ? 'hourglass_empty': name.valid ? 'check_circle' : 'cancel'}}</mat-icon>
+          <span class="ms-1">{{name.pending ? 'Checking..': name.valid ? 'Available' : 'Unavailable'}}</span>
+        </span>
+      </span>
+    </mat-card-actions>
+  </form>
+</mat-card>

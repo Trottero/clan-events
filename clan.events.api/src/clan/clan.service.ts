@@ -6,7 +6,7 @@ import { User } from 'src/database/schemas/user.schema';
 import { UserService } from 'src/user/user.service';
 import { ClanMembershipService } from './clan-membership.service';
 import { ClanRole } from '@common/auth/clan.role';
-import { ClanWithRole } from '@common/clan';
+import { ClanWithRole, sanitizeClanName } from '@common/clan';
 
 @Injectable()
 export class ClanService {
@@ -41,7 +41,7 @@ export class ClanService {
     const clan = new this.clanModel({
       members: [],
       displayName: displayName,
-      name: this.sanitizeClanName(displayName),
+      name: sanitizeClanName(displayName),
       owner: randomUser,
     });
     return clan.save();
@@ -49,7 +49,7 @@ export class ClanService {
 
   async createClan(displayName: string): Promise<ClanDocument> {
     const clan = new this.clanModel({
-      name: this.sanitizeClanName(displayName),
+      name: sanitizeClanName(displayName),
       displayName: displayName,
     });
     await clan.save();
@@ -58,7 +58,7 @@ export class ClanService {
   }
 
   async deleteClan(name: string, ownerDiscordId: number) {
-    const safeName = this.sanitizeClanName(name);
+    const safeName = sanitizeClanName(name);
     const clan = await this.getClanByName(name);
     if (!clan) {
       throw new Error('Clan not found');
@@ -99,26 +99,12 @@ export class ClanService {
   }
 
   async getClanByName(clanName: string): Promise<ClanDocument> {
-    const safeName = this.sanitizeClanName(clanName);
-
     return await this.clanModel
-      .findOne({ name: safeName })
+      .findOne({ name: sanitizeClanName(clanName) })
       .populate({
         path: 'members',
         populate: { path: 'user', model: this.userModel, select: '-clans' },
       })
       .exec();
-  }
-
-  private sanitizeClanName(name: string): string {
-    // Remove all non-alphanumeric characters
-    let safeName = name.replace(/[^a-zA-Z0-9 \-]/g, '');
-    // Convert to lowercase
-    safeName = safeName.toLowerCase();
-    // Truncate to 30 characters
-    safeName = safeName.substring(0, 30);
-    // replace spaces with dashes
-    safeName = safeName.replace(/\s/g, '-');
-    return safeName;
   }
 }
