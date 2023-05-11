@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, shareReplay, startWith, tap } from 'rxjs';
+import { Observable, map, shareReplay, tap } from 'rxjs';
 import { ConfigService } from '../config/config.service';
 import { AuthState } from './auth.state';
 import { JwtTokenContent, AccessTokenResponse } from '@common/auth';
@@ -8,8 +8,6 @@ import { hydrate } from '../common/hydrate.pipe';
 import { JwtService } from './jwt.service';
 import { State } from '../common/state';
 import { Response } from '@common/responses';
-import { FILTERED, filterMap } from '../shared/operators/filter-map';
-import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',

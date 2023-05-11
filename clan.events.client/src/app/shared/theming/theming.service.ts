@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, Subscription, shareReplay } from 'rxjs';
 import { Theme } from './theme';
-import { hydrate } from '../hydrate.pipe';
+import { hydrate } from 'src/app/common/hydrate.pipe';
 
 interface ThemeState {
   theme: Theme;

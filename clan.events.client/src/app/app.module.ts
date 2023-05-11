@@ -15,11 +15,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfigModule } from './config/config.module';
 import { MatCommonModule, MatNativeDateModule } from '@angular/material/core';
 import { LayoutModule } from './components/layout/layout.module';
-import { CustomSnackbarComponent } from './common/snackbar/custom-snackbar/custom-snackbar.component';
-import { SnackbarTestComponent } from './common/snackbar/snackbar-test/snackbar-test.component';
-import { SnackbarService } from './common/snackbar/snackbar-service';
+
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonModule } from '@angular/material/button';
+import { CustomSnackbarComponent } from './shared/snackbar/custom-snackbar/custom-snackbar.component';
+import { SnackbarService } from './shared/snackbar/snackbar-service';
+import { SnackbarTestComponent } from './shared/snackbar/snackbar-test/snackbar-test.component';
 
 @NgModule({
   declarations: [

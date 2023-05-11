@@ -10,8 +10,8 @@ import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/auth/auth.service';
 import { ClansService } from 'src/app/clan/services/clans.service';
 import { SelectedClanService } from 'src/app/clan/services/selected-clan.service';
+import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
 import { ConfigService } from 'src/app/config/config.service';
-import { notNullOrUndefined } from 'src/app/shared/operators/not-undefined';
 import { UserService } from 'src/app/user/user.service';
 
 @Component({

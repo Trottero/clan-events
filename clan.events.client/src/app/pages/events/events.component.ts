@@ -22,8 +22,8 @@ import {
 import { EventListItem } from '@common/events';
 import { PaginatedResponse } from '@common/responses';
 import { PageEvent } from '@angular/material/paginator';
-import { SelectedClanStream } from 'src/app/shared/streams';
-import { notNullOrUndefined } from 'src/app/shared/operators/not-undefined';
+import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
+import { SelectedClanStream } from 'src/app/common/streams';
 
 interface FetchEventsOptions {
   page: number;

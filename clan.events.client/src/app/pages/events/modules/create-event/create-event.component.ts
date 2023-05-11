@@ -14,8 +14,8 @@ import {
 } from 'rxjs';
 import { EventsService } from '../../events.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { notNullOrUndefined } from 'src/app/shared/operators/not-undefined';
-import { SelectedClanStream } from 'src/app/shared/streams';
+import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
+import { SelectedClanStream } from 'src/app/common/streams';
 
 const INITIAL_START_DATE = new Date();
 const INITIAL_END_DATE = new Date();

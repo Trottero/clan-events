@@ -1,5 +1,4 @@
-import { Inject, Injectable, inject } from '@angular/core';
-import { ClanWithRole } from '@common/clan';
+import { Injectable, inject } from '@angular/core';
 import {
   Subject,
   combineLatest,
@@ -9,8 +8,6 @@ import {
   switchMap,
 } from 'rxjs';
 import { AuthService } from 'src/app/auth/auth.service';
-import { State } from 'src/app/common/state';
-import { filterMap, FILTERED } from 'src/app/shared/operators/filter-map';
 import { ClanApiService } from './clan.api.service';
 
 @Injectable({

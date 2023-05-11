@@ -2,10 +2,10 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EventResponse } from '@common/events';
 import { Observable, Subscription, combineLatest, map, switchMap } from 'rxjs';
-import { notNullOrUndefined } from 'src/app/shared/operators/not-undefined';
 import { Response } from '@common/responses';
 import { EventsService } from '../../events.service';
-import { SelectedClanStream } from 'src/app/shared/streams';
+import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
+import { SelectedClanStream } from 'src/app/common/streams';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,

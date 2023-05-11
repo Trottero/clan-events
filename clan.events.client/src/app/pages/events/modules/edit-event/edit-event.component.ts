@@ -15,8 +15,8 @@ import {
 import { EventsService } from '../../events.service';
 import { FormControl, FormGroup } from '@ngneat/reactive-forms';
 import { Validators } from '@angular/forms';
-import { notNullOrUndefined } from 'src/app/shared/operators/not-undefined';
-import { SelectedClanStream } from 'src/app/shared/streams';
+import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
+import { SelectedClanStream } from 'src/app/common/streams';
 
 @Component({
   selector: 'app-edit-event',

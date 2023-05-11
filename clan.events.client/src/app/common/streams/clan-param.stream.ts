@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { InjectableStream } from 'src/app/shared/observable/injectable-stream';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, map, publish, share, shareReplay, startWith, tap } from 'rxjs';
 import { NAVIGATION_PARAMS } from 'src/app/config/navigation';
 import { getRouteParamsFromSnapshot } from '../utils/get-route-params';
 import { notNullOrUndefined } from '../operators/not-undefined';
+import { InjectableStream } from '../observable/injectable-stream';
 
 @Injectable({
   providedIn: 'root',

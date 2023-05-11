@@ -1,25 +1,19 @@
 import { Injectable, OnDestroy, inject } from '@angular/core';
 import {
-  BehaviorSubject,
   Observable,
   Subscription,
-  combineLatest,
   map,
   pairwise,
   shareReplay,
   switchMap,
-  tap,
 } from 'rxjs';
-import { ClanApiService } from './clan.api.service';
 import { ClanWithRole } from '@common/clan';
 import { Router } from '@angular/router';
 import { hydrate } from 'src/app/common/hydrate.pipe';
-import { ClanParamStream } from 'src/app/shared/streams';
-import { notNullOrUndefined } from 'src/app/shared/operators/not-undefined';
-import { AuthService } from 'src/app/auth/auth.service';
-import { FILTERED, filterMap } from 'src/app/shared/operators/filter-map';
 import { State } from 'src/app/common/state';
 import { ClansService } from './clans.service';
+import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
+import { ClanParamStream } from 'src/app/common/streams';
 
 export interface SelectedClanState {
   clanName?: string;
