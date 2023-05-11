@@ -23,6 +23,7 @@ import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
 import { SelectedClanService } from 'src/app/clan/services/selected-clan.service';
 import {
   Loadable,
+  filterMapSuccess,
   isLoading,
   isSuccess,
   mapToLoadable,
@@ -74,7 +75,7 @@ export class EventsComponent implements OnDestroy {
 
   events$: Observable<PaginatedResponse<EventListItem>> =
     this.eventsLoadable$.pipe(
-      filterMap(loadable => (isSuccess(loadable) ? loadable.value : FILTERED)),
+      filterMapSuccess(x => x.value),
       shareReplay(1)
     );
 

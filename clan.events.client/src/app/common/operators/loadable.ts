@@ -11,6 +11,7 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
+import { FILTERED, filterMap } from './filter-map';
 
 export enum LoadableState {
   Loading = 'LOADING',
@@ -68,4 +69,13 @@ export function mapToLoadable<T>(): OperatorFunction<T, Loadable<T>> {
       )
     ).pipe(tap(x => console.log(x)));
   };
+}
+
+export function filterMapSuccess<T>(
+  project: (value: Success<T>) => T
+): OperatorFunction<Loadable<T>, T> {
+  return (source$: Observable<Loadable<T>>) =>
+    source$.pipe(
+      filterMap(value => (isSuccess(value) ? project(value) : FILTERED))
+    );
 }
