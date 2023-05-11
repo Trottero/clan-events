@@ -1,12 +1,14 @@
 <ng-container *ngIf="selectedClan$ | async as clan">
   <h1>{{ clan.displayName }} Events</h1>
 
+  <mat-spinner *ngIf="eventsLoadable$ | async | isLoading"></mat-spinner>
+
   <span class="header">
     <h2>Events</h2>
     <a [routerLink]="['/', clan.name, 'events', 'create']" mat-flat-button color="primary">Create new Event</a>
   </span>
 
-  <ul *ngIf="events$ | async as events" class="events">
+  <ul *ngIf="eventsLoadable$ | async | isSuccess as events" class="events">
     <li *ngFor="let event of events.data.items" class="event">
       <span class="event__left">
         <span class="event__name">{{ event.name }}</span>
