@@ -8,9 +8,13 @@ import {
   ClanMembership,
   ClanMembershipSchema,
 } from 'src/database/schemas/clan-membership.schema';
-import { ClanMembershipService } from './clan-membership.service';
+import { ClanMembershipService } from './management/clan-membership.service';
 import { AuthModule } from 'src/auth/auth.module';
-import { ClanManagementController } from './clan-management.controller';
+import { ClanManagementController } from './management/clan-management.controller';
+import {
+  ClanApplication,
+  ClanApplicationSchema,
+} from 'src/database/schemas/clan-application.schema';
 
 @Module({
   imports: [
@@ -19,6 +23,7 @@ import { ClanManagementController } from './clan-management.controller';
     MongooseModule.forFeature([
       { name: Clan.name, schema: ClanSchema },
       { name: ClanMembership.name, schema: ClanMembershipSchema },
+      { name: ClanApplication.name, schema: ClanApplicationSchema },
     ]),
   ],
   controllers: [ClanController, ClanManagementController],

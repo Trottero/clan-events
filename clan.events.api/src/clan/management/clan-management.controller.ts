@@ -9,7 +9,7 @@ import {
   Post,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ClanService } from './clan.service';
+import { ClanService } from '../clan.service';
 import { ClanMembershipService } from './clan-membership.service';
 import { HasRoleInClan } from 'src/auth/authorized.decorator';
 import { User } from 'src/common/decorators/user.decorator';
