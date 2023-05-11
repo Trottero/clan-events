@@ -3,33 +3,39 @@
 
   <mat-spinner *ngIf="eventsLoadable$ | async | isLoading"></mat-spinner>
 
-  <span class="header">
+  <span class="header" *ngIf="eventsLoadable$ | async | isSuccess">
     <h2>Events</h2>
     <a [routerLink]="['/', clan.name, 'events', 'create']" mat-flat-button color="primary">Create new Event</a>
   </span>
 
-  <ul *ngIf="eventsLoadable$ | async | isSuccess as events" class="events">
-    <li *ngFor="let event of events.data.items" class="event">
-      <span class="event__left">
-        <span class="event__name">{{ event.name }}</span>
-        <span class="event__description">{{ event.description }}</span>
-      </span>
-      <span class="event__middle">
-        <span class="event__starts-at">{{
-          event.startsAt | date : 'short'
-          }}</span>
-        <span class="event__ends-at">{{ event.endsAt | date : 'short' }}</span>
-      </span>
-
-      <span class="event__right">
-        <a [routerLink]="['/', clan.name, 'events', event.id]" mat-flat-button color="primary">View</a>
-      </span>
-    </li>
-  </ul>
-
-  <div class="pagination">
-    <mat-paginator [length]="length$ | async" [pageSize]="pageSize$ | async" (page)="onPageChange($event)"
-      [pageSizeOptions]="pageSizeOptions" aria-label="Select page">
-    </mat-paginator>
+  <div *ngIf="(eventsLoadable$ | async | isSuccess)?.data.items.length === 0" class="no-events">
+    No events are currently scheduled. Create a new event to get started.
   </div>
+
+  <ng-container *ngIf="eventsLoadable$ | async | isSuccess as events">
+    <ul class="events">
+      <li *ngFor="let event of events.data.items" class="event">
+        <span class="event__left">
+          <span class="event__name">{{ event.name }}</span>
+          <span class="event__description">{{ event.description }}</span>
+        </span>
+        <span class="event__middle">
+          <span class="event__starts-at">{{
+            event.startsAt | date : 'short'
+            }}</span>
+          <span class="event__ends-at">{{ event.endsAt | date : 'short' }}</span>
+        </span>
+
+        <span class="event__right">
+          <a [routerLink]="['/', clan.name, 'events', event.id]" mat-flat-button color="primary">View</a>
+        </span>
+      </li>
+    </ul>
+
+    <div class="pagination" *ngIf="events.data.totalCount > 0">
+      <mat-paginator [length]="length$ | async" [pageSize]="pageSize$ | async" (page)="onPageChange($event)"
+        [pageSizeOptions]="pageSizeOptions" aria-label="Select page">
+      </mat-paginator>
+    </div>
+  </ng-container>
 </ng-container>
