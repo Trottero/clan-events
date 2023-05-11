@@ -1,5 +1,11 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { ClanService } from '../../services/clan.service';
+import {
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+  ViewChild,
+  inject,
+} from '@angular/core';
+import { ClanApiService } from '../../services/clan.api.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   BehaviorSubject,
@@ -10,6 +16,7 @@ import {
   filter,
   map,
   merge,
+  mergeMap,
   of,
   shareReplay,
   switchMap,
@@ -20,6 +27,8 @@ import { ClanMemberResponse } from '@common/clan';
 import { ClanRole } from '@common/auth/clan.role';
 import { UserService } from 'src/app/user/user.service';
 import { MatTable } from '@angular/material/table';
+import { SelectedClanService } from '../../services/selected-clan.service';
+import { ClansService } from '../../services/clans.service';
 
 @Component({
   selector: 'app-clan-overview',
@@ -27,6 +36,14 @@ import { MatTable } from '@angular/material/table';
   styleUrls: ['./clan-overview.component.scss'],
 })
 export class ClanOverviewComponent implements OnInit {
+  private readonly clanApiService = inject(ClanApiService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly userService = inject(UserService);
+  private readonly changeDetectorRef = inject(ChangeDetectorRef);
+  private readonly selectedClanService = inject(SelectedClanService);
+  private readonly clansService = inject(ClansService);
+
   allTableColumns = ['clanRole', 'discordId', 'name', 'delete'];
 
   clanName$ = this.route.params.pipe(
@@ -38,7 +55,7 @@ export class ClanOverviewComponent implements OnInit {
 
   clan$ = merge(this.clanName$, this.retrieveClan$).pipe(
     filter(x => !!x),
-    switchMap(x => this.clanService.getClan(x)),
+    switchMap(x => this.clanApiService.getClan(x)),
     shareReplay(1)
   );
 
@@ -84,14 +101,6 @@ export class ClanOverviewComponent implements OnInit {
   // Please forgive me.
   @ViewChild(MatTable) table: MatTable<ClanMemberResponse> | undefined;
 
-  constructor(
-    private readonly clanService: ClanService,
-    private readonly route: ActivatedRoute,
-    private readonly router: Router,
-    private readonly userService: UserService,
-    private readonly changeDetectorRef: ChangeDetectorRef
-  ) {}
-
   ngOnInit(): void {
     this._subscription.add(this.createMutationList$.subscribe());
     this._subscription.add(this.saveClanFromEdit().subscribe());
@@ -100,10 +109,16 @@ export class ClanOverviewComponent implements OnInit {
   deleteClan() {
     this.clanName$
       .pipe(
-        switchMap(name => this.clanService.deleteClan(name)),
-        switchMap(() => this.router.navigate(['/clan']))
+        switchMap(clanName =>
+          this.clanApiService.deleteClan(clanName).pipe(map(() => clanName))
+        ),
+        withLatestFrom(this.selectedClanService.selectedClan$)
       )
-      .subscribe();
+      .subscribe(() => {
+        this.clansService.refreshClans();
+
+        this.router.navigate(['/clan']);
+      });
   }
 
   saveClanFromEdit() {
@@ -130,17 +145,17 @@ export class ClanOverviewComponent implements OnInit {
         return combineLatest([
           of(clan),
           ...membersToAdd.map(x =>
-            this.clanService
+            this.clanApiService
               .addMember(clan.name, x.clanRole, x.discordId)
               .pipe(catchError(err => of(null)))
           ),
           ...membersToRemove.map(x =>
-            this.clanService
+            this.clanApiService
               .removeMember(clan.name, x.discordId)
               .pipe(catchError(err => of(null)))
           ),
           ...membersToUpdate.map(x =>
-            this.clanService
+            this.clanApiService
               .updateMember(clan.name, x.clanRole, x.discordId)
               .pipe(catchError(err => of(null)))
           ),

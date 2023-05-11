@@ -3,7 +3,7 @@ import { ClanListComponent } from './pages/clan-list/clan-list.component';
 import { CreateClanComponent } from './pages/create-clan/create-clan.component';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ClanService } from './services/clan.service';
+import { ClanApiService } from './services/clan.api.service';
 import { AuthModule } from '../auth/auth.module';
 import { ClanOverviewComponent } from './pages/clan-overview/clan-overview.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -41,7 +41,7 @@ import { MatSelectModule } from '@angular/material/select';
     ]),
     AuthModule,
   ],
-  providers: [ClanService],
+  providers: [],
   declarations: [ClanListComponent, CreateClanComponent, ClanOverviewComponent],
 })
 export class ClanModule {}

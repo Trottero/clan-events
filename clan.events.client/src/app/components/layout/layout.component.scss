@@ -9,6 +9,19 @@
       color: var(--app-text-primary-darker-color);
     }
 
+    .user {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: end;
+      width: auto;
+
+      .clan-select {
+        max-width: 200px;
+        margin-right: 24px;
+      }
+    }
+
     .user-chip {
       margin: 0 24px;
       cursor: pointer !important;
