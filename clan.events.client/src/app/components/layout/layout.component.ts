@@ -64,7 +64,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptions.add(
-      this.selectedClanControl.value$.subscribe(selectedClanName => {
+      this.selectedClanControl.valueChanges.subscribe(selectedClanName => {
         this.selectedClanService.setSelectedClan(selectedClanName);
       })
     );

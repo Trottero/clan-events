@@ -1,37 +1,47 @@
-import { Injectable, OnDestroy, OnInit, inject } from '@angular/core';
+import { Injectable, OnDestroy, inject } from '@angular/core';
 import {
   BehaviorSubject,
   Observable,
-  Subject,
   Subscription,
-  distinct,
-  distinctUntilChanged,
-  distinctUntilKeyChanged,
   map,
   pairwise,
   shareReplay,
   switchMap,
+  tap,
 } from 'rxjs';
 import { ClanService } from './clan.service';
 import { ClanWithRole } from '@common/clan';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { hydrate } from 'src/app/common/hydrate.pipe';
+import { ClanParamStream } from 'src/app/shared/streams';
+import { notNullOrUndefined } from 'src/app/shared/operators/not-undefined';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SelectedClanService implements OnDestroy {
+  private clanParam$ = inject(ClanParamStream);
+
   private selectedClanSubject = new BehaviorSubject<string | undefined>(
     undefined
   );
 
-  clans$ = this.selectedClanSubject.pipe(
+  private hydratedSelectedClan$ = this.selectedClanSubject.pipe(
+    map(selectedClan => ({ selectedClan })),
+    hydrate<{ selectedClan?: string }>('selectedClan', {
+      selectedClan: undefined,
+    }),
+    map(clan => clan.selectedClan),
+    shareReplay(1)
+  );
+
+  clans$ = this.hydratedSelectedClan$.pipe(
     switchMap(() => this.clanService.getClans()),
     shareReplay(1)
   );
 
-  private _selectedClan$: Observable<ClanWithRole | undefined> =
-    this.selectedClanSubject.pipe(
+  selectedClan$: Observable<ClanWithRole | undefined> =
+    this.hydratedSelectedClan$.pipe(
       switchMap(selectedClan =>
         this.clans$.pipe(map(clans => ({ selectedClan, clans })))
       ),
@@ -40,16 +50,6 @@ export class SelectedClanService implements OnDestroy {
       ),
       shareReplay(1)
     );
-
-  hydratedSelectedClan$ = this._selectedClan$.pipe(
-    map(clan => ({ selectedClan: clan })),
-    hydrate<{ selectedClan?: ClanWithRole }>('selectedClan', {
-      selectedClan: undefined,
-    }),
-    map(clan => clan?.selectedClan)
-  );
-
-  selectedClan$ = this.hydratedSelectedClan$.pipe(shareReplay(1));
 
   private subscriptions = new Subscription();
 
@@ -63,6 +63,13 @@ export class SelectedClanService implements OnDestroy {
           const url = this.router.url.replace(previous.name, next.name);
           this.router.navigateByUrl(url);
         }
+      })
+    );
+
+    // update selected clan when clan param changes
+    this.subscriptions.add(
+      this.clanParam$.pipe(notNullOrUndefined()).subscribe(clanName => {
+        this.setSelectedClan(clanName);
       })
     );
   }
