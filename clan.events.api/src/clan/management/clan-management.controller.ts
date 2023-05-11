@@ -67,41 +67,6 @@ export class ClanManagementController {
     };
   }
 
-  @Post('members')
-  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
-  async addMemberToClan(
-    @Param('clanName') clanName: string,
-    @User() user: UserClanContext,
-    @Body() body: AddClanMemberRequest,
-  ): Promise<ClanMemberResponse> {
-    if (!this.isAllowedToAssignRole(user.clanRole, body.clanRole)) {
-      throw new UnauthorizedException('Not allowed to assign role');
-    }
-
-    const clan = await this.clanService.getClanByName(clanName);
-    if (!clan) {
-      throw new NotFoundException('Clan not found');
-    }
-    try {
-      const membership = await this.clanMembershipService.addMemberToClan(
-        clan,
-        body.discordId,
-        body.clanRole as ClanRole,
-      );
-
-      return {
-        name: membership.user.name,
-        discordId: membership.user.discordId,
-        clanRole: membership.role,
-      };
-    } catch (ex: any) {
-      if (ex.message == 'User not found') {
-        throw new NotFoundException(ex.message);
-      }
-      throw ex;
-    }
-  }
-
   @Delete('members')
   @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
   async removeMemberToClan(
