@@ -3,10 +3,12 @@ import {
   Component,
   OnDestroy,
   OnInit,
+  inject,
 } from '@angular/core';
 import { FormControl } from '@ngneat/reactive-forms';
 import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/auth/auth.service';
+import { ClansService } from 'src/app/clan/services/clans.service';
 import { SelectedClanService } from 'src/app/clan/services/selected-clan.service';
 import { ConfigService } from 'src/app/config/config.service';
 import { notNullOrUndefined } from 'src/app/shared/operators/not-undefined';
@@ -23,7 +25,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
   userName$ = this.userService.userName$;
   isAuthenticated$ = this.authService.isAuthenticated$;
   selectedClan$ = this.selectedClanService.selectedClan$;
-  clans$ = this.selectedClanService.clans$;
+  clans$ = inject(ClansService).clans$;
 
   selectedClanControl = new FormControl<string | undefined>(undefined);
 

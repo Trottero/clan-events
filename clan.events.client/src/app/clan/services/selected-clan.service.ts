@@ -10,7 +10,7 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
-import { ClanService } from './clan.service';
+import { ClanApiService } from './clan.api.service';
 import { ClanWithRole } from '@common/clan';
 import { Router } from '@angular/router';
 import { hydrate } from 'src/app/common/hydrate.pipe';
@@ -18,38 +18,34 @@ import { ClanParamStream } from 'src/app/shared/streams';
 import { notNullOrUndefined } from 'src/app/shared/operators/not-undefined';
 import { AuthService } from 'src/app/auth/auth.service';
 import { FILTERED, filterMap } from 'src/app/shared/operators/filter-map';
+import { State } from 'src/app/common/state';
+import { ClansService } from './clans.service';
 
+export interface SelectedClanState {
+  clanName?: string;
+}
+
+const INITIAL_STATE: SelectedClanState = {};
 @Injectable({
   providedIn: 'root',
 })
 export class SelectedClanService implements OnDestroy {
   private clanParam$ = inject(ClanParamStream);
 
-  private selectedClanSubject = new BehaviorSubject<string | undefined>(
-    undefined
+  private selectedClanSubject = new State<SelectedClanState>(INITIAL_STATE);
+
+  private selectedClanState$ = this.selectedClanSubject.pipe(
+    hydrate<SelectedClanState>('selectedClan', INITIAL_STATE)
   );
 
-  private hydratedSelectedClan$ = this.selectedClanSubject.pipe(
-    map(selectedClan => ({ selectedClan })),
-    hydrate<{ selectedClan?: string }>('selectedClan', {
-      selectedClan: undefined,
-    }),
-    map(clan => clan.selectedClan),
-    shareReplay(1)
+  selectedClanName$ = this.selectedClanState$.pipe(
+    map(state => state.clanName)
   );
 
-  clans$ = combineLatest([
-    this.hydratedSelectedClan$,
-    this.authService.isAuthenticated$.pipe(
-      filterMap(isAuthenticated => isAuthenticated || FILTERED)
-    ),
-  ]).pipe(
-    switchMap(() => this.clanService.getClans()),
-    shareReplay(1)
-  );
+  clans$ = inject(ClansService).clans$;
 
   selectedClan$: Observable<ClanWithRole | undefined> =
-    this.hydratedSelectedClan$.pipe(
+    this.selectedClanName$.pipe(
       switchMap(selectedClan =>
         this.clans$.pipe(map(clans => ({ selectedClan, clans })))
       ),
@@ -63,10 +59,7 @@ export class SelectedClanService implements OnDestroy {
 
   private readonly router = inject(Router);
 
-  constructor(
-    private readonly clanService: ClanService,
-    private readonly authService: AuthService
-  ) {
+  constructor() {
     // redirect current page to clan if new clan is selected
     this.subscriptions.add(
       this.selectedClan$.pipe(pairwise()).subscribe(([previous, next]) => {
@@ -90,7 +83,9 @@ export class SelectedClanService implements OnDestroy {
   }
 
   setSelectedClan(clanName: string | undefined) {
-    this.selectedClanSubject.next(clanName);
+    this.selectedClanSubject.next({
+      clanName,
+    });
   }
 
   private getSelectedClanOrFirst(

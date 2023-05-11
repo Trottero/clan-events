@@ -9,7 +9,7 @@ import { ClanRole } from '@common/auth/clan.role';
 @Injectable({
   providedIn: 'root',
 })
-export class ClanService {
+export class ClanApiService {
   constructor(
     private readonly httpClient: HttpClient,
     private readonly configService: ConfigService

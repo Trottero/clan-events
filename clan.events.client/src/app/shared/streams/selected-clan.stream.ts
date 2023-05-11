@@ -19,30 +19,17 @@ import { getRouteParamsFromSnapshot } from '../utils/get-route-params';
 import { notNullOrUndefined } from '../operators/not-undefined';
 import { ClanParamStream } from './clan-param.stream';
 import { SelectedClanService } from 'src/app/clan/services/selected-clan.service';
-import { ClanService } from 'src/app/clan/services/clan.service';
+import { ClanApiService } from 'src/app/clan/services/clan.api.service';
 import { Clan } from '@common/clan';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SelectedClanStream extends InjectableStream<Clan | undefined> {
-  constructor(
-    clanParam$: ClanParamStream,
-    selectedClanService: SelectedClanService
-  ) {
+  constructor(selectedClanService: SelectedClanService) {
     super(
-      combineLatest([
-        clanParam$,
-        selectedClanService.selectedClan$,
-        selectedClanService.clans$,
-      ]).pipe(
-        map(([clanName, selectedClan, clans]) => {
-          if (clanName !== undefined) {
-            return clans.find(x => x.name === clanName);
-          }
-
-          return selectedClan;
-        }),
+      selectedClanService.selectedClan$.pipe(
+        distinctUntilChanged(),
         shareReplay(1)
       )
     );

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ClanService } from '../../services/clan.service';
+import { ClanApiService } from '../../services/clan.api.service';
 import { share } from 'rxjs';
 import { Router } from '@angular/router';
 
@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 })
 export class ClanListComponent {
   constructor(
-    private readonly clanService: ClanService,
+    private readonly clanService: ClanApiService,
     private readonly router: Router
   ) {}
 
