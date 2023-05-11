@@ -99,8 +99,10 @@ export class ClanService {
   }
 
   async getClanByName(clanName: string): Promise<ClanDocument> {
+    const safeName = this.sanitizeClanName(clanName);
+
     return await this.clanModel
-      .findOne({ name: this.sanitizeClanName(clanName) })
+      .findOne({ name: safeName })
       .populate({
         path: 'members',
         populate: { path: 'user', model: this.userModel, select: '-clans' },

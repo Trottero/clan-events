@@ -27,6 +27,8 @@ import { convertToEventResponse } from './converters/event.converter';
 import { JwtTokenContent } from '@common/auth';
 import { User } from 'src/common/decorators/user.decorator';
 import { ApiTokenGuard } from 'src/auth/guards/api-token.guard';
+import { HasRoleInClan } from 'src/auth/authorized.decorator';
+import { RoleInClan } from 'src/auth/role-in-clan.decorator';
 
 @Controller(':clanName/events')
 export class EventController {
@@ -37,15 +39,20 @@ export class EventController {
   async getEventsForUser(
     @Query() params: GetEventsRequest,
     @User() user: JwtTokenContent,
+    @Param('clanName') clanName: string,
   ): Promise<PaginatedModel<EventListItem>> {
     const { page, pageSize } = params;
 
-    const result = await this.eventService.getPaginatedEventsForUser(
+    const result = await this.eventService.getPaginatedEventsForUserInClan(
       user,
+      clanName,
       page,
       pageSize,
     );
-    const count = await this.eventService.countEventsForUser(user);
+    const count = await this.eventService.countEventsForUserInClan(
+      user,
+      clanName,
+    );
 
     return convertToEventListResponse(result, {
       page,
@@ -59,9 +66,9 @@ export class EventController {
   @UseGuards(ApiTokenGuard)
   async getEventById(
     @User() user: JwtTokenContent,
-    @Param() { id }: GetEventByIdRequest,
+    @Param() { clanName, id }: GetEventByIdRequest,
   ): Promise<EventResponse> {
-    const event = await this.eventService.getEventById(user, id);
+    const event = await this.eventService.getEventById(user, clanName, id);
     if (!event) throw new HttpException('Event not found', 404);
     return convertToEventResponse(event);
   }
@@ -71,8 +78,9 @@ export class EventController {
   public async createEventForUser(
     @User() user: JwtTokenContent,
     @Body() body: CreateEventRequest,
+    @Param('clanName') clanName: string,
   ): Promise<any> {
-    const event = await this.eventService.createEvent(user, body);
+    const event = await this.eventService.createEvent(user, clanName, body);
     return convertToEventResponse(event);
   }
 

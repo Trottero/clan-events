@@ -8,6 +8,8 @@ export interface EventResponse {
   endsAt: Date;
   participants: EventTeamDto[];
   board: BoardDto;
+  clanName: string;
+  clanDisplayName: string;
 }
 
 export interface BoardDto {

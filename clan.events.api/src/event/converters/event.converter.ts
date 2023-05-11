@@ -15,5 +15,7 @@ export function convertToEventResponse(event: EventDocument): EventResponse {
         name: member.name,
       })),
     })),
+    clanName: event.owner.name,
+    clanDisplayName: event.owner.displayName,
   };
 }
