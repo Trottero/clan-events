@@ -2,18 +2,21 @@ import { Injectable, OnDestroy, inject } from '@angular/core';
 import {
   Observable,
   Subscription,
+  filter,
   map,
   pairwise,
   shareReplay,
+  startWith,
   switchMap,
 } from 'rxjs';
 import { ClanWithRole } from '@common/clan';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 import { hydrate } from 'src/app/common/hydrate.pipe';
 import { State } from 'src/app/common/state';
 import { ClansService } from './clans.service';
 import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
-import { ClanParamStream } from 'src/app/common/streams';
+import { getRouteParamsFromSnapshot } from 'src/app/common/utils/get-route-params';
+import { NAVIGATION_PARAMS } from 'src/app/config/navigation';
 
 export interface SelectedClanState {
   clanName?: string;
@@ -24,7 +27,19 @@ const INITIAL_STATE: SelectedClanState = {};
   providedIn: 'root',
 })
 export class SelectedClanService implements OnDestroy {
-  private clanParam$ = inject(ClanParamStream);
+  private readonly router = inject(Router);
+
+  clanParam$ = this.router.events.pipe(
+    filter(event => event instanceof NavigationEnd),
+    startWith(undefined),
+    map(() =>
+      getRouteParamsFromSnapshot<string>(
+        this.router.routerState.root.snapshot,
+        NAVIGATION_PARAMS.CLAN_NAME
+      )
+    ),
+    shareReplay(1)
+  );
 
   private selectedClanSubject = new State<SelectedClanState>(INITIAL_STATE);
 
@@ -50,8 +65,6 @@ export class SelectedClanService implements OnDestroy {
     );
 
   private subscriptions = new Subscription();
-
-  private readonly router = inject(Router);
 
   constructor() {
     // redirect current page to clan if new clan is selected

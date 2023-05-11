@@ -10,20 +10,16 @@ import {
   Subject,
   Subscription,
   combineLatest,
-  distinctUntilChanged,
-  distinctUntilKeyChanged,
   map,
   shareReplay,
   startWith,
   switchMap,
-  tap,
-  withLatestFrom,
 } from 'rxjs';
 import { EventListItem } from '@common/events';
 import { PaginatedResponse } from '@common/responses';
 import { PageEvent } from '@angular/material/paginator';
 import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
-import { SelectedClanStream } from 'src/app/common/streams';
+import { SelectedClanService } from 'src/app/clan/services/selected-clan.service';
 
 interface FetchEventsOptions {
   page: number;
@@ -37,6 +33,12 @@ interface FetchEventsOptions {
   styleUrls: ['./events.component.scss'],
 })
 export class EventsComponent implements OnDestroy {
+  selectedClan$ = inject(SelectedClanService).selectedClan$.pipe(
+    notNullOrUndefined()
+  );
+
+  private readonly eventsService = inject(EventsService);
+
   public readonly pageSizeOptions: number[] = [10, 25, 50, 100];
 
   private readonly page: number = 0;
@@ -44,8 +46,6 @@ export class EventsComponent implements OnDestroy {
 
   private triggerRefreshSubject = new Subject<FetchEventsOptions>();
   private subscriptions = new Subscription();
-
-  selectedClan$ = inject(SelectedClanStream);
 
   events$: Observable<PaginatedResponse<EventListItem>> = combineLatest([
     this.triggerRefreshSubject.pipe(
@@ -73,8 +73,6 @@ export class EventsComponent implements OnDestroy {
   pageSize$: Observable<number> = this.events$.pipe(
     map(response => response.data.pageSize)
   );
-
-  constructor(private readonly eventsService: EventsService) {}
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();

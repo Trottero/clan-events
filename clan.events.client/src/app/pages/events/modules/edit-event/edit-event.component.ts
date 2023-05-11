@@ -16,7 +16,7 @@ import { EventsService } from '../../events.service';
 import { FormControl, FormGroup } from '@ngneat/reactive-forms';
 import { Validators } from '@angular/forms';
 import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
-import { SelectedClanStream } from 'src/app/common/streams';
+import { SelectedClanService } from 'src/app/clan/services/selected-clan.service';
 
 @Component({
   selector: 'app-edit-event',
@@ -24,7 +24,7 @@ import { SelectedClanStream } from 'src/app/common/streams';
   styleUrls: ['./edit-event.component.scss'],
 })
 export class EditEventComponent implements OnInit, OnDestroy {
-  private readonly selectedClan$ = inject(SelectedClanStream).pipe(
+  selectedClan$ = inject(SelectedClanService).selectedClan$.pipe(
     notNullOrUndefined()
   );
   private readonly eventsService = inject(EventsService);

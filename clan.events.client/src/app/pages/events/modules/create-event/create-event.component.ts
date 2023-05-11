@@ -15,7 +15,7 @@ import {
 import { EventsService } from '../../events.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
-import { SelectedClanStream } from 'src/app/common/streams';
+import { SelectedClanService } from 'src/app/clan/services/selected-clan.service';
 
 const INITIAL_START_DATE = new Date();
 const INITIAL_END_DATE = new Date();
@@ -28,7 +28,7 @@ INITIAL_END_DATE.setDate(INITIAL_END_DATE.getDate() + 7);
   styleUrls: ['./create-event.component.scss'],
 })
 export class CreateEventComponent implements OnInit, OnDestroy {
-  private readonly selectedClan$ = inject(SelectedClanStream).pipe(
+  selectedClan$ = inject(SelectedClanService).selectedClan$.pipe(
     notNullOrUndefined()
   );
   private readonly eventsService = inject(EventsService);

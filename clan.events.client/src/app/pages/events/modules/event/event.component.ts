@@ -5,7 +5,7 @@ import { Observable, Subscription, combineLatest, map, switchMap } from 'rxjs';
 import { Response } from '@common/responses';
 import { EventsService } from '../../events.service';
 import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
-import { SelectedClanStream } from 'src/app/common/streams';
+import { SelectedClanService } from 'src/app/clan/services/selected-clan.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -14,7 +14,9 @@ import { SelectedClanStream } from 'src/app/common/streams';
   styleUrls: ['./event.component.scss'],
 })
 export class EventComponent {
-  selectedClan$ = inject(SelectedClanStream).pipe(notNullOrUndefined());
+  selectedClan$ = inject(SelectedClanService).selectedClan$.pipe(
+    notNullOrUndefined()
+  );
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
