@@ -62,6 +62,16 @@ export class ClanApplicationService {
     clan: ClanDocument,
     discordId: number,
   ): Promise<ClanMembership> {
+    // Check if user has an open application
+    const hasApplication = await this.userHasActiveApplication(
+      clan as unknown as ClanRequestContext,
+      discordId,
+    );
+
+    if (!hasApplication) {
+      throw new Error('This user does not have an open application');
+    }
+
     await this.deleteApplication(clan.id, discordId);
 
     this.checkIfNotAlreadyInClan(
