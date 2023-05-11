@@ -3,12 +3,12 @@ import { ClanService } from '../../services/clan.service';
 import {
   Subject,
   Subscription,
-  catchError,
-  delay,
+  combineLatest,
+  debounceTime,
+  distinctUntilChanged,
   map,
   of,
   switchMap,
-  tap,
   withLatestFrom,
 } from 'rxjs';
 import { Router } from '@angular/router';
@@ -48,6 +48,23 @@ export class CreateClanComponent implements OnInit, OnDestroy {
     switchMap(([_, clanId]) => this.clanService.createClan(clanId))
   );
 
+  private readonly clanIdDebounced$ = this.clanId$.pipe(
+    distinctUntilChanged(),
+    debounceTime(1000)
+  );
+
+  spinnerStatus$ = combineLatest([this.clanId$, this.clanIdDebounced$]).pipe(
+    switchMap(([clanId, clanIdDebounced]) => {
+      if (clanId !== clanIdDebounced) {
+        return of('loading');
+      }
+
+      return this.clanService
+        .clanExists(clanId)
+        .pipe(map(clanExists => (clanExists ? 'error' : 'success')));
+    })
+  );
+
   private readonly subscriptions = new Subscription();
 
   ngOnInit(): void {
@@ -63,6 +80,7 @@ export class CreateClanComponent implements OnInit, OnDestroy {
         },
       })
     );
+    this.subscriptions.add(this.spinnerStatus$.subscribe());
   }
 
   createClan() {
