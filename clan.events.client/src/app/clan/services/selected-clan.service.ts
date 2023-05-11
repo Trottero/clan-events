@@ -3,6 +3,7 @@ import {
   BehaviorSubject,
   Observable,
   Subscription,
+  combineLatest,
   map,
   pairwise,
   shareReplay,
@@ -15,6 +16,8 @@ import { Router } from '@angular/router';
 import { hydrate } from 'src/app/common/hydrate.pipe';
 import { ClanParamStream } from 'src/app/shared/streams';
 import { notNullOrUndefined } from 'src/app/shared/operators/not-undefined';
+import { AuthService } from 'src/app/auth/auth.service';
+import { FILTERED, filterMap } from 'src/app/shared/operators/filter-map';
 
 @Injectable({
   providedIn: 'root',
@@ -35,7 +38,12 @@ export class SelectedClanService implements OnDestroy {
     shareReplay(1)
   );
 
-  clans$ = this.hydratedSelectedClan$.pipe(
+  clans$ = combineLatest([
+    this.hydratedSelectedClan$,
+    this.authService.isAuthenticated$.pipe(
+      filterMap(isAuthenticated => isAuthenticated || FILTERED)
+    ),
+  ]).pipe(
     switchMap(() => this.clanService.getClans()),
     shareReplay(1)
   );
@@ -55,7 +63,10 @@ export class SelectedClanService implements OnDestroy {
 
   private readonly router = inject(Router);
 
-  constructor(private readonly clanService: ClanService) {
+  constructor(
+    private readonly clanService: ClanService,
+    private readonly authService: AuthService
+  ) {
     // redirect current page to clan if new clan is selected
     this.subscriptions.add(
       this.selectedClan$.pipe(pairwise()).subscribe(([previous, next]) => {

@@ -26,6 +26,7 @@ const routes: Routes = [
   {
     path: 'profile',
     component: ProfileComponent,
+    canActivate: [authGuard],
   },
   {
     path: `:${NAVIGATION_PARAMS.CLAN_NAME}/${NAVIGATION_PATHS.EVENTS}`,
@@ -36,6 +37,7 @@ const routes: Routes = [
   {
     path: 'clan',
     loadChildren: () => import('./clan/clan.module').then(m => m.ClanModule),
+    canActivate: [authGuard],
   },
   {
     path: 'test/snackbar',

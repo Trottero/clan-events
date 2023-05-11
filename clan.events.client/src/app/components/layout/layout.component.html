@@ -39,9 +39,15 @@
         <a mat-list-item routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}"
           [routerLink]="'/'">Clan events</a>
         <a mat-list-item routerLinkActive="active-link" [routerLink]="'counter'">Counter</a>
-        <a mat-list-item routerLinkActive="active-link" *ngIf="selectedClan$ | async as clan"
-          [routerLink]="[clan.name, 'events']">Events</a>
-        <a mat-list-item routerLinkActive="active-link" [routerLink]="'clan'">Clans</a>
+
+        <ng-container *ngIf="isAuthenticated$ | async">
+
+          <a mat-list-item routerLinkActive="active-link" *ngIf="selectedClan$ | async as clan"
+            [routerLink]="[clan.name, 'events']">Events</a>
+          <a mat-list-item routerLinkActive="active-link" [routerLink]="'clan'">Clans</a>
+        </ng-container>
+
+
       </mat-action-list>
     </mat-drawer>
 

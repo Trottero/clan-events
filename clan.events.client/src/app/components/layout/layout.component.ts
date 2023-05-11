@@ -3,26 +3,12 @@ import {
   Component,
   OnDestroy,
   OnInit,
-  ViewChild,
 } from '@angular/core';
-import { ClanWithRole } from '@common/clan';
 import { FormControl } from '@ngneat/reactive-forms';
-import {
-  Subscription,
-  combineLatest,
-  map,
-  mergeMap,
-  shareReplay,
-  switchMap,
-  tap,
-  withLatestFrom,
-} from 'rxjs';
+import { Subscription } from 'rxjs';
 import { AuthService } from 'src/app/auth/auth.service';
-import { ClanService } from 'src/app/clan/services/clan.service';
 import { SelectedClanService } from 'src/app/clan/services/selected-clan.service';
-import { hydrate } from 'src/app/common/hydrate.pipe';
 import { ConfigService } from 'src/app/config/config.service';
-import { FILTERED, filterMap } from 'src/app/shared/operators/filter-map';
 import { notNullOrUndefined } from 'src/app/shared/operators/not-undefined';
 import { UserService } from 'src/app/user/user.service';
 
@@ -34,13 +20,9 @@ import { UserService } from 'src/app/user/user.service';
 })
 export class LayoutComponent implements OnInit, OnDestroy {
   discordLoginUrl = this.configService.discordLoginUrl;
-
   userName$ = this.userService.userName$;
-
   isAuthenticated$ = this.authService.isAuthenticated$;
-
   selectedClan$ = this.selectedClanService.selectedClan$;
-
   clans$ = this.selectedClanService.clans$;
 
   selectedClanControl = new FormControl<string | undefined>(undefined);

@@ -28,7 +28,7 @@ import { JwtTokenContent } from '@common/auth';
 import { User } from 'src/common/decorators/user.decorator';
 import { ApiTokenGuard } from 'src/auth/guards/api-token.guard';
 
-@Controller('events')
+@Controller(':clanName/events')
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 

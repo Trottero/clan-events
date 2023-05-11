@@ -43,7 +43,9 @@ export class AuthService {
     )
   );
 
-  isAuthenticated$: Observable<boolean> = this.hasValidToken$.pipe();
+  isAuthenticated$: Observable<boolean> = this.hasValidToken$.pipe(
+    shareReplay(1)
+  );
 
   constructor(
     private readonly httpClient: HttpClient,
