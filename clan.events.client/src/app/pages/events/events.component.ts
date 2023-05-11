@@ -70,14 +70,12 @@ export class EventsComponent implements OnDestroy {
             pageSize,
           })
           .pipe(mapToLoadable())
-      )
+      ),
+      shareReplay(1)
     );
 
   events$: Observable<PaginatedResponse<EventListItem>> =
-    this.eventsLoadable$.pipe(
-      filterMapSuccess(x => x.value),
-      shareReplay(1)
-    );
+    this.eventsLoadable$.pipe(filterMapSuccess(x => x.value));
 
   length$: Observable<number> = this.events$.pipe(
     map(response => response.data.totalItems)

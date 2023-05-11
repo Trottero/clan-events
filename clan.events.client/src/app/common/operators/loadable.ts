@@ -67,7 +67,7 @@ export function mapToLoadable<T>(): OperatorFunction<T, Loadable<T>> {
         map(value => success(value)),
         catchError((e: Error) => of(error(e.message)))
       )
-    ).pipe(tap(x => console.log(x)));
+    );
   };
 }
 

@@ -8,6 +8,7 @@ import {
   shareReplay,
   startWith,
   switchMap,
+  withLatestFrom,
 } from 'rxjs';
 import { ClanWithRole } from '@common/clan';
 import { NavigationEnd, Router } from '@angular/router';
@@ -44,7 +45,8 @@ export class SelectedClanService implements OnDestroy {
   private selectedClanSubject = new State<SelectedClanState>(INITIAL_STATE);
 
   private selectedClanState$ = this.selectedClanSubject.pipe(
-    hydrate<SelectedClanState>('selectedClan', INITIAL_STATE)
+    hydrate<SelectedClanState>('selectedClan', INITIAL_STATE),
+    shareReplay(1)
   );
 
   selectedClanName$ = this.selectedClanState$.pipe(
@@ -79,9 +81,13 @@ export class SelectedClanService implements OnDestroy {
 
     // update selected clan when clan param changes
     this.subscriptions.add(
-      this.clanParam$.pipe(notNullOrUndefined()).subscribe(clanName => {
-        this.setSelectedClan(clanName);
-      })
+      this.clanParam$
+        .pipe(notNullOrUndefined(), withLatestFrom(this.selectedClanName$))
+        .subscribe(([clanName, selectedClanName]) => {
+          if (clanName !== selectedClanName) {
+            this.setSelectedClan(clanName);
+          }
+        })
     );
   }
 
