@@ -10,7 +10,10 @@ import {
   Subject,
   Subscription,
   combineLatest,
+  distinctUntilChanged,
+  distinctUntilKeyChanged,
   map,
+  shareReplay,
   startWith,
   switchMap,
   tap,
@@ -55,7 +58,8 @@ export class EventsComponent implements OnDestroy {
         page,
         pageSize,
       })
-    )
+    ),
+    shareReplay(1)
   );
 
   length$: Observable<number> = this.events$.pipe(

@@ -3,6 +3,8 @@ import { InjectableStream } from 'src/app/shared/observable/injectable-stream';
 import { NavigationEnd, Router } from '@angular/router';
 import {
   combineLatest,
+  distinctUntilChanged,
+  distinctUntilKeyChanged,
   filter,
   map,
   publish,
@@ -25,9 +27,8 @@ import { Clan } from '@common/clan';
 })
 export class SelectedClanStream extends InjectableStream<Clan | undefined> {
   constructor(
-    private clanParam$: ClanParamStream,
-    private selectedClanService: SelectedClanService,
-    private clanService: ClanService
+    clanParam$: ClanParamStream,
+    selectedClanService: SelectedClanService
   ) {
     super(
       combineLatest([

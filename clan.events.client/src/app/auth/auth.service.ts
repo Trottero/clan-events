@@ -43,12 +43,7 @@ export class AuthService {
     )
   );
 
-  /**
-   * Emits only if the user is authenticated.
-   */
-  isAuthenticated$: Observable<boolean> = this.hasValidToken$.pipe(
-    filterMap(isAuthenticated => isAuthenticated || FILTERED)
-  );
+  isAuthenticated$: Observable<boolean> = this.hasValidToken$.pipe();
 
   constructor(
     private readonly httpClient: HttpClient,

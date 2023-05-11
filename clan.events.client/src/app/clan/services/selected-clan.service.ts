@@ -1,13 +1,21 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, OnInit, inject } from '@angular/core';
 import {
   BehaviorSubject,
   Observable,
+  Subject,
   Subscription,
+  distinct,
+  distinctUntilChanged,
+  distinctUntilKeyChanged,
   map,
+  pairwise,
+  shareReplay,
   switchMap,
 } from 'rxjs';
 import { ClanService } from './clan.service';
 import { ClanWithRole } from '@common/clan';
+import { ActivatedRoute, Router } from '@angular/router';
+import { hydrate } from 'src/app/common/hydrate.pipe';
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +26,8 @@ export class SelectedClanService implements OnDestroy {
   );
 
   clans$ = this.selectedClanSubject.pipe(
-    switchMap(() => this.clanService.getClans())
+    switchMap(() => this.clanService.getClans()),
+    shareReplay(1)
   );
 
   selectedClan$: Observable<ClanWithRole | undefined> =
@@ -28,27 +37,29 @@ export class SelectedClanService implements OnDestroy {
       ),
       map(({ selectedClan, clans }) =>
         this.getSelectedClanOrFirst(selectedClan, clans)
-      )
+      ),
+      map(clan => ({ selectedClan: clan })),
+      hydrate<{ selectedClan?: ClanWithRole }>('selectedClan', {
+        selectedClan: undefined,
+      }),
+      map(clan => clan?.selectedClan),
+      shareReplay(1)
     );
 
   private subscriptions = new Subscription();
 
+  private readonly router = inject(Router);
+
   constructor(private readonly clanService: ClanService) {
+    // redirect current page to clan if new clan is selected
     this.subscriptions.add(
-      this.selectedClan$.subscribe(clan => {
-        // save clan to local storage
-        localStorage.setItem(
-          'selectedClan',
-          JSON.stringify(clan?.name ?? null)
-        );
+      this.selectedClan$.pipe(pairwise()).subscribe(([previous, next]) => {
+        if (previous && next && previous.name !== next.name) {
+          const url = this.router.url.replace(previous.name, next.name);
+          this.router.navigateByUrl(url);
+        }
       })
     );
-
-    // load clan from local storage
-    const selectedClan = localStorage.getItem('selectedClan');
-    if (selectedClan) {
-      this.selectedClanSubject.next(JSON.parse(selectedClan) ?? undefined);
-    }
   }
 
   ngOnDestroy() {

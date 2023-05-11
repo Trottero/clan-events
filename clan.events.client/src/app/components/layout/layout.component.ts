@@ -39,13 +39,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   isAuthenticated$ = this.authService.isAuthenticated$;
 
-  selectedClan$ = combineLatest([
-    this.isAuthenticated$,
-    this.selectedClanService.selectedClan$,
-  ]).pipe(
-    map(([_, selectedClan]) => selectedClan),
-    shareReplay(1)
-  );
+  selectedClan$ = this.selectedClanService.selectedClan$;
 
   clans$ = this.selectedClanService.clans$;
 
