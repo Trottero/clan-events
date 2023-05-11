@@ -30,7 +30,7 @@ export class SelectedClanService implements OnDestroy {
     shareReplay(1)
   );
 
-  selectedClan$: Observable<ClanWithRole | undefined> =
+  private _selectedClan$: Observable<ClanWithRole | undefined> =
     this.selectedClanSubject.pipe(
       switchMap(selectedClan =>
         this.clans$.pipe(map(clans => ({ selectedClan, clans })))
@@ -38,13 +38,18 @@ export class SelectedClanService implements OnDestroy {
       map(({ selectedClan, clans }) =>
         this.getSelectedClanOrFirst(selectedClan, clans)
       ),
-      map(clan => ({ selectedClan: clan })),
-      hydrate<{ selectedClan?: ClanWithRole }>('selectedClan', {
-        selectedClan: undefined,
-      }),
-      map(clan => clan?.selectedClan),
       shareReplay(1)
     );
+
+  hydratedSelectedClan$ = this._selectedClan$.pipe(
+    map(clan => ({ selectedClan: clan })),
+    hydrate<{ selectedClan?: ClanWithRole }>('selectedClan', {
+      selectedClan: undefined,
+    }),
+    map(clan => clan?.selectedClan)
+  );
+
+  selectedClan$ = this.hydratedSelectedClan$.pipe(shareReplay(1));
 
   private subscriptions = new Subscription();
 
