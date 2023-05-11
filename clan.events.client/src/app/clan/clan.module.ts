@@ -3,7 +3,6 @@ import { ClanListComponent } from './pages/clan-list/clan-list.component';
 import { CreateClanComponent } from './pages/create-clan/create-clan.component';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ClanApiService } from './services/clan.api.service';
 import { AuthModule } from '../auth/auth.module';
 import { ClanOverviewComponent } from './pages/clan-overview/clan-overview.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -13,6 +12,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { ApplyToClanComponent } from './pages/apply-to-clan/apply-to-clan.component';
+import { AddClanComponent } from './pages/add-clan/add-clan.component';
+import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule } from '@angular/material/divider';
+import { AsyncClanNameValidator } from './validators/async-clan-name.validator';
+import { authGuard } from '../auth/auth.guard';
 
 @NgModule({
   imports: [
@@ -24,15 +29,19 @@ import { MatSelectModule } from '@angular/material/select';
     MatIconModule,
     MatInputModule,
     MatSelectModule,
+    MatCardModule,
+    MatDividerModule,
     ReactiveFormsModule,
     RouterModule.forChild([
       {
         path: '',
         component: ClanListComponent,
+        canActivate: [authGuard],
       },
       {
         path: 'new',
-        component: CreateClanComponent,
+        component: AddClanComponent,
+        canActivate: [authGuard],
       },
       {
         path: ':clanName',
@@ -41,7 +50,13 @@ import { MatSelectModule } from '@angular/material/select';
     ]),
     AuthModule,
   ],
-  providers: [],
-  declarations: [ClanListComponent, CreateClanComponent, ClanOverviewComponent],
+  providers: [AsyncClanNameValidator],
+  declarations: [
+    ClanListComponent,
+    CreateClanComponent,
+    ClanOverviewComponent,
+    ApplyToClanComponent,
+    AddClanComponent,
+  ],
 })
 export class ClanModule {}

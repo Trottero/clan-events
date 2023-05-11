@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, catchError, map, of } from 'rxjs';
 import { ClanMemberResponse, ClanResponse, ClanWithRole } from '@common/clan';
 import { HttpClient } from '@angular/common/http';
 import { Response } from '@common/responses';
@@ -35,6 +35,13 @@ export class ClanApiService {
         name: clanName,
       })
       .pipe(map(x => x.data));
+  }
+
+  clanExists(clanName: string): Observable<boolean> {
+    return this.getClan(clanName).pipe(
+      map(() => true),
+      catchError(() => of(false))
+    );
   }
 
   deleteClan(clanName: string): Observable<void> {
