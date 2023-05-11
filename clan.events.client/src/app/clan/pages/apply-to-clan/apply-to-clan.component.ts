@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { FormControl, FormGroup } from '@ngneat/reactive-forms';
 import { Subject, Subscription, delay, switchMap, tap } from 'rxjs';
-import { SnackbarService } from 'src/app/common/snackbar/snackbar-service';
+import { SnackbarService } from 'src/app/shared/snackbar/snackbar-service';
 
 @Component({
   selector: 'app-apply-to-clan',
