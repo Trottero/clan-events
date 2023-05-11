@@ -5,14 +5,14 @@ import { SnackbarData } from './snackbar-data';
 
 @Injectable()
 export class SnackbarService {
-  private readonly _snackbar = inject(MatSnackBar);
-  private readonly _snackbarDuration = 5000;
+  private readonly snackbar = inject(MatSnackBar);
+  private readonly snackbarDuration = 5000;
 
   info(message: string, action: string = 'Dismiss') {
-    this._snackbar.openFromComponent<CustomSnackbarComponent, SnackbarData>(
+    this.snackbar.openFromComponent<CustomSnackbarComponent, SnackbarData>(
       CustomSnackbarComponent,
       {
-        duration: this._snackbarDuration,
+        duration: this.snackbarDuration,
         panelClass: 'info',
         data: {
           action,
@@ -24,10 +24,10 @@ export class SnackbarService {
   }
 
   warning(message: string, action: string = 'Dismiss') {
-    this._snackbar.openFromComponent<CustomSnackbarComponent, SnackbarData>(
+    this.snackbar.openFromComponent<CustomSnackbarComponent, SnackbarData>(
       CustomSnackbarComponent,
       {
-        duration: this._snackbarDuration,
+        duration: this.snackbarDuration,
         panelClass: 'warning',
         data: {
           action,
@@ -39,10 +39,10 @@ export class SnackbarService {
   }
 
   error(message: string, action: string = 'Dismiss') {
-    this._snackbar.openFromComponent<CustomSnackbarComponent, SnackbarData>(
+    this.snackbar.openFromComponent<CustomSnackbarComponent, SnackbarData>(
       CustomSnackbarComponent,
       {
-        duration: this._snackbarDuration,
+        duration: this.snackbarDuration,
         panelClass: 'error',
         data: {
           action,
@@ -54,10 +54,10 @@ export class SnackbarService {
   }
 
   success(message: string, action: string = 'Dismiss') {
-    this._snackbar.openFromComponent<CustomSnackbarComponent, SnackbarData>(
+    this.snackbar.openFromComponent<CustomSnackbarComponent, SnackbarData>(
       CustomSnackbarComponent,
       {
-        duration: this._snackbarDuration,
+        duration: this.snackbarDuration,
         panelClass: 'success',
         data: {
           action,

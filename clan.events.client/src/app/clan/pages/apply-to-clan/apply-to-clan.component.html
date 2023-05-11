@@ -6,10 +6,7 @@
   <form [formGroup]="formGroup" (ngSubmit)="applyToClan()">
     <mat-card-content>
       <p>Enter the <i>name</i> or the <i>clan ID</i> of the clan you want to join.</p>
-      <p>Is your clan not found? Ask your clan owner to create their
-        clan
-        on the website.
-      </p>
+      <p>Is your clan not found? Ask your clan owner to create their clan on the website.</p>
       <mat-form-field subscriptSizing="dynamic">
         <input matInput title="clanName" [formControl]="clanName" placeholder="Clan Name" />
       </mat-form-field>
