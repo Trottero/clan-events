@@ -17,6 +17,7 @@ import { AddClanComponent } from './pages/add-clan/add-clan.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { AsyncClanNameValidator } from './validators/async-clan-name.validator';
+import { authGuard } from '../auth/auth.guard';
 
 @NgModule({
   imports: [
@@ -35,10 +36,12 @@ import { AsyncClanNameValidator } from './validators/async-clan-name.validator';
       {
         path: '',
         component: ClanListComponent,
+        canActivate: [authGuard],
       },
       {
         path: 'new',
         component: AddClanComponent,
+        canActivate: [authGuard],
       },
       {
         path: ':clanName',
