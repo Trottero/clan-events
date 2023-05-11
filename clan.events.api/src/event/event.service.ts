@@ -15,11 +15,16 @@ export class EventService {
     private readonly clanService: ClanService,
   ) {}
 
-  async countEventsForUser(user: JwtTokenContent): Promise<number> {
+  async countEventsForUserInClan(
+    user: JwtTokenContent,
+    clanName: string,
+  ): Promise<number> {
     const userObj = await this.userService.getUserByUsername(user.username);
+    const clan = await this.clanService.getClanByName(clanName);
 
     return this.eventModel
       .countDocuments({
+        owner: clan.id,
         'participants.members': {
           $eq: userObj.id,
         },
@@ -27,15 +32,18 @@ export class EventService {
       .exec();
   }
 
-  async getPaginatedEventsForUser(
+  async getPaginatedEventsForUserInClan(
     user: JwtTokenContent,
+    clanName: string,
     page: number,
     pageSize: number,
   ): Promise<EventDocument[]> {
     const userObj = await this.userService.getUserByUsername(user.username);
+    const clan = await this.clanService.getClanByName(clanName);
 
     const events = await this.eventModel
       .find({
+        owner: clan.id,
         'participants.members': {
           $eq: userObj.id,
         },
@@ -50,12 +58,15 @@ export class EventService {
 
   async getEventById(
     user: JwtTokenContent,
+    clanName: string,
     id: string,
   ): Promise<EventDocument | null> {
     const userObj = await this.userService.getUserByUsername(user.username);
+    const clan = await this.clanService.getClanByName(clanName);
 
     const hasAccess = await this.eventModel.exists({
       _id: id,
+      owner: clan.id,
       'participants.members': {
         $eq: userObj.id,
       },
@@ -63,14 +74,20 @@ export class EventService {
 
     if (!hasAccess) return null;
 
-    return this.eventModel.findById(id).populate('participants.members').exec();
+    return this.eventModel
+      .findById(id)
+      .populate('participants.members')
+      .populate('owner')
+      .exec();
   }
 
   async createEvent(
     user: JwtTokenContent,
+    clanName: string,
     event: CreateEventRequest,
   ): Promise<EventDocument> {
     const userObj = await this.userService.getUserByUsername(user.username);
+    const clan = await this.clanService.getClanByName(clanName);
 
     const newEvent = new this.eventModel<Event>({
       actions: [],
@@ -78,6 +95,7 @@ export class EventService {
         type: event.boardType,
         tiles: [],
       },
+      owner: clan,
       description: event.description,
       startsAt: event.startsAt,
       endsAt: event.endsAt,
@@ -91,7 +109,9 @@ export class EventService {
     });
 
     const result: EventDocument = await newEvent.save();
-    result.populate('participants.members');
+
+    await result.populate('participants.members');
+    await result.populate('owner');
 
     return result;
   }
