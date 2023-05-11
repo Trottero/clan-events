@@ -14,14 +14,18 @@
       <p *ngIf="clanId$ | async as clanId">
         Your unique <i>clan ID</i>: <strong>{{clanId}}</strong>
       </p>
-      <p>
-        {{spinnerStatus$ | async}}
-      </p>
+
     </mat-card-content>
-    <mat-card-actions>
+    <mat-card-actions class="d-flex align-items-center">
       <button type="submit" mat-raised-button color="primary" [disabled]="!(formGroup.valid$ | async)">
         Create
       </button>
+      <span class="ms-3" *ngIf="clanId$ | async as clanId">
+        <span class="d-flex align-items-center icon-with-text">
+          <mat-icon>{{name.pending ? 'hourglass_empty': name.valid ? 'check_circle' : 'cancel'}}</mat-icon>
+          <span class="ms-1">{{name.pending ? 'Checking..': name.valid ? 'Available' : 'Unavailable'}}</span>
+        </span>
+      </span>
     </mat-card-actions>
   </form>
 </mat-card>

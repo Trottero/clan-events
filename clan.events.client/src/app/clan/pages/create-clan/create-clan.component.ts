@@ -3,11 +3,9 @@ import { ClanService } from '../../services/clan.service';
 import {
   Subject,
   Subscription,
-  combineLatest,
   debounceTime,
   distinctUntilChanged,
   map,
-  of,
   switchMap,
   withLatestFrom,
 } from 'rxjs';
@@ -17,6 +15,7 @@ import { Validators } from '@angular/forms';
 import { sanitizeClanName } from '@common/clan';
 import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
 import { SnackbarService } from 'src/app/common/snackbar/snackbar-service';
+import { AsyncClanNameValidator } from '../../validators/async-clan-name.validator';
 
 @Component({
   selector: 'app-create-clan',
@@ -27,11 +26,13 @@ export class CreateClanComponent implements OnInit, OnDestroy {
   private readonly clanService = inject(ClanService);
   private readonly router = inject(Router);
   private readonly snackbarService = inject(SnackbarService);
+  private readonly asyncClanNameValidator = inject(AsyncClanNameValidator);
 
-  name = new FormControl<string>('', [
-    Validators.required,
-    Validators.minLength(3),
-  ]);
+  name = new FormControl<string>(
+    '',
+    [Validators.required, Validators.minLength(3)],
+    [this.asyncClanNameValidator.validate.bind(this.asyncClanNameValidator)]
+  );
 
   formGroup = new FormGroup({
     name: this.name,
@@ -46,23 +47,6 @@ export class CreateClanComponent implements OnInit, OnDestroy {
   private readonly createClan$ = this.createClanSubmit$.pipe(
     withLatestFrom(this.clanId$),
     switchMap(([_, clanId]) => this.clanService.createClan(clanId))
-  );
-
-  private readonly clanIdDebounced$ = this.clanId$.pipe(
-    distinctUntilChanged(),
-    debounceTime(1000)
-  );
-
-  spinnerStatus$ = combineLatest([this.clanId$, this.clanIdDebounced$]).pipe(
-    switchMap(([clanId, clanIdDebounced]) => {
-      if (clanId !== clanIdDebounced) {
-        return of('loading');
-      }
-
-      return this.clanService
-        .clanExists(clanId)
-        .pipe(map(clanExists => (clanExists ? 'error' : 'success')));
-    })
   );
 
   private readonly subscriptions = new Subscription();
@@ -80,7 +64,6 @@ export class CreateClanComponent implements OnInit, OnDestroy {
         },
       })
     );
-    this.subscriptions.add(this.spinnerStatus$.subscribe());
   }
 
   createClan() {

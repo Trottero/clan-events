@@ -17,6 +17,7 @@ import { ApplyToClanComponent } from './pages/apply-to-clan/apply-to-clan.compon
 import { AddClanComponent } from './pages/add-clan/add-clan.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
+import { AsyncClanNameValidator } from './validators/async-clan-name.validator';
 
 @NgModule({
   imports: [
@@ -47,7 +48,7 @@ import { MatDividerModule } from '@angular/material/divider';
     ]),
     AuthModule,
   ],
-  providers: [ClanService],
+  providers: [ClanService, AsyncClanNameValidator],
   declarations: [
     ClanListComponent,
     CreateClanComponent,
