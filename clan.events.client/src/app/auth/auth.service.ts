@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, shareReplay, tap } from 'rxjs';
+import { Observable, map, shareReplay, startWith, tap } from 'rxjs';
 import { ConfigService } from '../config/config.service';
 import { AuthState } from './auth.state';
 import { JwtTokenContent, AccessTokenResponse } from '@common/auth';
@@ -8,8 +8,11 @@ import { hydrate } from '../common/hydrate.pipe';
 import { JwtService } from './jwt.service';
 import { State } from '../common/state';
 import { Response } from '@common/responses';
+import { FILTERED, filterMap } from '../shared/operators/filter-map';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class AuthService {
   private readonly initialState: AuthState = {
     accessToken: '',
@@ -37,6 +40,13 @@ export class AuthService {
         !!decodedToken.iat &&
         decodedToken.iat + decodedToken.expiresIn > Date.now() / 1000
     )
+  );
+
+  /**
+   * Emits only if the user is authenticated.
+   */
+  isAuthenticated$: Observable<boolean> = this.hasValidToken$.pipe(
+    filterMap(isAuthenticated => isAuthenticated || FILTERED)
   );
 
   constructor(

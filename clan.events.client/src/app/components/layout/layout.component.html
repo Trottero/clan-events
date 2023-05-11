@@ -8,15 +8,26 @@
 
     <div class="spacer"></div>
 
-    <mat-chip-listbox>
-      <mat-chip-option class="user-chip" [highlighted]="true" color="primary" *ngIf="(userName$ | async)"
-        [selectable]="false" [routerLink]="['/profile']">
-        <mat-icon matChipAvatar>account_circle</mat-icon>
-        {{userName$ | async}}
-      </mat-chip-option>
-    </mat-chip-listbox>
+    <div class="user" *ngIf="isAuthenticated$ | async">
+      <mat-select class="clan-select" *ngIf="(clans$ | async) as clans" [formControl]="selectedClanControl"
+        placeholder="Select a clan">
+        <mat-option *ngFor="let clan of clans" [value]="clan.name">
+          {{clan.displayName}}
+        </mat-option>
+      </mat-select>
 
-    <a mat-flat-button color="primary" *ngIf="!(userName$ | async)" class="nav-link" [href]="discordLoginUrl">Log in</a>
+      <mat-chip-listbox *ngIf="(userName$ | async) as userName">
+        <mat-chip-option class="user-chip" [highlighted]="true" color="primary" [selectable]="false"
+          [routerLink]="['/profile']">
+          <mat-icon matChipAvatar>account_circle</mat-icon>
+          {{userName}}
+        </mat-chip-option>
+      </mat-chip-listbox>
+    </div>
+
+    <a mat-flat-button color="primary" *ngIf="!(userName$ | async)" class="nav-link" [href]="discordLoginUrl">
+      Log in
+    </a>
     <a mat-flat-button *ngIf="(userName$ | async)" (click)="logout()">Log out</a>
   </mat-toolbar>
 
@@ -28,7 +39,8 @@
         <a mat-list-item routerLinkActive="active-link" [routerLinkActiveOptions]="{exact: true}"
           [routerLink]="'/'">Clan events</a>
         <a mat-list-item routerLinkActive="active-link" [routerLink]="'counter'">Counter</a>
-        <a mat-list-item routerLinkActive="active-link" [routerLink]="'events'">Events</a>
+        <a mat-list-item routerLinkActive="active-link" *ngIf="selectedClan$ | async as clan"
+          [routerLink]="[clan.name, 'events']">Events</a>
         <a mat-list-item routerLinkActive="active-link" [routerLink]="'clan'">Clans</a>
       </mat-action-list>
     </mat-drawer>

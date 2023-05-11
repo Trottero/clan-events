@@ -9,7 +9,6 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 @NgModule({
   imports: [CommonModule],
   providers: [
-    AuthService,
     JwtService,
     AuthInterceptorService,
     {

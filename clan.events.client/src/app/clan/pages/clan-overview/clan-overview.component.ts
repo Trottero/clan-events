@@ -10,6 +10,7 @@ import {
   filter,
   map,
   merge,
+  mergeMap,
   of,
   shareReplay,
   switchMap,
@@ -20,6 +21,7 @@ import { ClanMemberResponse } from '@common/clan';
 import { ClanRole } from '@common/auth/clan.role';
 import { UserService } from 'src/app/user/user.service';
 import { MatTable } from '@angular/material/table';
+import { SelectedClanService } from '../../services/selected-clan.service';
 
 @Component({
   selector: 'app-clan-overview',
@@ -89,7 +91,8 @@ export class ClanOverviewComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly userService: UserService,
-    private readonly changeDetectorRef: ChangeDetectorRef
+    private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly selectedClanService: SelectedClanService
   ) {}
 
   ngOnInit(): void {
@@ -100,10 +103,18 @@ export class ClanOverviewComponent implements OnInit {
   deleteClan() {
     this.clanName$
       .pipe(
-        switchMap(name => this.clanService.deleteClan(name)),
-        switchMap(() => this.router.navigate(['/clan']))
+        switchMap(clanName =>
+          this.clanService.deleteClan(clanName).pipe(map(() => clanName))
+        ),
+        withLatestFrom(this.selectedClanService.selectedClan$)
       )
-      .subscribe();
+      .subscribe(([deletedClanName, selectedClan]) => {
+        if (selectedClan?.name === deletedClanName) {
+          this.selectedClanService.setSelectedClan(undefined);
+        }
+
+        this.router.navigate(['/clan']);
+      });
   }
 
   saveClanFromEdit() {

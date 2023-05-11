@@ -1,9 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { ClanService } from '../../services/clan.service';
-import { switchMap } from 'rxjs';
+import { switchMap, withLatestFrom } from 'rxjs';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup } from '@ngneat/reactive-forms';
 import { Validators } from '@angular/forms';
+import { SelectedClanService } from '../../services/selected-clan.service';
 
 @Component({
   selector: 'app-create-clan',
@@ -22,13 +23,14 @@ export class CreateClanComponent {
 
   private readonly _clanService = inject(ClanService);
   private readonly _router = inject(Router);
+  private readonly _selectedClanService = inject(SelectedClanService);
 
   createClan() {
     this.formGroup.value$
-      .pipe(
-        switchMap(value => this._clanService.createClan(value.name)),
-        switchMap(result => this._router.navigate(['/clan', result.name]))
-      )
-      .subscribe();
+      .pipe(switchMap(value => this._clanService.createClan(value.name)))
+      .subscribe(result => {
+        this._selectedClanService.setSelectedClan(result.name);
+        this._router.navigate(['/clan', result.name]);
+      });
   }
 }

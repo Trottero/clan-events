@@ -41,7 +41,7 @@ import { MatSelectModule } from '@angular/material/select';
     ]),
     AuthModule,
   ],
-  providers: [ClanService],
+  providers: [],
   declarations: [ClanListComponent, CreateClanComponent, ClanOverviewComponent],
 })
 export class ClanModule {}
