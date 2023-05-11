@@ -6,6 +6,7 @@ import {
   HttpException,
   Param,
   Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -17,6 +18,8 @@ import {
   EventResponse,
   GetEventByIdRequest,
   GetEventsRequest,
+  UpdateEventParams,
+  UpdateEventRequest,
 } from '@common/events';
 import { PaginatedModel } from '@common/responses';
 import { convertToEventListResponse } from './converters/event-list.converter';
@@ -25,7 +28,7 @@ import { JwtTokenContent } from '@common/auth';
 import { User } from 'src/common/decorators/user.decorator';
 import { ApiTokenGuard } from 'src/auth/guards/api-token.guard';
 
-@Controller('events')
+@Controller(':clanName/events')
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
@@ -80,5 +83,15 @@ export class EventController {
     @Param() { id }: DeleteEventByIdRequest,
   ): Promise<any> {
     await this.eventService.deleteEventById(user, id);
+  }
+
+  @Put(':id')
+  @UseGuards(ApiTokenGuard)
+  public async updateEventById(
+    @Body() body: UpdateEventRequest,
+    @Param() { id }: UpdateEventParams,
+  ): Promise<any> {
+    const event = await this.eventService.updateEvent(id, body);
+    return convertToEventResponse(event);
   }
 }

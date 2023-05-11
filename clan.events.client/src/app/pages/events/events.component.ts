@@ -1,16 +1,25 @@
-import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  inject,
+} from '@angular/core';
 import { EventsService } from './events.service';
 import {
   Observable,
   Subject,
   Subscription,
+  combineLatest,
   map,
+  shareReplay,
   startWith,
   switchMap,
 } from 'rxjs';
 import { EventListItem } from '@common/events';
 import { PaginatedResponse } from '@common/responses';
 import { PageEvent } from '@angular/material/paginator';
+import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
+import { SelectedClanService } from 'src/app/clan/services/selected-clan.service';
 
 interface FetchEventsOptions {
   page: number;
@@ -24,6 +33,12 @@ interface FetchEventsOptions {
   styleUrls: ['./events.component.scss'],
 })
 export class EventsComponent implements OnDestroy {
+  selectedClan$ = inject(SelectedClanService).selectedClan$.pipe(
+    notNullOrUndefined()
+  );
+
+  private readonly eventsService = inject(EventsService);
+
   public readonly pageSizeOptions: number[] = [10, 25, 50, 100];
 
   private readonly page: number = 0;
@@ -32,16 +47,20 @@ export class EventsComponent implements OnDestroy {
   private triggerRefreshSubject = new Subject<FetchEventsOptions>();
   private subscriptions = new Subscription();
 
-  events$: Observable<PaginatedResponse<EventListItem>> =
+  events$: Observable<PaginatedResponse<EventListItem>> = combineLatest([
     this.triggerRefreshSubject.pipe(
-      startWith({ page: this.page, pageSize: this.pageSize }),
-      switchMap(({ page, pageSize }) =>
-        this.eventsService.getEvents({
-          page,
-          pageSize,
-        })
-      )
-    );
+      startWith({ page: this.page, pageSize: this.pageSize })
+    ),
+    this.selectedClan$.pipe(notNullOrUndefined()),
+  ]).pipe(
+    switchMap(([{ page, pageSize }, selectedClan]) =>
+      this.eventsService.getEvents(selectedClan.name, {
+        page,
+        pageSize,
+      })
+    ),
+    shareReplay(1)
+  );
 
   length$: Observable<number> = this.events$.pipe(
     map(response => response.data.totalItems)
@@ -55,8 +74,6 @@ export class EventsComponent implements OnDestroy {
     map(response => response.data.pageSize)
   );
 
-  constructor(private readonly eventsService: EventsService) {}
-
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
@@ -66,16 +83,5 @@ export class EventsComponent implements OnDestroy {
       page: event.pageIndex,
       pageSize: event.pageSize,
     });
-  }
-
-  delete(eventId: string): void {
-    this.subscriptions.add(
-      this.eventsService.deleteEventById(eventId).subscribe(() => {
-        this.triggerRefreshSubject.next({
-          page: this.page,
-          pageSize: this.pageSize,
-        });
-      })
-    );
   }
 }

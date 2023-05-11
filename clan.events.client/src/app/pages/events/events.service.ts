@@ -5,6 +5,7 @@ import {
   EventListItem,
   EventResponse,
   GetEventsRequest,
+  UpdateEventRequest,
 } from '@common/events';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -19,10 +20,11 @@ export class EventsService {
   ) {}
 
   getEvents(
+    clanName: string,
     request: GetEventsRequest
   ): Observable<PaginatedResponse<EventListItem>> {
     return this.http.get<PaginatedResponse<EventListItem>>(
-      `${this.configService.backEndUrl}/events`,
+      `${this.configService.backEndUrl}/${clanName}/events`,
       {
         params: {
           page: request.page.toString(),
@@ -32,24 +34,39 @@ export class EventsService {
     );
   }
 
-  getEventById(id: string): Observable<Response<EventResponse>> {
+  getEventById(
+    id: string,
+    clanName: string
+  ): Observable<Response<EventResponse>> {
     return this.http.get<Response<EventResponse>>(
-      `${this.configService.backEndUrl}/events/${id}`
+      `${this.configService.backEndUrl}/${clanName}/events/${id}`
     );
   }
 
   createEvent(
+    clanName: string,
     request: CreateEventRequest
   ): Observable<Response<EventResponse>> {
     return this.http.post<Response<EventResponse>>(
-      `${this.configService.backEndUrl}/events`,
+      `${this.configService.backEndUrl}/${clanName}/events`,
       request
     );
   }
 
-  deleteEventById(id: string): Observable<void> {
+  deleteEventById(id: string, clanName: string): Observable<void> {
     return this.http.delete<void>(
-      `${this.configService.backEndUrl}/events/${id}`
+      `${this.configService.backEndUrl}/${clanName}/events/${id}`
+    );
+  }
+
+  updateEvent(
+    id: string,
+    clanName: string,
+    request: UpdateEventRequest
+  ): Observable<Response<EventResponse>> {
+    return this.http.put<Response<EventResponse>>(
+      `${this.configService.backEndUrl}/${clanName}/events/${id}`,
+      request
     );
   }
 }

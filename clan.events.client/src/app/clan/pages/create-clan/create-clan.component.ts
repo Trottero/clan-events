@@ -1,21 +1,15 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { ClanService } from '../../services/clan.service';
-import {
-  Subject,
-  Subscription,
-  debounceTime,
-  distinctUntilChanged,
-  map,
-  switchMap,
-  withLatestFrom,
-} from 'rxjs';
+import { Subject, Subscription, map, switchMap, withLatestFrom } from 'rxjs';
 import { Router } from '@angular/router';
 import { FormControl, FormGroup } from '@ngneat/reactive-forms';
 import { Validators } from '@angular/forms';
 import { sanitizeClanName } from '@common/clan';
 import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
-import { SnackbarService } from 'src/app/common/snackbar/snackbar-service';
 import { AsyncClanNameValidator } from '../../validators/async-clan-name.validator';
+import { ClanApiService } from '../../services/clan.api.service';
+import { ClansService } from '../../services/clans.service';
+import { SelectedClanService } from '../../services/selected-clan.service';
+import { SnackbarService } from 'src/app/shared/snackbar/snackbar-service';
 
 @Component({
   selector: 'app-create-clan',
@@ -23,7 +17,9 @@ import { AsyncClanNameValidator } from '../../validators/async-clan-name.validat
   styleUrls: ['./create-clan.component.scss'],
 })
 export class CreateClanComponent implements OnInit, OnDestroy {
-  private readonly clanService = inject(ClanService);
+  private readonly clanApiService = inject(ClanApiService);
+  private readonly clansService = inject(ClansService);
+  private readonly selectedClanService = inject(SelectedClanService);
   private readonly router = inject(Router);
   private readonly snackbarService = inject(SnackbarService);
   private readonly asyncClanNameValidator = inject(AsyncClanNameValidator);
@@ -46,7 +42,7 @@ export class CreateClanComponent implements OnInit, OnDestroy {
   private readonly createClanSubmit$ = new Subject<void>();
   private readonly createClan$ = this.createClanSubmit$.pipe(
     withLatestFrom(this.clanId$),
-    switchMap(([_, clanId]) => this.clanService.createClan(clanId))
+    switchMap(([_, clanId]) => this.clanApiService.createClan(clanId))
   );
 
   private readonly subscriptions = new Subscription();
@@ -56,6 +52,8 @@ export class CreateClanComponent implements OnInit, OnDestroy {
       this.createClan$.subscribe({
         next: result => {
           this.snackbarService.success('Clan created');
+          this.clansService.refreshClans();
+          this.selectedClanService.setSelectedClan(result.name);
           this.router.navigate(['/clan', result.name]);
         },
         error: error => {

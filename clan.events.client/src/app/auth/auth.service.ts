@@ -9,7 +9,9 @@ import { JwtService } from './jwt.service';
 import { State } from '../common/state';
 import { Response } from '@common/responses';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class AuthService {
   private readonly initialState: AuthState = {
     accessToken: '',
@@ -38,6 +40,8 @@ export class AuthService {
         decodedToken.iat + decodedToken.expiresIn > Date.now() / 1000
     )
   );
+
+  isAuthenticated$: Observable<boolean> = this.hasValidToken$;
 
   constructor(
     private readonly httpClient: HttpClient,

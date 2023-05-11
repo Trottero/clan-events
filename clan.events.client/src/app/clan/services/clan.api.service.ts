@@ -6,8 +6,10 @@ import { Response } from '@common/responses';
 import { ConfigService } from 'src/app/config/config.service';
 import { ClanRole } from '@common/auth/clan.role';
 
-@Injectable()
-export class ClanService {
+@Injectable({
+  providedIn: 'root',
+})
+export class ClanApiService {
   constructor(
     private readonly httpClient: HttpClient,
     private readonly configService: ConfigService

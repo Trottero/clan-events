@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EventResponse } from '@common/events';
-import { Observable, map, switchMap } from 'rxjs';
-import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
+import { Observable, Subscription, combineLatest, map, switchMap } from 'rxjs';
 import { Response } from '@common/responses';
 import { EventsService } from '../../events.service';
+import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
+import { SelectedClanService } from 'src/app/clan/services/selected-clan.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -13,22 +14,44 @@ import { EventsService } from '../../events.service';
   styleUrls: ['./event.component.scss'],
 })
 export class EventComponent {
+  selectedClan$ = inject(SelectedClanService).selectedClan$.pipe(
+    notNullOrUndefined()
+  );
+
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly eventsService = inject(EventsService);
+
   id$: Observable<string> = this.route.paramMap.pipe(
     map(params => params.get('id')),
     notNullOrUndefined()
   );
 
-  event$: Observable<Response<EventResponse>> = this.id$.pipe(
-    switchMap(id => this.eventsService.getEventById(id))
+  event$: Observable<Response<EventResponse>> = combineLatest([
+    this.id$,
+    this.selectedClan$,
+  ]).pipe(
+    switchMap(([id, selectedClan]) =>
+      this.eventsService.getEventById(id, selectedClan.name)
+    )
   );
 
-  constructor(
-    private readonly route: ActivatedRoute,
-    private readonly router: Router,
-    private readonly eventsService: EventsService
-  ) {}
+  private subscriptions = new Subscription();
 
   back() {
-    this.router.navigate(['../'], { relativeTo: this.route });
+    return this.router.navigate(['../'], { relativeTo: this.route });
+  }
+
+  delete(eventId: string): void {
+    this.subscriptions.add(
+      this.selectedClan$
+        .pipe(
+          switchMap(clan =>
+            this.eventsService.deleteEventById(eventId, clan.name)
+          ),
+          switchMap(() => this.back())
+        )
+        .subscribe()
+    );
   }
 }
