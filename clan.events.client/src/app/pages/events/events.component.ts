@@ -14,12 +14,21 @@ import {
   shareReplay,
   startWith,
   switchMap,
+  tap,
 } from 'rxjs';
 import { EventListItem } from '@common/events';
 import { PaginatedResponse } from '@common/responses';
 import { PageEvent } from '@angular/material/paginator';
 import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
 import { SelectedClanService } from 'src/app/clan/services/selected-clan.service';
+import {
+  Loadable,
+  filterMapSuccess,
+  isLoading,
+  isSuccess,
+  mapToLoadable,
+} from 'src/app/common/operators/loadable';
+import { FILTERED, filterMap } from 'src/app/common/operators/filter-map';
 
 interface FetchEventsOptions {
   page: number;
@@ -47,20 +56,26 @@ export class EventsComponent implements OnDestroy {
   private triggerRefreshSubject = new Subject<FetchEventsOptions>();
   private subscriptions = new Subscription();
 
-  events$: Observable<PaginatedResponse<EventListItem>> = combineLatest([
-    this.triggerRefreshSubject.pipe(
-      startWith({ page: this.page, pageSize: this.pageSize })
-    ),
-    this.selectedClan$.pipe(notNullOrUndefined()),
-  ]).pipe(
-    switchMap(([{ page, pageSize }, selectedClan]) =>
-      this.eventsService.getEvents(selectedClan.name, {
-        page,
-        pageSize,
-      })
-    ),
-    shareReplay(1)
-  );
+  eventsLoadable$: Observable<Loadable<PaginatedResponse<EventListItem>>> =
+    combineLatest([
+      this.triggerRefreshSubject.pipe(
+        startWith({ page: this.page, pageSize: this.pageSize })
+      ),
+      this.selectedClan$.pipe(notNullOrUndefined()),
+    ]).pipe(
+      switchMap(([{ page, pageSize }, selectedClan]) =>
+        this.eventsService
+          .getEvents(selectedClan.name, {
+            page,
+            pageSize,
+          })
+          .pipe(mapToLoadable())
+      ),
+      shareReplay(1)
+    );
+
+  events$: Observable<PaginatedResponse<EventListItem>> =
+    this.eventsLoadable$.pipe(filterMapSuccess(x => x.value));
 
   length$: Observable<number> = this.events$.pipe(
     map(response => response.data.totalItems)
