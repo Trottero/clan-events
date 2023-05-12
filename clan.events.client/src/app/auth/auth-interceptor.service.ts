@@ -14,22 +14,30 @@ export class AuthInterceptorService implements HttpInterceptor {
 
   public intercept(
     request: HttpRequest<unknown>,
-    next: HttpHandler,
+    next: HttpHandler
   ): Observable<HttpEvent<unknown>> {
     return this.authService.authState$.pipe(
-      map((authState) => authState.accessToken),
-      switchMap((token) => {
-        if (token) {
+      switchMap(authState => {
+        if (request.url.includes('auth/refresh')) {
+          if (authState.refreshToken) {
+            // eslint-disable-next-line no-param-reassign
+            request = request.clone({
+              setHeaders: {
+                Authorization: `Bearer ${authState.refreshToken}`,
+              },
+            });
+          }
+        } else if (authState.accessToken) {
           // eslint-disable-next-line no-param-reassign
           request = request.clone({
             setHeaders: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${authState.accessToken}`,
             },
           });
         }
 
         return next.handle(request);
-      }),
+      })
     );
   }
 }

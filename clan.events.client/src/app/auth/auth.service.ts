@@ -15,6 +15,7 @@ import { Response } from '@common/responses';
 export class AuthService {
   private readonly initialState: AuthState = {
     accessToken: '',
+    refreshToken: '',
   };
 
   private readonly _authState$ = new State<AuthState>(this.initialState);
@@ -49,7 +50,7 @@ export class AuthService {
     private readonly jwtService: JwtService
   ) {}
 
-  redeemCode(code: string): Observable<Response<{ token: string }>> {
+  redeemCode(code: string): Observable<Response<AccessTokenResponse>> {
     return this.httpClient
       .post<Response<AccessTokenResponse>>(
         `${this.configService.backEndUrl}/auth/redeem`,
@@ -60,7 +61,7 @@ export class AuthService {
       .pipe(tap(x => this.handleNewToken(x)));
   }
 
-  refreshCode(refreshToken: string): Observable<Response<{ token: string }>> {
+  refreshCode(refreshToken: string): Observable<Response<AccessTokenResponse>> {
     return this.httpClient
       .post<Response<AccessTokenResponse>>(
         `${this.configService.backEndUrl}/auth/refresh`,
@@ -78,6 +79,7 @@ export class AuthService {
   private handleNewToken(res: Response<AccessTokenResponse>): void {
     this._authState$.next({
       accessToken: res.data.token,
+      refreshToken: res.data.refreshToken,
     });
   }
 }
