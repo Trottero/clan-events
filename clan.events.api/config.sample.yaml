@@ -13,3 +13,4 @@ discord:
 auth:
   jwtSecret: 'Another secret'
   jwtLifetime: 3600
+  refreshTokenLifetime: 604800

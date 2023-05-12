@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Post,
   UseGuards,
+  Request,
 } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
 import { ApiTokenGuard } from './guards/api-token.guard';
@@ -14,8 +15,10 @@ import { User } from 'src/common/decorators/user.decorator';
 import {
   AccessTokenResponse,
   DiscordCodeRedeemRequest,
+  JwtRefreshTokenContent,
   JwtTokenContent,
 } from '@common/auth';
+import { RefreshTokenGuard } from './guards/refresh-token.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -30,25 +33,27 @@ export class AuthController {
     }
 
     try {
-      const token = await this.authService.redeemDiscordCode(request.code);
-      return { token };
+      return await this.authService.redeemDiscordCode(request.code);
     } catch (ex) {
       console.error(ex);
       throw new HttpException('Unauthorized', 401);
     }
   }
 
-  @UseGuards(ApiTokenGuard)
+  @UseGuards(RefreshTokenGuard)
   @HttpCode(HttpStatus.OK)
   @Post('refresh')
-  async refreshToken(
-    @User() user: JwtTokenContent,
-  ): Promise<AccessTokenResponse> {
+  async refreshToken(@Request() req): Promise<AccessTokenResponse> {
     try {
-      const token = await this.authService.refreshCode(
-        user.discordRefreshToken,
+      const refreshToken = req['refresh_token'] as JwtRefreshTokenContent;
+
+      if (!refreshToken) {
+        throw new HttpException('Unauthorized', 401);
+      }
+
+      return await this.authService.refreshCode(
+        refreshToken.discordRefreshToken,
       );
-      return { token };
     } catch (ex) {
       console.error(ex);
       throw new HttpException('Unauthorized', 401);
