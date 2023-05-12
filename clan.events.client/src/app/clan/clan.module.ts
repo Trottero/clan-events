@@ -18,6 +18,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { AsyncClanNameValidator } from './validators/async-clan-name.validator';
 import { authGuard } from '../auth/auth.guard';
+import { ClanApplicationsComponent } from './pages/clan-applications/clan-applications.component';
+import { ClanApplicationApiService } from './services/clan-application.api.service';
 
 @NgModule({
   imports: [
@@ -47,16 +49,21 @@ import { authGuard } from '../auth/auth.guard';
         path: ':clanName',
         component: ClanOverviewComponent,
       },
+      {
+        path: ':clanName/applications',
+        component: ClanApplicationsComponent,
+      },
     ]),
     AuthModule,
   ],
-  providers: [AsyncClanNameValidator],
+  providers: [AsyncClanNameValidator, ClanApplicationApiService],
   declarations: [
     ClanListComponent,
     CreateClanComponent,
     ClanOverviewComponent,
     ApplyToClanComponent,
     AddClanComponent,
+    ClanApplicationsComponent,
   ],
 })
 export class ClanModule {}

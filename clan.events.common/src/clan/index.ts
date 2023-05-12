@@ -10,3 +10,4 @@ export * from './requests/approve-clan-application.requests';
 export * from './responses/clan-member.response';
 export * from './models/clan-with-role';
 export * from './models/clan';
+export * from './models/clan-application';

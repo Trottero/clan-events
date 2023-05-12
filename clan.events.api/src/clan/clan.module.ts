@@ -15,6 +15,8 @@ import {
   ClanApplication,
   ClanApplicationSchema,
 } from 'src/database/schemas/clan-application.schema';
+import { ClanApplicationsController } from './applications/clan-applications.controller';
+import { ClanApplicationService } from './applications/clan-application.service';
 
 @Module({
   imports: [
@@ -26,8 +28,12 @@ import {
       { name: ClanApplication.name, schema: ClanApplicationSchema },
     ]),
   ],
-  controllers: [ClanController, ClanManagementController],
-  providers: [ClanService, ClanMembershipService],
+  controllers: [
+    ClanController,
+    ClanManagementController,
+    ClanApplicationsController,
+  ],
+  providers: [ClanService, ClanMembershipService, ClanApplicationService],
   exports: [ClanService, ClanMembershipService],
 })
 export class ClanModule {}

@@ -1,14 +1,22 @@
 import { ClanRole } from '@common/auth/clan.role';
-import { Body, Controller, Delete, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { HasRoleInClan } from 'src/auth/authorized.decorator';
 import { ApiTokenGuard } from 'src/auth/guards/api-token.guard';
 import { ClanApplication } from 'src/database/schemas/clan-application.schema';
 import { ClanContextGuard } from 'src/auth/guards/clan-context.guard';
-import { ClanMembership } from 'src/database/schemas/clan-membership.schema';
 import { ClanApplicationService } from './clan-application.service';
 import { JwtTokenContent } from '@common/auth';
 import {
   ApproveClanApplicationRequest,
+  ClanMemberResponse,
   DeleteClanApplicationRequest,
 } from '@common/clan';
 import { User } from 'src/common/decorators/user.decorator';
@@ -46,10 +54,7 @@ export class ClanApplicationsController {
         user.username,
       );
     } catch (ex: any) {
-      console.error(ex);
-      if (ex.error === '0') {
-        throw new Error('You have already applied to this clan');
-      }
+      throw new BadRequestException(ex.message);
     }
   }
 
@@ -58,11 +63,17 @@ export class ClanApplicationsController {
   async approveApplication(
     @ClanContext() clanContext: ClanDocument,
     @Body() body: ApproveClanApplicationRequest,
-  ): Promise<ClanMembership> {
-    return this.clanApplicationService.approveApplication(
+  ): Promise<ClanMemberResponse> {
+    const result = await this.clanApplicationService.approveApplication(
       clanContext,
       body.discordId,
     );
+
+    return {
+      clanRole: result.role,
+      discordId: result.user.discordId,
+      name: result.user.name,
+    };
   }
 
   @Delete()

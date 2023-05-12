@@ -44,6 +44,7 @@ export class ClanApplicationService {
       user: userId,
       discordId: discordId,
       discordName: discordName,
+      createdAt: new Date(),
     });
 
     return await application.save();

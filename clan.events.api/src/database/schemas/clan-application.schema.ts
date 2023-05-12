@@ -16,7 +16,7 @@ export class ClanApplication {
   discordId: number;
 
   @Prop({ unique: true })
-  discordName: number;
+  discordName: string;
 
   @Prop()
   createdAt?: Date;
