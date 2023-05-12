@@ -16,6 +16,7 @@ import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
 import { BoardApiService } from './board.api.service';
 import { EventIdStream } from '../../streams/event-id.stream';
 import { State } from 'src/app/common/state';
+import { TileResponse } from '@common/events';
 
 export interface BoardState {
   selectedTileId: string | null;
@@ -35,6 +36,9 @@ export class BoardService {
   private readonly subscriptions = new Subscription();
 
   private readonly createTileTriggerSubject = new Subject<void>();
+  private readonly updateSelectedTileSubject = new Subject<
+    Partial<TileResponse> & { id: string }
+  >();
 
   private boardState = new State<BoardState>(INITIAL_STATE);
 
@@ -84,6 +88,29 @@ export class BoardService {
         )
         .subscribe()
     );
+
+    // update
+    this.subscriptions.add(
+      this.updateSelectedTileSubject
+        .pipe(
+          switchMap(update =>
+            combineLatest([
+              this.selectedClanService.selectedClan$.pipe(notNullOrUndefined()),
+              this.eventId$.pipe(notNullOrUndefined()),
+            ]).pipe(
+              switchMap(([clan, eventId]) =>
+                this.boardApiService.updateTile(
+                  clan.name,
+                  eventId,
+                  update.id,
+                  update
+                )
+              )
+            )
+          )
+        )
+        .subscribe()
+    );
   }
 
   createTile() {
@@ -93,6 +120,14 @@ export class BoardService {
   setSelectedTileId(tileId: string | null) {
     this.boardState.next({
       selectedTileId: tileId,
+    });
+  }
+
+  updateTilePosition(tileId: string, x: number, y: number) {
+    this.updateSelectedTileSubject.next({
+      id: tileId,
+      x,
+      y,
     });
   }
 }

@@ -63,4 +63,52 @@ export class BoardService {
 
     return tile;
   }
+
+  async updateTile(
+    clanName: string,
+    eventId: string,
+    tileId: string,
+    body: Partial<CreateTileRequest>,
+  ) {
+    const clan = await this.clanService.getClanByName(clanName);
+    const event = await this.eventModel
+      .findOne({ _id: eventId, owner: clan.id })
+      .populate('board.tiles')
+      .exec();
+
+    if (!event) {
+      throw new NotFoundException();
+    }
+
+    const eventHasTile = event.board.tiles.some(
+      (tile) => (tile as TileDocument).id === tileId,
+    );
+
+    if (!eventHasTile) {
+      throw new NotFoundException();
+    }
+
+    const tile = event.board.tiles.find(
+      (tile) => (tile as TileDocument).id === tileId,
+    );
+
+    if (!tile) {
+      throw new NotFoundException();
+    }
+
+    tile.name = body.name ?? tile.name;
+    tile.canvas = {
+      x: body.x ?? tile.canvas.x,
+      y: body.y ?? tile.canvas.y,
+      borderColor: body.borderColor ?? tile.canvas.borderColor,
+      borderWidth: body.borderWidth ?? tile.canvas.borderWidth,
+      fillColor: body.fillColor ?? tile.canvas.fillColor,
+      height: body.height ?? tile.canvas.height,
+      width: body.width ?? tile.canvas.width,
+      image: body.image ?? tile.canvas.image,
+    };
+
+    await event.save();
+    return tile;
+  }
 }

@@ -34,4 +34,16 @@ export class BoardApiService {
       request
     );
   }
+
+  updateTile(
+    clanName: string,
+    eventId: string,
+    tileId: string,
+    request: Partial<CreateTileRequest>
+  ): Observable<Response<TileResponse>> {
+    return this.http.patch<Response<TileResponse>>(
+      `${this.configService.backEndUrl}/${clanName}/events/${eventId}/tiles/${tileId}`,
+      request
+    );
+  }
 }

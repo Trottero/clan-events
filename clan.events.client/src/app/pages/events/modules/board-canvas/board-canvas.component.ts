@@ -230,6 +230,12 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onPointerUp(e: MouseEvent | TouchEvent) {
+    if (this.isGrabbing && this.grabbedObjectIndex !== undefined) {
+      const object = this.objects[this.grabbedObjectIndex];
+      // update it's new location
+      this.boardService.updateTilePosition(object.id, object.x, object.y);
+    }
+
     this.isPanning = false;
     this.isGrabbing = false;
     this.initialPinchDistance = undefined;
