@@ -41,7 +41,6 @@ export class ApplyToClanComponent implements OnInit, OnDestroy {
       this.clanApplicationApiService.applyToClan(this.clanName.value).pipe(
         tap(() => this.snackbarService.success('Application submitted')),
         catchError(error => {
-          console.log(error);
           this.snackbarService.error(
             `Failed to submit application: ${error.error.message}`
           );
@@ -57,7 +56,6 @@ export class ApplyToClanComponent implements OnInit, OnDestroy {
   }
 
   applyToClan() {
-    console.log('applyToClan');
     this.applyToClanSubmit$.next();
   }
 
