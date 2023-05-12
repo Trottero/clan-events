@@ -22,6 +22,7 @@ import { ClanApplicationsComponent } from './pages/clan-applications/clan-applic
 import { ClanApplicationApiService } from './services/clan-application.api.service';
 import { EditClanComponent } from './pages/edit-clan/edit-clan.component';
 import { ManageClanComponent } from './pages/manage-clan/manage-clan.component';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @NgModule({
   imports: [
@@ -35,6 +36,7 @@ import { ManageClanComponent } from './pages/manage-clan/manage-clan.component';
     MatSelectModule,
     MatCardModule,
     MatDividerModule,
+    MatTabsModule,
     ReactiveFormsModule,
     RouterModule.forChild([
       {
