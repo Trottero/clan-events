@@ -1,0 +1,7 @@
+<div class="d-flex flex-column flex-grow-1">
+  <div class="d-flex justify-content-between flex-row" *ngIf="selectedClan$ | async as clan">
+    <h2 class="d-flex">{{clan.displayName}}</h2>
+    <button mat-raised-button color="primary" type="button" *ngIf="clan.role == roleEnum.Owner"
+      (click)="deleteClan()">Delete</button>
+  </div>
+</div>

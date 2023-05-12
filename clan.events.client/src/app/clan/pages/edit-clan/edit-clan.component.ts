@@ -20,8 +20,6 @@ import { UserService } from 'src/app/user/user.service';
 import { SnackbarService } from 'src/app/shared/snackbar/snackbar-service';
 import { ClanMemberResponse } from '@common/clan';
 import { ClanRole } from '@common/auth/clan.role';
-import { ClansService } from '../../services/clans.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-edit-clan',
@@ -33,8 +31,6 @@ export class EditClanComponent {
   private readonly clanApiService = inject(ClanApiService);
   private readonly userService = inject(UserService);
   private readonly snackbarService = inject(SnackbarService);
-  private readonly clansService = inject(ClansService);
-  private readonly router = inject(Router);
 
   roleEnum = ClanRole;
   clanRoles = Object.values(ClanRole);
@@ -102,29 +98,6 @@ export class EditClanComponent {
       return other !== ClanRole.Owner;
     }
     return selfRole === ClanRole.Admin && other === ClanRole.Member;
-  }
-
-  deleteClan() {
-    this.clan$
-      .pipe(
-        switchMap(clan =>
-          this.clanApiService.deleteClan(clan.name).pipe(
-            tap(() =>
-              this.snackbarService.success(
-                `Clan ${clan.name} has been deleted.`
-              )
-            ),
-            catchError(() => {
-              this.snackbarService.error(`Failed to delete clan ${clan.name}.`);
-              return of();
-            })
-          )
-        )
-      )
-      .subscribe(() => {
-        this.clansService.refreshClans();
-        this.router.navigate(['/clan']);
-      });
   }
 
   promoteUser(member: ClanMemberResponse, role: ClanRole) {

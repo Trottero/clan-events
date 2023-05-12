@@ -21,6 +21,7 @@ import { authGuard } from '../auth/auth.guard';
 import { ClanApplicationsComponent } from './pages/clan-applications/clan-applications.component';
 import { ClanApplicationApiService } from './services/clan-application.api.service';
 import { EditClanComponent } from './pages/edit-clan/edit-clan.component';
+import { ManageClanComponent } from './pages/manage-clan/manage-clan.component';
 
 @NgModule({
   imports: [
@@ -51,11 +52,15 @@ import { EditClanComponent } from './pages/edit-clan/edit-clan.component';
         component: ClanOverviewComponent,
       },
       {
-        path: ':clanName/applications',
+        path: ':clanName/manage',
+        component: ManageClanComponent,
+      },
+      {
+        path: ':clanName/manage/applications',
         component: ClanApplicationsComponent,
       },
       {
-        path: ':clanName/manage',
+        path: ':clanName/manage/members',
         component: EditClanComponent,
       },
     ]),
@@ -70,6 +75,7 @@ import { EditClanComponent } from './pages/edit-clan/edit-clan.component';
     AddClanComponent,
     ClanApplicationsComponent,
     EditClanComponent,
+    ManageClanComponent,
   ],
 })
 export class ClanModule {}

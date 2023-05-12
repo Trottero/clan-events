@@ -1,12 +1,4 @@
 <div *ngIf="clan$ | async as clan" class="d-flex flex-column flex-grow-1">
-  <div class="d-flex justify-content-between flex-row">
-    <h2 class="d-flex">{{clan.displayName}}</h2>
-    <button mat-raised-button color="primary" type="button" *ngIf="(role$ | async) == roleEnum.Owner"
-      (click)="deleteClan()">Delete</button>
-  </div>
-  <div>
-
-  </div>
   <table mat-table [dataSource]="clan.members" class="mat-elevation-z8">
     <ng-container matColumnDef="clanRole" *ngIf="(role$ | async) as role">
       <th mat-header-cell *matHeaderCellDef> Role </th>
