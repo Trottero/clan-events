@@ -6,6 +6,7 @@ import {
   shareReplay,
   Subject,
   Subscription,
+  catchError,
 } from 'rxjs';
 import { SelectedClanService } from 'src/app/clan/services/selected-clan.service';
 import {
@@ -83,8 +84,8 @@ export class BoardService {
               borderColor: '#000000',
               fillColor: '#ffffff',
               borderWidth: 1,
-              width: 1,
-              height: 1,
+              width: 100,
+              height: 100,
               x: 0,
               y: 0,
             })

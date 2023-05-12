@@ -133,27 +133,6 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       -this.canvasSize.height / 2 + this.cameraOffset.y
     ); // translate back to the top left
 
-    // draw a rectangle
-    this.boardCanvasContext.fillStyle = 'green';
-    this.boardCanvasContext.fillRect(20, 20, 100, 100);
-
-    // draw a red circle
-    this.boardCanvasContext?.beginPath();
-    this.boardCanvasContext?.arc(0, -20, 50, 0, Math.PI * 2, true);
-    this.boardCanvasContext?.closePath();
-    this.boardCanvasContext.fillStyle = 'red';
-    this.boardCanvasContext?.fill();
-
-    if (this.grabLocation) {
-      this.boardCanvasContext.fillStyle = 'blue';
-      this.boardCanvasContext.fillRect(
-        this.grabLocation.x - 5,
-        this.grabLocation.y - 5,
-        10,
-        10
-      );
-    }
-
     // draw objects
     this.drawObjects();
 
@@ -167,7 +146,20 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
 
     for (const object of this.objects) {
       this.boardCanvasContext.fillStyle = object.fillColor;
-      this.boardCanvasContext.fillRect(object.x, object.y, 100, 100);
+      this.boardCanvasContext.fillRect(
+        object.x,
+        object.y,
+        object.width,
+        object.height
+      );
+      this.boardCanvasContext.strokeStyle = object.borderColor;
+      this.boardCanvasContext.lineWidth = object.borderWidth;
+      this.boardCanvasContext.strokeRect(
+        object.x,
+        object.y,
+        object.width,
+        object.height
+      );
     }
   }
 
