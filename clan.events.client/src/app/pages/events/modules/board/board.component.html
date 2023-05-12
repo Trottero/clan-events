@@ -4,10 +4,6 @@
 
 <button mat-flat-button color="primary" (click)="createTile()">Create Tile</button>
 
-<ul *ngIf="tiles$ | async | isSuccess as tiles">
-  <li *ngFor="let tile of tiles.data">
-    {{tile | json}}
-  </li>
-</ul>
+{{ selectedTile$ | async | json }}
 
-<app-board-canvas [tiles$]="tiles$"></app-board-canvas>
+<app-board-canvas></app-board-canvas>

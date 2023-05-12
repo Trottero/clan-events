@@ -1,4 +1,20 @@
 :host {
+  .board-canvas-wrapper {
+    position: relative;
+  }
+
+  .spinner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba($color: #000000, $alpha: 0.5);
+    height: 600px;
+  }
+
   #board-canvas {
     border: 1px solid var(--app-border-color-z-3);
     background-color: var(--app-background-color-z-3);

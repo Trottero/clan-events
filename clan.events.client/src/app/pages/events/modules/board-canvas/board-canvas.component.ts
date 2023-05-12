@@ -7,6 +7,7 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
+  inject,
 } from '@angular/core';
 import { TileResponse } from '@common/events';
 import { Observable, Subscription, fromEvent, of, switchMap } from 'rxjs';
@@ -15,6 +16,7 @@ import { observeProperty } from 'src/app/common/observable/observe-property';
 import { Loadable, filterMapSuccess } from 'src/app/common/operators/loadable';
 import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
 import { Response } from '@common/responses';
+import { BoardService } from '../board/board.service';
 
 const MAX_ZOOM = 5;
 const MIN_ZOOM = 0.1;
@@ -26,27 +28,13 @@ const SCROLL_SENSITIVITY = 0.0005;
   styleUrls: ['./board-canvas.component.scss'],
 })
 export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
+  private readonly boardService = inject(BoardService);
+
+  tiles$ = this.boardService.tiles$.pipe(filterMapSuccess(x => x.value));
+
   @ViewChild('boardCanvas')
   boardCanvas?: ElementRef<HTMLCanvasElement>;
   boardCanvasContext?: CanvasRenderingContext2D;
-
-  @Input() tiles$?: Observable<Loadable<Response<TileResponse[]>>>;
-
-  @Memoized public get tilesInput$(): Observable<
-    Loadable<Response<TileResponse[]>>
-  > {
-    return observeProperty(this, 'tiles$').pipe(
-      switchMap(source$ => {
-        if (!source$) {
-          return of(undefined);
-        }
-        return source$;
-      }),
-      notNullOrUndefined()
-    );
-  }
-
-  objects$ = this.tilesInput$.pipe(filterMapSuccess(tiles => tiles.value));
 
   onMouseDown$?: Observable<MouseEvent>;
   onTouchStart$?: Observable<TouchEvent>;
@@ -78,7 +66,7 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscriptions = new Subscription();
 
   ngOnInit(): void {
-    this.objects$.subscribe(objects => {
+    this.tiles$.subscribe(objects => {
       console.log('objects', objects);
       this.objects = objects.data;
     });
@@ -236,6 +224,7 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
         this.grabbedObjectIndex = grabbedObject;
         this.grabLocation.x = location.x;
         this.grabLocation.y = location.y;
+        this.boardService.setSelectedTileId(this.objects[grabbedObject].id);
       }
     }
   }

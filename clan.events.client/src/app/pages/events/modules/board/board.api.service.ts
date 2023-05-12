@@ -6,7 +6,9 @@ import { Observable } from 'rxjs';
 import { ConfigService } from 'src/app/config/config.service';
 import { TileResponse } from '@common/events';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class BoardApiService {
   constructor(
     private readonly http: HttpClient,

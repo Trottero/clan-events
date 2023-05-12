@@ -7,10 +7,11 @@ import { IsLoadingPipe } from '../../../../common/pipes/is-loading.pipe';
 import { IsSuccessPipe } from '../../../../common/pipes/is-success.pipe';
 import { MatButtonModule } from '@angular/material/button';
 import { BoardCanvasModule } from '../board-canvas/board-canvas.module';
+import { BoardService } from './board.service';
 
 @NgModule({
   declarations: [BoardComponent],
-  providers: [BoardApiService],
+  providers: [],
   exports: [BoardComponent],
   imports: [
     CommonModule,

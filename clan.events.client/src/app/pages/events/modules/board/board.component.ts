@@ -14,6 +14,7 @@ import {
   Subject,
   Subscription,
   combineLatest,
+  shareReplay,
   startWith,
   switchMap,
 } from 'rxjs';
@@ -23,87 +24,23 @@ import {
   mapToLoadable,
 } from 'src/app/common/operators/loadable';
 import { TileResponse } from '@common/events';
+import { BoardService } from './board.service';
 
 @Component({
   selector: 'app-board',
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss'],
 })
-export class BoardComponent implements OnInit, OnDestroy, AfterViewInit {
-  private readonly boardApiService = inject(BoardApiService);
-  private readonly selectedClanService = inject(SelectedClanService);
+export class BoardComponent {
+  private readonly boardService = inject(BoardService);
 
-  private readonly createTileTriggerSubject = new Subject<void>();
-  private readonly subscriptions = new Subscription();
+  tiles$ = this.boardService.tiles$;
 
-  eventId$ = inject(EventIdStream);
+  selectedTile$ = this.boardService.selectedTile$;
 
-  tiles$ = combineLatest([
-    this.createTileTriggerSubject.pipe(startWith(undefined)),
-    this.selectedClanService.selectedClan$.pipe(notNullOrUndefined()),
-    this.eventId$.pipe(notNullOrUndefined()),
-  ]).pipe(
-    switchMap(([_, clan, eventId]) =>
-      this.boardApiService.getTiles(clan.name, eventId).pipe(mapToLoadable())
-    )
-  );
-
-  ngOnInit(): void {
-    this.subscriptions.add(
-      this.createTileTriggerSubject
-        .pipe(
-          switchMap(() =>
-            combineLatest([
-              this.selectedClanService.selectedClan$.pipe(notNullOrUndefined()),
-              this.eventId$.pipe(notNullOrUndefined()),
-            ])
-          ),
-          switchMap(([clan, eventId]) =>
-            this.boardApiService.createTile(clan.name, eventId, {
-              name: 'New tile',
-              borderColor: '#000000',
-              fillColor: '#ffffff',
-              borderWidth: 1,
-              width: 1,
-              height: 1,
-              x: 0,
-              y: 0,
-            })
-          )
-        )
-        .subscribe()
-    );
-  }
-
-  ngAfterViewInit(): void {
-    // if (this.boardCanvasContext) {
-    //   this.subscriptions.add(
-    //     this.tiles$
-    //       .pipe(filterMapSuccess(tiles => tiles.value.data))
-    //       .subscribe(tiles => {
-    //         this.drawTiles(this.boardCanvasContext!, tiles);
-    //       })
-    //   );
-    // }
-  }
-
-  drawTiles(context: CanvasRenderingContext2D, tiles: TileResponse[]) {
-    tiles.forEach(tile => {
-      context.beginPath();
-      context.rect(tile.x, tile.y, tile.width, tile.height);
-      context.fillStyle = tile.fillColor;
-      context.fill();
-      context.lineWidth = tile.borderWidth;
-      context.strokeStyle = tile.borderColor;
-      context.stroke();
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
-  }
+  ngOnInit(): void {}
 
   createTile() {
-    this.createTileTriggerSubject.next();
+    this.boardService.createTile();
   }
 }

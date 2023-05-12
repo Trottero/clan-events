@@ -1,3 +1,9 @@
 <button mat-flat-button (click)="reset()">Reset Canvas</button>
 
-<canvas #boardCanvas id="board-canvas"></canvas>
+<div class="board-canvas-wrapper">
+  <div class="spinner" *ngIf="tiles$ | async | isLoading">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <canvas #boardCanvas id="board-canvas"></canvas>
+</div>
