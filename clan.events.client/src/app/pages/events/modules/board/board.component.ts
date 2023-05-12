@@ -1,4 +1,12 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  inject,
+} from '@angular/core';
 import { BoardApiService } from './board.api.service';
 import { SelectedClanService } from 'src/app/clan/services/selected-clan.service';
 import { EventIdStream } from '../../streams/event-id.stream';
@@ -10,14 +18,18 @@ import {
   switchMap,
 } from 'rxjs';
 import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
-import { mapToLoadable } from 'src/app/common/operators/loadable';
+import {
+  filterMapSuccess,
+  mapToLoadable,
+} from 'src/app/common/operators/loadable';
+import { TileResponse } from '@common/events';
 
 @Component({
   selector: 'app-board',
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss'],
 })
-export class BoardComponent implements OnInit, OnDestroy {
+export class BoardComponent implements OnInit, OnDestroy, AfterViewInit {
   private readonly boardApiService = inject(BoardApiService);
   private readonly selectedClanService = inject(SelectedClanService);
 
@@ -61,6 +73,30 @@ export class BoardComponent implements OnInit, OnDestroy {
         )
         .subscribe()
     );
+  }
+
+  ngAfterViewInit(): void {
+    // if (this.boardCanvasContext) {
+    //   this.subscriptions.add(
+    //     this.tiles$
+    //       .pipe(filterMapSuccess(tiles => tiles.value.data))
+    //       .subscribe(tiles => {
+    //         this.drawTiles(this.boardCanvasContext!, tiles);
+    //       })
+    //   );
+    // }
+  }
+
+  drawTiles(context: CanvasRenderingContext2D, tiles: TileResponse[]) {
+    tiles.forEach(tile => {
+      context.beginPath();
+      context.rect(tile.x, tile.y, tile.width, tile.height);
+      context.fillStyle = tile.fillColor;
+      context.fill();
+      context.lineWidth = tile.borderWidth;
+      context.strokeStyle = tile.borderColor;
+      context.stroke();
+    });
   }
 
   ngOnDestroy(): void {

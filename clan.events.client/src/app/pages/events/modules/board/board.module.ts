@@ -6,6 +6,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { IsLoadingPipe } from '../../../../common/pipes/is-loading.pipe';
 import { IsSuccessPipe } from '../../../../common/pipes/is-success.pipe';
 import { MatButtonModule } from '@angular/material/button';
+import { BoardCanvasModule } from '../board-canvas/board-canvas.module';
 
 @NgModule({
   declarations: [BoardComponent],
@@ -15,6 +16,8 @@ import { MatButtonModule } from '@angular/material/button';
     CommonModule,
     IsLoadingPipe,
     IsSuccessPipe,
+
+    BoardCanvasModule,
 
     MatButtonModule,
     MatProgressSpinnerModule,

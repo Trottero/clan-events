@@ -71,9 +71,9 @@ export function mapToLoadable<T>(): OperatorFunction<T, Loadable<T>> {
   };
 }
 
-export function filterMapSuccess<T>(
-  project: (value: Success<T>) => T
-): OperatorFunction<Loadable<T>, T> {
+export function filterMapSuccess<T, R>(
+  project: (value: Success<T>) => R
+): OperatorFunction<Loadable<T>, R> {
   return (source$: Observable<Loadable<T>>) =>
     source$.pipe(
       filterMap(value => (isSuccess(value) ? project(value) : FILTERED))

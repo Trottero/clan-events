@@ -1,4 +1,5 @@
 export interface TileResponse {
+  id: string;
   name: string;
 
   // canvas
@@ -9,4 +10,5 @@ export interface TileResponse {
   height: number;
   borderWidth: number;
   borderColor: string;
+  fillColor: string;
 }

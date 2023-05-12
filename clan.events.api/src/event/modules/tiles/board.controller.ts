@@ -5,6 +5,7 @@ import { UserClanContext } from 'src/auth/user-clan-context';
 import { User } from 'src/common/decorators/user.decorator';
 import { BoardService } from './board.service';
 import { CreateTileRequest } from '@common/events';
+import { convertToTileResponse } from 'src/event/converters/tile.converter';
 
 @Controller(':clanName/events/:eventId')
 export class BoardController {
@@ -16,7 +17,9 @@ export class BoardController {
     @User() user: UserClanContext,
     @Param() params: { clanName: string; eventId: string },
   ) {
-    return this.boardService.getTiles(params.clanName, params.eventId);
+    return (
+      await this.boardService.getTiles(params.clanName, params.eventId)
+    ).map(convertToTileResponse);
   }
 
   @Post('tiles')

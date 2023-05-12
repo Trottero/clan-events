@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { ClanService } from 'src/clan/clan.service';
 import { Event } from 'src/database/schemas/event.schema';
 import { UserService } from 'src/user/user.service';
-import { Tile } from 'src/database/schemas/tile.schema';
+import { Tile, TileDocument } from 'src/database/schemas/tile.schema';
 
 @Injectable()
 export class BoardService {
@@ -16,7 +16,7 @@ export class BoardService {
     private readonly clanService: ClanService,
   ) {}
 
-  async getTiles(clanName: string, eventId: string) {
+  async getTiles(clanName: string, eventId: string): Promise<TileDocument[]> {
     const clan = await this.clanService.getClanByName(clanName);
     const event = await this.eventModel
       .findOne({ _id: eventId, owner: clan.id })
@@ -26,7 +26,7 @@ export class BoardService {
       throw new NotFoundException();
     }
 
-    return event.board.tiles;
+    return event.board.tiles as TileDocument[];
   }
 
   async createTile(

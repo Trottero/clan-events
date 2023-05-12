@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import { Challenge, ChallengeSchema } from './challenge.schema';
 import { CanvasTile, CanvasTileSchema } from './canvas-tile.schema';
 
+export type TileDocument = mongoose.HydratedDocument<Tile>;
+
 @Schema()
 export class Tile {
   @Prop()
