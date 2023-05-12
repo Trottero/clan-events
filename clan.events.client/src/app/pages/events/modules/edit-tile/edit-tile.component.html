@@ -1,0 +1,28 @@
+<form class=" edit-tile" *ngIf="selectedTile$ | async" [formGroup]="formGroup" (ngSubmit)="update()">
+  <mat-form-field>
+    <mat-label>Name</mat-label>
+    <input matInput [formControl]="nameControl" />
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Border Color</mat-label>
+    <input matInput [formControl]="borderColorControl" />
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Background Color</mat-label>
+    <input matInput [formControl]="fillColorControl" />
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Height</mat-label>
+    <input matInput [formControl]="heightControl" type="number" />
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Width</mat-label>
+    <input matInput [formControl]="widthControl" type="number" />
+  </mat-form-field>
+
+  <button mat-flat-button color="primary" type="submit">Update</button>
+</form>

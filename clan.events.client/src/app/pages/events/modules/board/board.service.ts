@@ -39,11 +39,13 @@ export class BoardService {
   private readonly updateSelectedTileSubject = new Subject<
     Partial<TileResponse> & { id: string }
   >();
+  private readonly resetCanvasSubject = new Subject<void>();
+  private readonly refreshTilesSubject = new Subject<void>();
 
   private boardState = new State<BoardState>(INITIAL_STATE);
 
   tiles$ = combineLatest([
-    this.createTileTriggerSubject.pipe(startWith(undefined)),
+    this.refreshTilesSubject.pipe(startWith(undefined)),
     this.selectedClanService.selectedClan$.pipe(notNullOrUndefined()),
     this.eventId$.pipe(notNullOrUndefined()),
   ]).pipe(
@@ -62,6 +64,8 @@ export class BoardService {
       )
     )
   );
+
+  resetCanvas$ = this.resetCanvasSubject.pipe(startWith(undefined));
 
   constructor() {
     this.subscriptions.add(
@@ -86,7 +90,7 @@ export class BoardService {
             })
           )
         )
-        .subscribe()
+        .subscribe(() => this.refreshTilesSubject.next())
     );
 
     // update
@@ -117,6 +121,10 @@ export class BoardService {
     this.createTileTriggerSubject.next();
   }
 
+  refreshTiles() {
+    this.refreshTilesSubject.next();
+  }
+
   setSelectedTileId(tileId: string | null) {
     this.boardState.next({
       selectedTileId: tileId,
@@ -129,5 +137,9 @@ export class BoardService {
       x,
       y,
     });
+  }
+
+  resetCanvas() {
+    this.resetCanvasSubject.next();
   }
 }

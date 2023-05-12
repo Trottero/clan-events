@@ -2,4 +2,17 @@
   mat-spinner {
     margin: 50px auto;
   }
+
+  .board-container {
+    display: flex;
+    column-gap: 24px;
+
+    app-board-canvas {
+      flex: 1;
+    }
+
+    app-edit-tile {
+      max-width: 300px;
+    }
+  }
 }

@@ -1,9 +1,9 @@
-<p>board works!</p>
-
 <mat-spinner *ngIf="tiles$ | async | isLoading"></mat-spinner>
 
 <button mat-flat-button color="primary" (click)="createTile()">Create Tile</button>
+<button mat-flat-button (click)="resetCanvas()">Reset Canvas</button>
 
-{{ selectedTile$ | async | json }}
-
-<app-board-canvas></app-board-canvas>
+<div class="board-container">
+  <app-board-canvas></app-board-canvas>
+  <app-edit-tile *ngIf="selectedTile$ | async"></app-edit-tile>
+</div>

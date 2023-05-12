@@ -43,4 +43,8 @@ export class BoardComponent {
   createTile() {
     this.boardService.createTile();
   }
+
+  resetCanvas() {
+    this.boardService.resetCanvas();
+  }
 }

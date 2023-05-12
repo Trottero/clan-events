@@ -31,6 +31,7 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly boardService = inject(BoardService);
 
   tiles$ = this.boardService.tiles$.pipe(filterMapSuccess(x => x.value));
+  resetCanvas$ = this.boardService.resetCanvas$;
 
   @ViewChild('boardCanvas')
   boardCanvas?: ElementRef<HTMLCanvasElement>;
@@ -66,10 +67,18 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscriptions = new Subscription();
 
   ngOnInit(): void {
-    this.tiles$.subscribe(objects => {
-      console.log('objects', objects);
-      this.objects = objects.data;
-    });
+    this.subscriptions.add(
+      this.tiles$.subscribe(objects => {
+        console.log('objects', objects);
+        this.objects = objects.data;
+      })
+    );
+
+    this.subscriptions.add(
+      this.resetCanvas$.subscribe(() => {
+        this.reset();
+      })
+    );
   }
 
   ngAfterViewInit(): void {
@@ -225,6 +234,8 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
         this.grabLocation.x = location.x;
         this.grabLocation.y = location.y;
         this.boardService.setSelectedTileId(this.objects[grabbedObject].id);
+      } else {
+        this.boardService.setSelectedTileId(null);
       }
     }
   }

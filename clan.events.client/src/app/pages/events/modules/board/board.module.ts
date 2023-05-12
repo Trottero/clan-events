@@ -8,6 +8,7 @@ import { IsSuccessPipe } from '../../../../common/pipes/is-success.pipe';
 import { MatButtonModule } from '@angular/material/button';
 import { BoardCanvasModule } from '../board-canvas/board-canvas.module';
 import { BoardService } from './board.service';
+import { EditTileModule } from '../edit-tile/edit-tile.module';
 
 @NgModule({
   declarations: [BoardComponent],
@@ -18,6 +19,7 @@ import { BoardService } from './board.service';
     IsLoadingPipe,
     IsSuccessPipe,
 
+    EditTileModule,
     BoardCanvasModule,
 
     MatButtonModule,
