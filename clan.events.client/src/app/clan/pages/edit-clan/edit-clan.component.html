@@ -1,0 +1,55 @@
+<div *ngIf="clan$ | async as clan" class="d-flex flex-column flex-grow-1">
+  <div class="d-flex justify-content-between flex-row">
+    <h2 class="d-flex">{{clan.displayName}}</h2>
+    <button mat-raised-button color="primary" type="button" *ngIf="(role$ | async) == roleEnum.Owner"
+      (click)="deleteClan()">Delete</button>
+  </div>
+  <div>
+
+  </div>
+  <table mat-table [dataSource]="clan.members" class="mat-elevation-z8">
+    <ng-container matColumnDef="clanRole" *ngIf="(role$ | async) as role">
+      <th mat-header-cell *matHeaderCellDef> Role </th>
+      <td mat-cell *matCellDef="let element">
+        <mat-form-field subscriptSizing="dynamic">
+          <mat-select title="Select role" [(ngModel)]="element.clanRole"
+            (selectionChange)="promoteUser(element, $event.value)"
+            [disabled]="(discordId$ | async) == element.discordId || !isAllowedToEdit(role, element.clanRole)">
+            <mat-option *ngFor="let availableRole of clanRoles" [value]="availableRole"
+              [disabled]="!isAllowedToEdit(role, availableRole)">{{availableRole}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </td>
+    </ng-container>
+
+    <!-- Discord Id Column -->
+    <ng-container matColumnDef="discordId" *ngIf="role$ |async as role">
+      <th mat-header-cell *matHeaderCellDef> DiscordId </th>
+      <td mat-cell *matCellDef="let element">
+        <span>
+          {{element.discordId}}
+        </span>
+      </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name </th>
+      <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+
+    <!-- Delete column -->
+    <ng-container matColumnDef="delete" *ngIf="role$ |async as role">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let element">
+        <button *ngIf="(discordId$ | async) != element.discordId && isAllowedToEdit(role, element.clanRole)"
+          mat-icon-button color="primary" (click)="kickUser(element)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="['clanRole', 'discordId', 'name', 'delete']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['clanRole', 'discordId', 'name', 'delete']"></tr>
+
+  </table>
+</div>

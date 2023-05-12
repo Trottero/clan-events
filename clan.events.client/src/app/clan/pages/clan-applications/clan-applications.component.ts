@@ -5,14 +5,13 @@ import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
 import {
   Subject,
   distinctUntilChanged,
-  interval,
   map,
   merge,
   share,
   shareReplay,
-  startWith,
   switchMap,
   tap,
+  timer,
   withLatestFrom,
 } from 'rxjs';
 import { SnackbarService } from 'src/app/shared/snackbar/snackbar-service';
@@ -33,7 +32,7 @@ export class ClanApplicationsComponent {
 
   private readonly snackbarService = inject(SnackbarService);
 
-  private readonly triggerClanRefresh$ = interval(1000 * 5).pipe(startWith(0));
+  private readonly triggerClanRefresh$ = timer(0, 1000 * 5);
 
   @ViewChild(MatTable) table: MatTable<ClanApplication> | undefined;
 

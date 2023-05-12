@@ -20,6 +20,7 @@ import { AsyncClanNameValidator } from './validators/async-clan-name.validator';
 import { authGuard } from '../auth/auth.guard';
 import { ClanApplicationsComponent } from './pages/clan-applications/clan-applications.component';
 import { ClanApplicationApiService } from './services/clan-application.api.service';
+import { EditClanComponent } from './pages/edit-clan/edit-clan.component';
 
 @NgModule({
   imports: [
@@ -53,6 +54,10 @@ import { ClanApplicationApiService } from './services/clan-application.api.servi
         path: ':clanName/applications',
         component: ClanApplicationsComponent,
       },
+      {
+        path: ':clanName/manage',
+        component: EditClanComponent,
+      },
     ]),
     AuthModule,
   ],
@@ -64,6 +69,7 @@ import { ClanApplicationApiService } from './services/clan-application.api.servi
     ApplyToClanComponent,
     AddClanComponent,
     ClanApplicationsComponent,
+    EditClanComponent,
   ],
 })
 export class ClanModule {}
