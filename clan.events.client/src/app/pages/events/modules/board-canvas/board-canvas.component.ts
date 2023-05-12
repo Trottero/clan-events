@@ -63,7 +63,6 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   cameraOffset = { x: 0, y: 0 };
   canvasOffset = { x: 0, y: 0 };
   canvasSize = { width: 0, height: 0 };
-  cameraZoom = 1;
 
   isPanning = false;
   panStart = { x: 0, y: 0 };
@@ -73,7 +72,6 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   grabbedObjectIndex?: number;
 
   initialPinchDistance?: number;
-  lastZoom = this.cameraZoom;
 
   objects: TileResponse[] = [];
 
@@ -133,7 +131,6 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       this.canvasSize.width / 2,
       this.canvasSize.height / 2
     );
-    this.boardCanvasContext.scale(this.cameraZoom, this.cameraZoom); // scale by the camera zoom
     this.boardCanvasContext.translate(
       -this.canvasSize.width / 2 + this.cameraOffset.x,
       -this.canvasSize.height / 2 + this.cameraOffset.y
@@ -179,7 +176,6 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
 
   reset() {
     this.calculateCanvasOffset(true);
-    this.cameraZoom = 1;
   }
 
   // Gets the relevant location from a mouse or single touch event
@@ -249,7 +245,6 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isGrabbing = false;
     this.initialPinchDistance = undefined;
     this.grabbedObjectIndex = undefined;
-    this.lastZoom = this.cameraZoom;
   }
 
   onPointerMove(e: MouseEvent | TouchEvent) {
@@ -268,7 +263,6 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       location.x = location.x - this.cameraOffset.x;
       location.y = location.y - this.cameraOffset.y;
 
-      console.log('grabbing', this.grabbedObjectIndex, location);
       this.objects[this.grabbedObjectIndex].x +=
         location.x - this.grabLocation.x;
       this.objects[this.grabbedObjectIndex].y +=
@@ -284,43 +278,7 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       singleTouchHandler(e);
     } else if (e.type == 'touchmove' && e.touches.length == 2) {
       this.isPanning = false;
-      this.handlePinch(e);
     }
-  }
-
-  handlePinch(e: TouchEvent) {
-    e.preventDefault();
-
-    let touch1 = {
-      x: e.touches[0].clientX - this.canvasOffset.x,
-      y: e.touches[0].clientY - this.canvasOffset.y,
-    };
-    let touch2 = {
-      x: e.touches[1].clientX - this.canvasOffset.x,
-      y: e.touches[1].clientY - this.canvasOffset.y,
-    };
-
-    // This is distance squared, but no need for an expensive sqrt as it's only used in ratio
-    let currentDistance =
-      (touch1.x - touch2.x) ** 2 + (touch1.y - touch2.y) ** 2;
-
-    if (this.initialPinchDistance == null) {
-      this.initialPinchDistance = currentDistance;
-    } else {
-      // this.zoomByFactor(currentDistance / this.initialPinchDistance);
-    }
-  }
-
-  zoomByFactor(factor: number) {
-    this.cameraZoom = factor * this.lastZoom;
-    this.cameraZoom = Math.min(this.cameraZoom, MAX_ZOOM);
-    this.cameraZoom = Math.max(this.cameraZoom, MIN_ZOOM);
-  }
-
-  zoomByAmount(amount: number) {
-    this.cameraZoom += amount;
-    this.cameraZoom = Math.min(this.cameraZoom, MAX_ZOOM);
-    this.cameraZoom = Math.max(this.cameraZoom, MIN_ZOOM);
   }
 
   private calculateCanvasOffset(resetZoom: boolean = false) {
@@ -353,7 +311,6 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     this.onTouchEnd$ = fromEvent<TouchEvent>(el, 'touchend');
     this.onMouseMove$ = fromEvent<MouseEvent>(el, 'mousemove');
     this.onTouchMove$ = fromEvent<TouchEvent>(el, 'touchmove');
-    this.onWheel$ = fromEvent<WheelEvent>(el, 'wheel');
     this.onWindowResize$ = fromEvent(window, 'resize');
     this.onWindowScroll$ = fromEvent(window, 'scroll');
     this.onCanvasResize$ = fromEvent(el, 'resize');
@@ -379,12 +336,6 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     );
     this.subscriptions.add(
       this.onTouchMove$?.subscribe(e => this.handleTouch(e, this.onPointerMove))
-    );
-    this.subscriptions.add(
-      this.onWheel$?.subscribe(e =>
-        // this.zoomByAmount(-e.deltaY * SCROLL_SENSITIVITY)
-        {}
-      )
     );
     this.subscriptions.add(
       this.onWindowResize$?.subscribe(e => this.calculateCanvasOffset())
