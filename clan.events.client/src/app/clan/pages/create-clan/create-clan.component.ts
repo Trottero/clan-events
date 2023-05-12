@@ -41,8 +41,10 @@ export class CreateClanComponent implements OnInit, OnDestroy {
 
   private readonly createClanSubmit$ = new Subject<void>();
   private readonly createClan$ = this.createClanSubmit$.pipe(
-    withLatestFrom(this.clanId$),
-    switchMap(([_, clanId]) => this.clanApiService.createClan(clanId))
+    withLatestFrom(this.formGroup.value$),
+    switchMap(([_, formGroup]) =>
+      this.clanApiService.createClan(formGroup.name)
+    )
   );
 
   private readonly subscriptions = new Subscription();

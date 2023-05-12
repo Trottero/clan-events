@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { Clan, ClanDocument } from 'src/database/schemas/clan.schema';
 import { User } from 'src/database/schemas/user.schema';
 import { UserService } from 'src/user/user.service';
-import { ClanMembershipService } from './clan-membership.service';
+import { ClanMembershipService } from './management/clan-membership.service';
 import { ClanRole } from '@common/auth/clan.role';
 import { ClanWithRole, sanitizeClanName } from '@common/clan';
 
