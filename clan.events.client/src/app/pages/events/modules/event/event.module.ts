@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { EventComponent } from './event.component';
 import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { BoardModule } from '../board/board.module';
 
 @NgModule({
   declarations: [EventComponent],
@@ -14,6 +15,8 @@ import { MatButtonModule } from '@angular/material/button';
         component: EventComponent,
       },
     ]),
+
+    BoardModule,
 
     MatButtonModule,
   ],

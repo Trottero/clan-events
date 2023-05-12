@@ -7,5 +7,5 @@ export const NAVIGATION_PATHS = {
 
 export const NAVIGATION_PARAMS = {
   CLAN_NAME: 'clanName',
-  ID: 'id',
+  EVENT_ID: 'eventId',
 };

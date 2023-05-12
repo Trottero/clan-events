@@ -1,0 +1,11 @@
+<p>board works!</p>
+
+<mat-spinner *ngIf="tiles$ | async | isLoading"></mat-spinner>
+
+<button mat-flat-button color="primary" (click)="createTile()">Create Tile</button>
+
+<ul *ngIf="tiles$ | async | isSuccess as tiles">
+  <li *ngFor="let tile of tiles.data">
+    {{tile | json}}
+  </li>
+</ul>
