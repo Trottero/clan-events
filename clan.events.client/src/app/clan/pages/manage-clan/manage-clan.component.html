@@ -1,0 +1,15 @@
+<div class="d-flex flex-column flex-grow-1">
+  <div class="d-flex justify-content-between flex-row" *ngIf="selectedClan$ | async as clan">
+    <h2 class="d-flex">{{clan.displayName}}</h2>
+    <button mat-raised-button color="primary" type="button" *ngIf="clan.role == roleEnum.Owner"
+      (click)="deleteClan()">Delete</button>
+  </div>
+  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+    <mat-tab label="Members">
+      <app-edit-clan></app-edit-clan>
+    </mat-tab>
+    <mat-tab label="Applications">
+      <app-clan-applications></app-clan-applications>
+    </mat-tab>
+  </mat-tab-group>
+</div>

@@ -1,10 +1,4 @@
 <div *ngIf="clanName$ | async as clanName" class="d-flex flex-column flex-grow-1">
-  <div class="d-flex justify-content-between flex-row">
-    <h2 class="d-flex">Applications for {{clanName}}</h2>
-  </div>
-  <div>
-
-  </div>
   <div *ngIf="applications$ | async as applications">
     <table mat-table [dataSource]="applications" class="mat-elevation-z8">
       <ng-container matColumnDef="discordName">

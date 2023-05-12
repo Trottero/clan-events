@@ -20,6 +20,9 @@ import { AsyncClanNameValidator } from './validators/async-clan-name.validator';
 import { authGuard } from '../auth/auth.guard';
 import { ClanApplicationsComponent } from './pages/clan-applications/clan-applications.component';
 import { ClanApplicationApiService } from './services/clan-application.api.service';
+import { EditClanComponent } from './pages/edit-clan/edit-clan.component';
+import { ManageClanComponent } from './pages/manage-clan/manage-clan.component';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @NgModule({
   imports: [
@@ -33,6 +36,7 @@ import { ClanApplicationApiService } from './services/clan-application.api.servi
     MatSelectModule,
     MatCardModule,
     MatDividerModule,
+    MatTabsModule,
     ReactiveFormsModule,
     RouterModule.forChild([
       {
@@ -50,8 +54,16 @@ import { ClanApplicationApiService } from './services/clan-application.api.servi
         component: ClanOverviewComponent,
       },
       {
-        path: ':clanName/applications',
+        path: ':clanName/manage',
+        component: ManageClanComponent,
+      },
+      {
+        path: ':clanName/manage/applications',
         component: ClanApplicationsComponent,
+      },
+      {
+        path: ':clanName/manage/members',
+        component: EditClanComponent,
       },
     ]),
     AuthModule,
@@ -64,6 +76,8 @@ import { ClanApplicationApiService } from './services/clan-application.api.servi
     ApplyToClanComponent,
     AddClanComponent,
     ClanApplicationsComponent,
+    EditClanComponent,
+    ManageClanComponent,
   ],
 })
 export class ClanModule {}
