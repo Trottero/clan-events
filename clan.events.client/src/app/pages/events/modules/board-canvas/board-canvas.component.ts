@@ -3,10 +3,18 @@ import {
   Component,
   ElementRef,
   HostListener,
+  Input,
   OnDestroy,
+  OnInit,
   ViewChild,
 } from '@angular/core';
-import { Observable, Subscription, fromEvent } from 'rxjs';
+import { TileResponse } from '@common/events';
+import { Observable, Subscription, fromEvent, of, switchMap } from 'rxjs';
+import { Memoized } from 'src/app/common/decorators';
+import { observeProperty } from 'src/app/common/observable/observe-property';
+import { Loadable, filterMapSuccess } from 'src/app/common/operators/loadable';
+import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
+import { Response } from '@common/responses';
 
 const MAX_ZOOM = 5;
 const MIN_ZOOM = 0.1;
@@ -17,10 +25,28 @@ const SCROLL_SENSITIVITY = 0.0005;
   templateUrl: './board-canvas.component.html',
   styleUrls: ['./board-canvas.component.scss'],
 })
-export class BoardCanvasComponent implements AfterViewInit, OnDestroy {
+export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('boardCanvas')
   boardCanvas?: ElementRef<HTMLCanvasElement>;
   boardCanvasContext?: CanvasRenderingContext2D;
+
+  @Input() tiles$?: Observable<Loadable<Response<TileResponse[]>>>;
+
+  @Memoized public get tilesInput$(): Observable<
+    Loadable<Response<TileResponse[]>>
+  > {
+    return observeProperty(this, 'tiles$').pipe(
+      switchMap(source$ => {
+        if (!source$) {
+          return of(undefined);
+        }
+        return source$;
+      }),
+      notNullOrUndefined()
+    );
+  }
+
+  objects$ = this.tilesInput$.pipe(filterMapSuccess(tiles => tiles.value));
 
   onMouseDown$?: Observable<MouseEvent>;
   onTouchStart$?: Observable<TouchEvent>;
@@ -36,15 +62,29 @@ export class BoardCanvasComponent implements AfterViewInit, OnDestroy {
 
   cameraOffset = { x: 0, y: 0 };
   canvasOffset = { x: 0, y: 0 };
+  canvasSize = { width: 0, height: 0 };
   cameraZoom = 1;
 
-  isDragging = false;
-  dragStart = { x: 0, y: 0 };
+  isPanning = false;
+  panStart = { x: 0, y: 0 };
+
+  isGrabbing = false;
+  grabLocation = { x: 0, y: 0 };
+  grabbedObjectIndex?: number;
 
   initialPinchDistance?: number;
   lastZoom = this.cameraZoom;
 
+  objects: TileResponse[] = [];
+
   private subscriptions = new Subscription();
+
+  ngOnInit(): void {
+    this.objects$.subscribe(objects => {
+      console.log('objects', objects);
+      this.objects = objects.data;
+    });
+  }
 
   ngAfterViewInit(): void {
     this.boardCanvasContext =
@@ -54,13 +94,7 @@ export class BoardCanvasComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    this.calculateCanvasOffset();
-
-    // set initial camera offset to the centre of the canvas
-    // this.cameraOffset = {
-    //   x: this.boardCanvas.nativeElement.width / 2,
-    //   y: this.boardCanvas.nativeElement.height / 2,
-    // };
+    this.calculateCanvasOffset(true);
 
     this.registerEventListeners(this.boardCanvas.nativeElement);
     this.registerSubscriptions();
@@ -77,35 +111,33 @@ export class BoardCanvasComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    const rect = this.boardCanvas.nativeElement.getBoundingClientRect();
-    this.boardCanvas.nativeElement.width = rect.width;
-    this.boardCanvas.nativeElement.height = rect.height;
-
-    const width = this.boardCanvas.nativeElement.width;
-    const height = this.boardCanvas.nativeElement.height;
-
-    // Translate to the canvas centre before zooming - so you'll always zoom on what you're looking directly at
-    // this.boardCanvasContext.translate(width / 2, height / 2);
-    // this.boardCanvasContext.scale(this.cameraZoom, this.cameraZoom);
-    // this.boardCanvasContext.translate(
-    //   -width / 2 + this.cameraOffset.x,
-    //   -height / 2 + this.cameraOffset.y
-    // );
+    this.calculateCanvasOffset();
 
     // Store the current transformation matrix
     this.boardCanvasContext.save();
 
     // Use the identity matrix while clearing the canvas
     this.boardCanvasContext.setTransform(1, 0, 0, 1, 0, 0);
-    this.boardCanvasContext.clearRect(0, 0, width, height);
+    this.boardCanvasContext.clearRect(
+      0,
+      0,
+      this.canvasSize.width,
+      this.canvasSize.height
+    );
 
     // Restore the transform
     this.boardCanvasContext.restore();
 
-    // translate to the camera offset
-    this.boardCanvasContext.translate(width / 2, height / 2);
-    this.boardCanvasContext.translate(this.cameraOffset.x, this.cameraOffset.y);
-    this.boardCanvasContext.scale(this.cameraZoom, this.cameraZoom);
+    // translate to the centre of the canvas for zooming
+    this.boardCanvasContext.translate(
+      this.canvasSize.width / 2,
+      this.canvasSize.height / 2
+    );
+    this.boardCanvasContext.scale(this.cameraZoom, this.cameraZoom); // scale by the camera zoom
+    this.boardCanvasContext.translate(
+      -this.canvasSize.width / 2 + this.cameraOffset.x,
+      -this.canvasSize.height / 2 + this.cameraOffset.y
+    ); // translate back to the top left
 
     // draw a rectangle
     this.boardCanvasContext.fillStyle = 'green';
@@ -118,16 +150,40 @@ export class BoardCanvasComponent implements AfterViewInit, OnDestroy {
     this.boardCanvasContext.fillStyle = 'red';
     this.boardCanvasContext?.fill();
 
+    if (this.grabLocation) {
+      this.boardCanvasContext.fillStyle = 'blue';
+      this.boardCanvasContext.fillRect(
+        this.grabLocation.x - 5,
+        this.grabLocation.y - 5,
+        10,
+        10
+      );
+    }
+
+    // draw objects
+    this.drawObjects();
+
     requestAnimationFrame(() => this.draw());
   }
 
+  drawObjects() {
+    if (!this.boardCanvasContext) {
+      return;
+    }
+
+    for (const object of this.objects) {
+      this.boardCanvasContext.fillStyle = object.fillColor;
+      this.boardCanvasContext.fillRect(object.x, object.y, 100, 100);
+    }
+  }
+
   reset() {
-    this.cameraOffset = { x: 0, y: 0 };
+    this.calculateCanvasOffset(true);
     this.cameraZoom = 1;
   }
 
   // Gets the relevant location from a mouse or single touch event
-  getEventLocation(e: MouseEvent | TouchEvent) {
+  getEventOnCameraLocation(e: MouseEvent | TouchEvent) {
     const offset = this.canvasOffset;
 
     if (e instanceof MouseEvent) {
@@ -142,29 +198,84 @@ export class BoardCanvasComponent implements AfterViewInit, OnDestroy {
     return undefined;
   }
 
-  onPointerDown(e: MouseEvent | TouchEvent) {
-    console.log('onPointerDown');
-    this.isDragging = true;
-    const location = this.getEventLocation(e);
-    if (!location) return;
+  cameraToCanvasLocation(location: { x: number; y: number }) {
+    return {
+      x: location.x - this.cameraOffset.x,
+      y: location.y - this.cameraOffset.y,
+    };
+  }
 
-    this.dragStart.x = location.x / this.cameraZoom - this.cameraOffset.x;
-    this.dragStart.y = location.y / this.cameraZoom - this.cameraOffset.y;
+  onPointerDown(e: MouseEvent | TouchEvent) {
+    // set panning if middle click
+    if (e instanceof MouseEvent && e.button == 1) {
+      this.isPanning = true;
+      const location = this.getEventOnCameraLocation(e);
+      if (!location) return;
+
+      const { x, y } = this.cameraToCanvasLocation(location);
+
+      this.panStart.x = x;
+      this.panStart.y = y;
+    }
+
+    // grab object if left click
+    if (e instanceof MouseEvent && e.button == 0) {
+      // get location
+      const eventLocation = this.getEventOnCameraLocation(e);
+      if (!eventLocation) return;
+
+      const location = this.cameraToCanvasLocation(eventLocation);
+
+      // check if we are grabbing an object
+      const grabbedObject = this.objects.findIndex(
+        object =>
+          location.x >= object.x &&
+          location.x <= object.x + 100 &&
+          location.y >= object.y &&
+          location.y <= object.y + 100
+      );
+
+      if (grabbedObject > -1) {
+        this.isGrabbing = true;
+        this.grabbedObjectIndex = grabbedObject;
+        this.grabLocation.x = location.x;
+        this.grabLocation.y = location.y;
+      }
+    }
   }
 
   onPointerUp(e: MouseEvent | TouchEvent) {
-    this.isDragging = false;
+    this.isPanning = false;
+    this.isGrabbing = false;
     this.initialPinchDistance = undefined;
+    this.grabbedObjectIndex = undefined;
     this.lastZoom = this.cameraZoom;
   }
 
   onPointerMove(e: MouseEvent | TouchEvent) {
-    if (this.isDragging) {
-      const location = this.getEventLocation(e);
+    if (this.isPanning) {
+      const location = this.getEventOnCameraLocation(e);
       if (!location) return;
 
-      this.cameraOffset.x = location.x / this.cameraZoom - this.dragStart.x;
-      this.cameraOffset.y = location.y / this.cameraZoom - this.dragStart.y;
+      this.cameraOffset.x = location.x - this.panStart.x;
+      this.cameraOffset.y = location.y - this.panStart.y;
+    }
+
+    if (this.isGrabbing && this.grabbedObjectIndex !== undefined) {
+      const location = this.getEventOnCameraLocation(e);
+      if (!location) return;
+
+      location.x = location.x - this.cameraOffset.x;
+      location.y = location.y - this.cameraOffset.y;
+
+      console.log('grabbing', this.grabbedObjectIndex, location);
+      this.objects[this.grabbedObjectIndex].x +=
+        location.x - this.grabLocation.x;
+      this.objects[this.grabbedObjectIndex].y +=
+        location.y - this.grabLocation.y;
+
+      this.grabLocation.x = location.x;
+      this.grabLocation.y = location.y;
     }
   }
 
@@ -172,7 +283,7 @@ export class BoardCanvasComponent implements AfterViewInit, OnDestroy {
     if (e.touches.length == 1) {
       singleTouchHandler(e);
     } else if (e.type == 'touchmove' && e.touches.length == 2) {
-      this.isDragging = false;
+      this.isPanning = false;
       this.handlePinch(e);
     }
   }
@@ -196,29 +307,38 @@ export class BoardCanvasComponent implements AfterViewInit, OnDestroy {
     if (this.initialPinchDistance == null) {
       this.initialPinchDistance = currentDistance;
     } else {
-      this.adjustZoom(undefined, currentDistance / this.initialPinchDistance);
+      // this.zoomByFactor(currentDistance / this.initialPinchDistance);
     }
   }
 
-  adjustZoom(zoomAmount?: number, zoomFactor?: number) {
-    if (!this.isDragging) {
-      if (zoomAmount) {
-        this.cameraZoom += zoomAmount;
-      } else if (zoomFactor) {
-        console.log(zoomFactor);
-        this.cameraZoom = zoomFactor * this.lastZoom;
-      }
-
-      this.cameraZoom = Math.min(this.cameraZoom, MAX_ZOOM);
-      this.cameraZoom = Math.max(this.cameraZoom, MIN_ZOOM);
-
-      console.log(this.cameraZoom);
-    }
+  zoomByFactor(factor: number) {
+    this.cameraZoom = factor * this.lastZoom;
+    this.cameraZoom = Math.min(this.cameraZoom, MAX_ZOOM);
+    this.cameraZoom = Math.max(this.cameraZoom, MIN_ZOOM);
   }
 
-  private calculateCanvasOffset() {
+  zoomByAmount(amount: number) {
+    this.cameraZoom += amount;
+    this.cameraZoom = Math.min(this.cameraZoom, MAX_ZOOM);
+    this.cameraZoom = Math.max(this.cameraZoom, MIN_ZOOM);
+  }
+
+  private calculateCanvasOffset(resetZoom: boolean = false) {
     const rect = this.boardCanvas?.nativeElement.getBoundingClientRect();
     if (!rect) return;
+
+    this.canvasSize.width = rect.width;
+    this.canvasSize.height = rect.height;
+
+    if (this.boardCanvas) {
+      this.boardCanvas.nativeElement.width = this.canvasSize.width;
+      this.boardCanvas.nativeElement.height = this.canvasSize.height;
+    }
+
+    if (resetZoom) {
+      this.cameraOffset.x = this.canvasSize.width / 2;
+      this.cameraOffset.y = this.canvasSize.height / 2;
+    }
 
     this.canvasOffset = {
       x: rect.left,
@@ -262,7 +382,8 @@ export class BoardCanvasComponent implements AfterViewInit, OnDestroy {
     );
     this.subscriptions.add(
       this.onWheel$?.subscribe(e =>
-        this.adjustZoom(-e.deltaY * SCROLL_SENSITIVITY)
+        // this.zoomByAmount(-e.deltaY * SCROLL_SENSITIVITY)
+        {}
       )
     );
     this.subscriptions.add(
@@ -274,5 +395,13 @@ export class BoardCanvasComponent implements AfterViewInit, OnDestroy {
     this.subscriptions.add(
       this.onCanvasResize$?.subscribe(e => this.calculateCanvasOffset())
     );
+
+    if (this.boardCanvas) {
+      this.subscriptions.add(
+        fromEvent(this.boardCanvas.nativeElement, 'contextmenu').subscribe(e =>
+          e.preventDefault()
+        )
+      );
+    }
   }
 }
