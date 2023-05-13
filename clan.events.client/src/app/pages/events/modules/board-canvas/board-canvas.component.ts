@@ -13,15 +13,11 @@ import {
   CanvasObservables,
   getCanvasObservables,
 } from './board-canvas-observables';
-import { BoardRenderer } from '../board/simple-board-renderer';
+import {
+  BoardCanvasObject,
+  BoardRenderer,
+} from '../board/simple-board-renderer';
 import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
-
-export interface BoardCanvasObject {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
 
 @Component({
   selector: 'app-board-canvas',
@@ -105,7 +101,11 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  draw() {
+  reset() {
+    this.calculateCanvasOffset(true);
+  }
+
+  private draw() {
     if (!this.boardCanvasContext || !this.boardCanvas) {
       return;
     }
@@ -147,12 +147,8 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     requestAnimationFrame(() => this.draw());
   }
 
-  reset() {
-    this.calculateCanvasOffset(true);
-  }
-
   // Gets the relevant location from a mouse or single touch event
-  getEventOnCameraLocation(e: MouseEvent | TouchEvent) {
+  private getEventOnCameraLocation(e: MouseEvent | TouchEvent) {
     const offset = this.canvasOffset;
 
     if (e instanceof MouseEvent) {
@@ -167,15 +163,22 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     return undefined;
   }
 
-  cameraToCanvasLocation(location: { x: number; y: number }) {
+  private cameraToCanvasLocation(location: { x: number; y: number }) {
     return {
       x: location.x - this.cameraOffset.x,
       y: location.y - this.cameraOffset.y,
     };
   }
 
-  onPointerDown(e: MouseEvent | TouchEvent) {
+  private onPointerDown(e: MouseEvent | TouchEvent) {
     // set panning if middle click
+    this.handlePan(e);
+
+    // grab object if left click
+    this.handleGrab(e);
+  }
+
+  private handlePan(e: MouseEvent | TouchEvent) {
     if (e instanceof MouseEvent && e.button == 1) {
       this.isPanning = true;
       const location = this.getEventOnCameraLocation(e);
@@ -186,8 +189,9 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       this.panStart.x = x;
       this.panStart.y = y;
     }
+  }
 
-    // grab object if left click
+  private handleGrab(e: MouseEvent | TouchEvent) {
     if (e instanceof MouseEvent && e.button == 0) {
       // get location
       const eventLocation = this.getEventOnCameraLocation(e);
@@ -216,7 +220,7 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  onPointerUp(e: MouseEvent | TouchEvent) {
+  private onPointerUp(e: MouseEvent | TouchEvent) {
     if (this.isGrabbing && this.grabbedObjectIndex !== undefined) {
       const object = this.objects[this.grabbedObjectIndex];
       // update it's new location
@@ -233,7 +237,7 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     this.grabbedObjectIndex = undefined;
   }
 
-  onPointerMove(e: MouseEvent | TouchEvent) {
+  private onPointerMove(e: MouseEvent | TouchEvent) {
     if (this.isPanning) {
       const location = this.getEventOnCameraLocation(e);
       if (!location) return;
@@ -265,7 +269,10 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  handleTouch(e: TouchEvent, singleTouchHandler: (e: TouchEvent) => void) {
+  private handleTouch(
+    e: TouchEvent,
+    singleTouchHandler: (e: TouchEvent) => void
+  ) {
     if (e.touches.length == 1) {
       singleTouchHandler(e);
     } else if (e.type == 'touchmove' && e.touches.length == 2) {

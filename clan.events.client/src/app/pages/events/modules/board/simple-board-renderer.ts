@@ -7,7 +7,6 @@ import { BoardService } from './board.service';
 import { ThemingService } from 'src/app/shared/theming/theming.service';
 
 export interface BoardCanvasObject {
-  id: string;
   x: number;
   y: number;
   width: number;
@@ -206,7 +205,6 @@ export class SimpleBoardRenderer extends BoardRenderer {
 
 function mapTileToCanvasObject(tile: TileResponse): BoardCanvasObject {
   return {
-    id: tile.id,
     x: tile.x,
     y: tile.y,
     width: tile.width,

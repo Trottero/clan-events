@@ -87,10 +87,10 @@ export class BoardService {
           ),
           switchMap(([clan, eventId]) =>
             this.boardApiService.createTile(clan.name, eventId, {
-              name: 'New tile',
-              borderColor: '#000000',
-              fillColor: '#ffffff',
-              borderWidth: 1,
+              name: 'New Tile',
+              borderColor: '#915ead',
+              fillColor: '#decfe6',
+              borderWidth: 5,
               width: 100,
               height: 100,
               x: 0,
