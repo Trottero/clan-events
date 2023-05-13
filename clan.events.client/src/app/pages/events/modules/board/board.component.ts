@@ -25,20 +25,30 @@ import {
 } from 'src/app/common/operators/loadable';
 import { TileResponse } from '@common/events';
 import { BoardService } from './board.service';
+import { SimpleBoardRenderer } from './simple-board-renderer';
 
 @Component({
   selector: 'app-board',
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.scss'],
 })
-export class BoardComponent {
+export class BoardComponent implements OnDestroy {
   private readonly boardService = inject(BoardService);
 
   tiles$ = this.boardService.tiles$;
 
   selectedTile$ = this.boardService.selectedTile$;
 
-  ngOnInit(): void {}
+  boardRenderer = new SimpleBoardRenderer();
+
+  ngOnInit(): void {
+    this.boardService.setBoardRenderer(this.boardRenderer);
+  }
+
+  ngOnDestroy(): void {
+    this.boardRenderer.destroy();
+    this.boardService.setBoardRenderer(null);
+  }
 
   createTile() {
     this.boardService.createTile();

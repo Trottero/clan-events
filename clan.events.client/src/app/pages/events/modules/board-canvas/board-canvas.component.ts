@@ -7,16 +7,21 @@ import {
   ViewChild,
   inject,
 } from '@angular/core';
-import { TileResponse } from '@common/events';
-import { Subscription, fromEvent, map } from 'rxjs';
-import { filterMapSuccess } from 'src/app/common/operators/loadable';
+import { Subscription, fromEvent, switchMap } from 'rxjs';
 import { BoardService } from '../board/board.service';
-import { ThemingService } from 'src/app/shared/theming/theming.service';
-import { Theme } from 'src/app/shared/theming/theme';
 import {
   CanvasObservables,
   getCanvasObservables,
 } from './board-canvas-observables';
+import { BoardRenderer } from '../board/simple-board-renderer';
+import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
+
+export interface BoardCanvasObject {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 @Component({
   selector: 'app-board-canvas',
@@ -25,18 +30,11 @@ import {
 })
 export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly boardService = inject(BoardService);
-  private readonly themingService = inject(ThemingService);
+  private readonly boardRenderer$ = this.boardService.boardRenderer$;
 
-  tiles$ = this.boardService.tiles$.pipe(filterMapSuccess(x => x.value));
+  private boardRenderer?: BoardRenderer;
+
   resetCanvas$ = this.boardService.resetCanvas$;
-
-  lineColor$ = this.themingService.theme$.pipe(
-    map(state => (state.theme === Theme.Light ? '#e4e4e4' : '#524f6a'))
-  );
-
-  textColor$ = this.themingService.theme$.pipe(
-    map(state => (state.theme === Theme.Light ? '#333333de' : '#e2d7ec'))
-  );
 
   @ViewChild('boardCanvas')
   boardCanvas?: ElementRef<HTMLCanvasElement>;
@@ -54,39 +52,33 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   isGrabbing = false;
   grabLocation = { x: 0, y: 0 };
   grabbedObjectIndex?: number;
+  objects = [] as BoardCanvasObject[];
 
   initialPinchDistance?: number;
-
-  lineColor = '#000000';
-  textColor = '#000000';
-
-  objects: TileResponse[] = [];
 
   private subscriptions = new Subscription();
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.tiles$.subscribe(objects => {
-        console.log('objects', objects);
-        this.objects = objects.data;
+      this.boardRenderer$.subscribe(boardRenderer => {
+        this.boardRenderer = boardRenderer;
       })
+    );
+
+    this.subscriptions.add(
+      this.boardRenderer$
+        .pipe(
+          notNullOrUndefined(),
+          switchMap(boardRenderer => boardRenderer.canvasObjects$)
+        )
+        .subscribe(objects => {
+          this.objects = objects;
+        })
     );
 
     this.subscriptions.add(
       this.resetCanvas$.subscribe(() => {
         this.reset();
-      })
-    );
-
-    this.subscriptions.add(
-      this.lineColor$.subscribe(color => {
-        this.lineColor = color;
-      })
-    );
-
-    this.subscriptions.add(
-      this.textColor$.subscribe(color => {
-        this.textColor = color;
       })
     );
   }
@@ -145,82 +137,14 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       -this.canvasSize.height / 2 + this.cameraOffset.y
     ); // translate back to the top left
 
-    // draw objects
-    this.drawObjects();
+    // render
+    this.boardRenderer?.renderBackground(
+      this.boardCanvasContext,
+      this.cameraOffset
+    );
+    this.boardRenderer?.render(this.boardCanvasContext);
 
     requestAnimationFrame(() => this.draw());
-  }
-
-  drawObjects() {
-    if (!this.boardCanvasContext) {
-      return;
-    }
-
-    // set shadow
-    this.boardCanvasContext.shadowColor = 'rgba(0, 0, 0, 0.1)';
-    this.boardCanvasContext.shadowBlur = 10;
-    this.boardCanvasContext.shadowOffsetX = -2;
-    this.boardCanvasContext.shadowOffsetY = 5;
-
-    // draw lines between objects
-    for (const object of this.objects) {
-      if (!object.nextTileId) {
-        continue;
-      }
-
-      const nextObject = this.objects.find(
-        x => x.id === object.nextTileId
-      ) as TileResponse;
-
-      if (!nextObject) {
-        continue;
-      }
-
-      this.boardCanvasContext.beginPath();
-      this.boardCanvasContext.moveTo(
-        object.x + object.width / 2,
-        object.y + object.height / 2
-      );
-      this.boardCanvasContext.lineTo(
-        nextObject.x + nextObject.width / 2,
-        nextObject.y + nextObject.height / 2
-      );
-      this.boardCanvasContext.strokeStyle = this.lineColor;
-      this.boardCanvasContext.lineWidth = 5;
-      this.boardCanvasContext.stroke();
-    }
-
-    for (const object of this.objects) {
-      this.boardCanvasContext.fillStyle = object.fillColor;
-      this.boardCanvasContext.fillRect(
-        object.x,
-        object.y,
-        object.width,
-        object.height
-      );
-      this.boardCanvasContext.strokeStyle = object.borderColor;
-      this.boardCanvasContext.lineWidth = object.borderWidth;
-
-      if (object.borderWidth > 0) {
-        this.boardCanvasContext.strokeRect(
-          object.x + object.borderWidth / 2,
-          object.y + object.borderWidth / 2,
-          object.width - object.borderWidth,
-          object.height - object.borderWidth
-        );
-      }
-
-      // draw text
-      this.boardCanvasContext.fillStyle = this.textColor;
-      this.boardCanvasContext.font = '500 16px "Roboto"';
-      this.boardCanvasContext.textAlign = 'center';
-      this.boardCanvasContext.textBaseline = 'middle';
-      this.boardCanvasContext.fillText(
-        object.name,
-        object.x + object.width / 2,
-        object.y + object.height + 20
-      );
-    }
   }
 
   reset() {
@@ -275,9 +199,9 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       const grabbedObject = this.objects.findIndex(
         object =>
           location.x >= object.x &&
-          location.x <= object.x + 100 &&
+          location.x <= object.x + object.width &&
           location.y >= object.y &&
-          location.y <= object.y + 100
+          location.y <= object.y + object.height
       );
 
       if (grabbedObject > -1) {
@@ -285,9 +209,9 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
         this.grabbedObjectIndex = grabbedObject;
         this.grabLocation.x = location.x;
         this.grabLocation.y = location.y;
-        this.boardService.setSelectedTileId(this.objects[grabbedObject].id);
+        this.boardRenderer?.selectCanvasObject(grabbedObject);
       } else {
-        this.boardService.setSelectedTileId(null);
+        this.boardRenderer?.selectCanvasObject(undefined);
       }
     }
   }
@@ -296,7 +220,11 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.isGrabbing && this.grabbedObjectIndex !== undefined) {
       const object = this.objects[this.grabbedObjectIndex];
       // update it's new location
-      this.boardService.updateTilePosition(object.id, object.x, object.y);
+      this.boardRenderer?.onGrabEnd(
+        this.grabbedObjectIndex,
+        object.x,
+        object.y
+      );
     }
 
     this.isPanning = false;
@@ -325,6 +253,12 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
         location.x - this.grabLocation.x;
       this.objects[this.grabbedObjectIndex].y +=
         location.y - this.grabLocation.y;
+
+      this.boardRenderer?.onGrabMove(
+        this.grabbedObjectIndex,
+        this.objects[this.grabbedObjectIndex].x,
+        this.objects[this.grabbedObjectIndex].y
+      );
 
       this.grabLocation.x = location.x;
       this.grabLocation.y = location.y;

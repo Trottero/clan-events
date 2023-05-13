@@ -7,6 +7,7 @@ import {
   Subject,
   Subscription,
   catchError,
+  BehaviorSubject,
 } from 'rxjs';
 import { SelectedClanService } from 'src/app/clan/services/selected-clan.service';
 import {
@@ -18,6 +19,7 @@ import { BoardApiService } from './board.api.service';
 import { EventIdStream } from '../../streams/event-id.stream';
 import { State } from 'src/app/common/state';
 import { TileResponse } from '@common/events';
+import { BoardRenderer, SimpleBoardRenderer } from './simple-board-renderer';
 
 export interface BoardState {
   selectedTileId: string | null;
@@ -43,6 +45,9 @@ export class BoardService {
   private readonly resetCanvasSubject = new Subject<void>();
   private readonly refreshTilesSubject = new Subject<void>();
 
+  private readonly boardRendererSubject =
+    new BehaviorSubject<BoardRenderer | null>(null);
+
   private boardState = new State<BoardState>(INITIAL_STATE);
 
   tiles$ = combineLatest([
@@ -67,6 +72,8 @@ export class BoardService {
   );
 
   resetCanvas$ = this.resetCanvasSubject.pipe(startWith(undefined));
+
+  boardRenderer$ = this.boardRendererSubject.pipe(notNullOrUndefined());
 
   constructor() {
     this.subscriptions.add(
@@ -116,6 +123,10 @@ export class BoardService {
         )
         .subscribe()
     );
+  }
+
+  setBoardRenderer(boardRenderer: BoardRenderer | null) {
+    this.boardRendererSubject.next(boardRenderer);
   }
 
   createTile() {
