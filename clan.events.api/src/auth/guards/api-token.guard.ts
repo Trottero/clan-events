@@ -31,6 +31,11 @@ export class ApiTokenGuard implements CanActivate {
           secret: authConfig.jwtSecret,
         },
       );
+
+      if (payload.iat + payload.expiresIn < Date.now() / 1000) {
+        throw new UnauthorizedException();
+      }
+
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
       request['user'] = payload;

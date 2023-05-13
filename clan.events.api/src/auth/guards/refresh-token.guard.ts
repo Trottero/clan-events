@@ -31,6 +31,11 @@ export class RefreshTokenGuard implements CanActivate {
           secret: authConfig.jwtSecret,
         },
       );
+
+      if (payload.iat + payload.expiresIn < Date.now() / 1000) {
+        throw new UnauthorizedException();
+      }
+
       request['refresh_token'] = payload;
     } catch {
       throw new UnauthorizedException();
