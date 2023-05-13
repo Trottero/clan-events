@@ -1,11 +1,20 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { BoardService } from '../board/board.service';
 import { FormControl, FormGroup } from '@ngneat/reactive-forms';
-import { Subject, Subscription, switchMap, withLatestFrom } from 'rxjs';
+import {
+  Subject,
+  Subscription,
+  combineLatest,
+  map,
+  switchMap,
+  withLatestFrom,
+} from 'rxjs';
 import { BoardApiService } from '../board/board.api.service';
 import { SelectedClanService } from 'src/app/clan/services/selected-clan.service';
 import { EventIdStream } from '../../streams/event-id.stream';
 import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
+import { filterMapSuccess } from 'src/app/common/operators/loadable';
+import { TileResponse } from '@common/events';
 
 @Component({
   selector: 'app-edit-tile',
@@ -23,12 +32,25 @@ export class EditTileComponent implements OnInit, OnDestroy {
 
   selectedTile$ = this.boardService.selectedTile$;
 
+  availableTiles$ = combineLatest([
+    this.boardService.tiles$.pipe(
+      notNullOrUndefined(),
+      filterMapSuccess(tiles => tiles.value.data)
+    ),
+    this.boardService.selectedTile$.pipe(notNullOrUndefined()),
+  ]).pipe(
+    map(([tiles, selectedTile]) =>
+      tiles.filter(tile => tile.id !== selectedTile.id)
+    )
+  );
+
   nameControl = new FormControl<string>();
   borderColorControl = new FormControl<string>();
   fillColorControl = new FormControl<string>();
   borderWidthControl = new FormControl<number>();
   widthControl = new FormControl<number>();
   heightControl = new FormControl<number>();
+  nextTileIdControl = new FormControl<string | undefined>();
 
   formGroup = new FormGroup({
     name: this.nameControl,
@@ -37,6 +59,7 @@ export class EditTileComponent implements OnInit, OnDestroy {
     borderWidth: this.borderWidthControl,
     width: this.widthControl,
     height: this.heightControl,
+    nextTile: this.nextTileIdControl,
   });
 
   ngOnInit(): void {
@@ -49,6 +72,7 @@ export class EditTileComponent implements OnInit, OnDestroy {
           this.borderWidthControl.setValue(tile.borderWidth);
           this.widthControl.setValue(tile.width);
           this.heightControl.setValue(tile.height);
+          this.nextTileIdControl.setValue(tile.nextTileId);
         }
       })
     );
@@ -73,6 +97,7 @@ export class EditTileComponent implements OnInit, OnDestroy {
               borderWidth: form.borderWidth,
               width: form.width,
               height: form.height,
+              nextTileId: form.nextTile,
             })
           )
         )

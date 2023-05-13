@@ -1,6 +1,7 @@
 export interface TileResponse {
   id: string;
   name: string;
+  nextTileId?: string;
 
   // canvas
   image?: string;

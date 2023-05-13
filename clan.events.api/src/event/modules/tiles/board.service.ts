@@ -45,6 +45,7 @@ export class BoardService {
 
     const tile = new this.tileModel({
       name: request.name,
+      nextTile: request.nextTileId,
       canvas: {
         x: request.x,
         y: request.y,
@@ -96,7 +97,13 @@ export class BoardService {
       throw new NotFoundException();
     }
 
+    // get next tile in event
+    const nextTile = event.board.tiles.find(
+      (tile) => (tile as TileDocument).id === body.nextTileId,
+    );
+
     tile.name = body.name ?? tile.name;
+    tile.nextTile = body.nextTileId ? nextTile : tile.nextTile;
     tile.canvas = {
       x: body.x ?? tile.canvas.x,
       y: body.y ?? tile.canvas.y,

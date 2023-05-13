@@ -18,5 +18,6 @@ export function convertToTileResponse(tile: TileDocument): TileResponse {
     x: tile.canvas.x,
     y: tile.canvas.y,
     image: tile.canvas.image,
+    nextTileId: tile.nextTile?.toString(),
   };
 }

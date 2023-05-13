@@ -1,5 +1,6 @@
 export interface CreateTileRequest {
   name: string;
+  nextTileId?: string;
 
   // canvas
   image?: string;
