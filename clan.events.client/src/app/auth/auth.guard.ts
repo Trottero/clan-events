@@ -9,9 +9,9 @@ import { map } from 'rxjs';
 export const authGuard = (next: ActivatedRouteSnapshot) => {
   const authService = inject(AuthService);
 
-  return authService.hasValidToken$.pipe(
-    map(hasValidToken => {
-      if (!hasValidToken) {
+  return authService.isAuthenticated$.pipe(
+    map(isAuthenticated => {
+      if (!isAuthenticated) {
         return createUrlTreeFromSnapshot(next, ['/']);
       }
 
