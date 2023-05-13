@@ -28,7 +28,7 @@ export class RefreshTokenGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync<JwtRefreshTokenContent>(
         token,
         {
-          secret: authConfig.jwtSecret,
+          secret: authConfig.refreshTokenSecret,
         },
       );
 
