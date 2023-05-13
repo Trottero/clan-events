@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Buffer } from 'buffer';
-import { JwtTokenContent } from '@common/auth';
+import { JwtRefreshTokenContent, JwtTokenContent } from '@common/auth';
 
 @Injectable()
 export class JwtService {
-  decodeToken(token: string): JwtTokenContent {
+  decodeToken<T = JwtTokenContent | JwtRefreshTokenContent>(token: string): T {
     const parts = token.split('.');
     if (parts.length !== 3) {
       throw new Error('JWT must have 3 parts');
@@ -14,7 +14,7 @@ export class JwtService {
       throw new Error('Cannot decode the token');
     }
 
-    return JSON.parse(decoded) as JwtTokenContent;
+    return JSON.parse(decoded) as T;
   }
 
   urlBase64Decode(data: string): string {
