@@ -2,27 +2,21 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
-  HostListener,
-  Input,
   OnDestroy,
   OnInit,
   ViewChild,
   inject,
 } from '@angular/core';
 import { TileResponse } from '@common/events';
-import { Observable, Subscription, fromEvent, map, of, switchMap } from 'rxjs';
-import { Memoized } from 'src/app/common/decorators';
-import { observeProperty } from 'src/app/common/observable/observe-property';
-import { Loadable, filterMapSuccess } from 'src/app/common/operators/loadable';
-import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
-import { Response } from '@common/responses';
+import { Subscription, fromEvent, map } from 'rxjs';
+import { filterMapSuccess } from 'src/app/common/operators/loadable';
 import { BoardService } from '../board/board.service';
 import { ThemingService } from 'src/app/shared/theming/theming.service';
 import { Theme } from 'src/app/shared/theming/theme';
-
-const MAX_ZOOM = 5;
-const MIN_ZOOM = 0.1;
-const SCROLL_SENSITIVITY = 0.0005;
+import {
+  CanvasObservables,
+  getCanvasObservables,
+} from './board-canvas-observables';
 
 @Component({
   selector: 'app-board-canvas',
@@ -48,17 +42,7 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   boardCanvas?: ElementRef<HTMLCanvasElement>;
   boardCanvasContext?: CanvasRenderingContext2D;
 
-  onMouseDown$?: Observable<MouseEvent>;
-  onTouchStart$?: Observable<TouchEvent>;
-  onMouseUp$?: Observable<MouseEvent>;
-  onTouchEnd$?: Observable<TouchEvent>;
-  onMouseMove$?: Observable<MouseEvent>;
-  onTouchMove$?: Observable<TouchEvent>;
-  onWheel$?: Observable<WheelEvent>;
-
-  onWindowResize$?: Observable<Event>;
-  onWindowScroll$?: Observable<Event>;
-  onCanvasResize$?: Observable<Event>;
+  private canvasObservables?: CanvasObservables;
 
   cameraOffset = { x: 0, y: 0 };
   canvasOffset = { x: 0, y: 0 };
@@ -117,7 +101,9 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.calculateCanvasOffset(true);
 
-    this.registerEventListeners(this.boardCanvas.nativeElement);
+    this.canvasObservables = getCanvasObservables(
+      this.boardCanvas.nativeElement
+    );
     this.registerSubscriptions();
 
     this.draw();
@@ -376,47 +362,47 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     };
   }
 
-  private registerEventListeners(el: HTMLCanvasElement) {
-    this.onMouseDown$ = fromEvent<MouseEvent>(el, 'mousedown');
-    this.onTouchStart$ = fromEvent<TouchEvent>(el, 'touchstart');
-    this.onMouseUp$ = fromEvent<MouseEvent>(el, 'mouseup');
-    this.onTouchEnd$ = fromEvent<TouchEvent>(el, 'touchend');
-    this.onMouseMove$ = fromEvent<MouseEvent>(el, 'mousemove');
-    this.onTouchMove$ = fromEvent<TouchEvent>(el, 'touchmove');
-    this.onWindowResize$ = fromEvent(window, 'resize');
-    this.onWindowScroll$ = fromEvent(window, 'scroll');
-    this.onCanvasResize$ = fromEvent(el, 'resize');
-  }
-
   private registerSubscriptions() {
+    if (!this.canvasObservables) return;
+
     this.subscriptions.add(
-      this.onMouseDown$?.subscribe(e => this.onPointerDown(e))
+      this.canvasObservables.onMouseDown$.subscribe(e => this.onPointerDown(e))
     );
     this.subscriptions.add(
-      this.onTouchStart$?.subscribe(e =>
+      this.canvasObservables.onTouchStart$.subscribe(e =>
         this.handleTouch(e, this.onPointerDown)
       )
     );
     this.subscriptions.add(
-      this.onMouseUp$?.subscribe(e => this.onPointerUp(e))
+      this.canvasObservables.onMouseUp$.subscribe(e => this.onPointerUp(e))
     );
     this.subscriptions.add(
-      this.onTouchEnd$?.subscribe(e => this.handleTouch(e, this.onPointerUp))
+      this.canvasObservables.onTouchEnd$.subscribe(e =>
+        this.handleTouch(e, this.onPointerUp)
+      )
     );
     this.subscriptions.add(
-      this.onMouseMove$?.subscribe(e => this.onPointerMove(e))
+      this.canvasObservables.onMouseMove$.subscribe(e => this.onPointerMove(e))
     );
     this.subscriptions.add(
-      this.onTouchMove$?.subscribe(e => this.handleTouch(e, this.onPointerMove))
+      this.canvasObservables.onTouchMove$.subscribe(e =>
+        this.handleTouch(e, this.onPointerMove)
+      )
     );
     this.subscriptions.add(
-      this.onWindowResize$?.subscribe(e => this.calculateCanvasOffset(true))
+      this.canvasObservables.onWindowResize$.subscribe(e =>
+        this.calculateCanvasOffset(true)
+      )
     );
     this.subscriptions.add(
-      this.onWindowScroll$?.subscribe(e => this.calculateCanvasOffset(true))
+      this.canvasObservables.onWindowScroll$.subscribe(e =>
+        this.calculateCanvasOffset(true)
+      )
     );
     this.subscriptions.add(
-      this.onCanvasResize$?.subscribe(e => this.calculateCanvasOffset(true))
+      this.canvasObservables.onCanvasResize$.subscribe(e =>
+        this.calculateCanvasOffset(true)
+      )
     );
 
     if (this.boardCanvas) {
