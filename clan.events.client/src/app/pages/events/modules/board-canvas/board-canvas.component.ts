@@ -37,7 +37,11 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   resetCanvas$ = this.boardService.resetCanvas$;
 
   lineColor$ = this.themingService.theme$.pipe(
-    map(state => (state.theme === Theme.Light ? '#000000' : '#ffffff'))
+    map(state => (state.theme === Theme.Light ? '#e4e4e4' : '#524f6a'))
+  );
+
+  textColor$ = this.themingService.theme$.pipe(
+    map(state => (state.theme === Theme.Light ? '#333333de' : '#e2d7ec'))
   );
 
   @ViewChild('boardCanvas')
@@ -70,6 +74,7 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   initialPinchDistance?: number;
 
   lineColor = '#000000';
+  textColor = '#000000';
 
   objects: TileResponse[] = [];
 
@@ -92,6 +97,12 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscriptions.add(
       this.lineColor$.subscribe(color => {
         this.lineColor = color;
+      })
+    );
+
+    this.subscriptions.add(
+      this.textColor$.subscribe(color => {
+        this.textColor = color;
       })
     );
   }
@@ -159,6 +170,12 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    // set shadow
+    this.boardCanvasContext.shadowColor = 'rgba(0, 0, 0, 0.1)';
+    this.boardCanvasContext.shadowBlur = 10;
+    this.boardCanvasContext.shadowOffsetX = -2;
+    this.boardCanvasContext.shadowOffsetY = 5;
+
     // draw lines between objects
     for (const object of this.objects) {
       if (!object.nextTileId) {
@@ -197,11 +214,25 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       );
       this.boardCanvasContext.strokeStyle = object.borderColor;
       this.boardCanvasContext.lineWidth = object.borderWidth;
-      this.boardCanvasContext.strokeRect(
-        object.x,
-        object.y,
-        object.width,
-        object.height
+
+      if (object.borderWidth > 0) {
+        this.boardCanvasContext.strokeRect(
+          object.x + object.borderWidth / 2,
+          object.y + object.borderWidth / 2,
+          object.width - object.borderWidth,
+          object.height - object.borderWidth
+        );
+      }
+
+      // draw text
+      this.boardCanvasContext.fillStyle = this.textColor;
+      this.boardCanvasContext.font = '500 16px "Roboto"';
+      this.boardCanvasContext.textAlign = 'center';
+      this.boardCanvasContext.textBaseline = 'middle';
+      this.boardCanvasContext.fillText(
+        object.name,
+        object.x + object.width / 2,
+        object.y + object.height + 20
       );
     }
   }
