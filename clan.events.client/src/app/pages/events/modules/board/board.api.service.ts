@@ -39,6 +39,18 @@ export class BoardApiService {
     clanName: string,
     eventId: string,
     tileId: string,
+    request: CreateTileRequest
+  ): Observable<Response<TileResponse>> {
+    return this.http.put<Response<TileResponse>>(
+      `${this.configService.backEndUrl}/${clanName}/events/${eventId}/tiles/${tileId}`,
+      request
+    );
+  }
+
+  patchTile(
+    clanName: string,
+    eventId: string,
+    tileId: string,
     request: Partial<CreateTileRequest>
   ): Observable<Response<TileResponse>> {
     return this.http.patch<Response<TileResponse>>(

@@ -69,6 +69,60 @@ export class BoardService {
     clanName: string,
     eventId: string,
     tileId: string,
+    body: CreateTileRequest,
+  ) {
+    const clan = await this.clanService.getClanByName(clanName);
+    const event = await this.eventModel
+      .findOne({ _id: eventId, owner: clan.id })
+      .populate('board.tiles')
+      .exec();
+
+    if (!event) {
+      throw new NotFoundException();
+    }
+
+    const eventHasTile = event.board.tiles.some(
+      (tile) => (tile as TileDocument).id === tileId,
+    );
+
+    if (!eventHasTile) {
+      throw new NotFoundException();
+    }
+
+    const tile = event.board.tiles.find(
+      (tile) => (tile as TileDocument).id === tileId,
+    );
+
+    if (!tile) {
+      throw new NotFoundException();
+    }
+
+    // get next tile in event
+    const nextTile = event.board.tiles.find(
+      (tile) => (tile as TileDocument).id === body.nextTileId,
+    );
+
+    tile.name = body.name;
+    tile.nextTile = nextTile;
+    tile.canvas = {
+      x: body.x,
+      y: body.y,
+      borderColor: body.borderColor,
+      borderWidth: body.borderWidth,
+      fillColor: body.fillColor,
+      height: body.height,
+      width: body.width,
+      image: body.image,
+    };
+
+    await event.save();
+    return tile;
+  }
+
+  async patchTile(
+    clanName: string,
+    eventId: string,
+    tileId: string,
     body: Partial<CreateTileRequest>,
   ) {
     const clan = await this.clanService.getClanByName(clanName);

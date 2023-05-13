@@ -1,5 +1,5 @@
 import { ClanRole } from '@common/auth/clan.role';
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Put } from '@nestjs/common';
 import { HasRoleInClan } from 'src/auth/authorized.decorator';
 import { UserClanContext } from 'src/auth/user-clan-context';
 import { User } from 'src/common/decorators/user.decorator';
@@ -32,14 +32,29 @@ export class BoardController {
     return this.boardService.createTile(params.clanName, params.eventId, body);
   }
 
-  @Patch('tiles/:tileId')
+  @Put('tiles/:tileId')
   @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
   async updateTile(
     @User() user: UserClanContext,
     @Param() params: { clanName: string; eventId: string; tileId: string },
-    @Body() body: Partial<CreateTileRequest>,
+    @Body() body: CreateTileRequest,
   ) {
     return this.boardService.updateTile(
+      params.clanName,
+      params.eventId,
+      params.tileId,
+      body,
+    );
+  }
+
+  @Patch('tiles/:tileId')
+  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
+  async patchTile(
+    @User() user: UserClanContext,
+    @Param() params: { clanName: string; eventId: string; tileId: string },
+    @Body() body: Partial<CreateTileRequest>,
+  ) {
+    return this.boardService.patchTile(
       params.clanName,
       params.eventId,
       params.tileId,

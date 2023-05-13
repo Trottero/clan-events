@@ -104,7 +104,7 @@ export class BoardService {
               this.eventId$.pipe(notNullOrUndefined()),
             ]).pipe(
               switchMap(([clan, eventId]) =>
-                this.boardApiService.updateTile(
+                this.boardApiService.patchTile(
                   clan.name,
                   eventId,
                   update.id,

@@ -10,13 +10,15 @@ import {
   inject,
 } from '@angular/core';
 import { TileResponse } from '@common/events';
-import { Observable, Subscription, fromEvent, of, switchMap } from 'rxjs';
+import { Observable, Subscription, fromEvent, map, of, switchMap } from 'rxjs';
 import { Memoized } from 'src/app/common/decorators';
 import { observeProperty } from 'src/app/common/observable/observe-property';
 import { Loadable, filterMapSuccess } from 'src/app/common/operators/loadable';
 import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
 import { Response } from '@common/responses';
 import { BoardService } from '../board/board.service';
+import { ThemingService } from 'src/app/shared/theming/theming.service';
+import { Theme } from 'src/app/shared/theming/theme';
 
 const MAX_ZOOM = 5;
 const MIN_ZOOM = 0.1;
@@ -29,9 +31,14 @@ const SCROLL_SENSITIVITY = 0.0005;
 })
 export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly boardService = inject(BoardService);
+  private readonly themingService = inject(ThemingService);
 
   tiles$ = this.boardService.tiles$.pipe(filterMapSuccess(x => x.value));
   resetCanvas$ = this.boardService.resetCanvas$;
+
+  lineColor$ = this.themingService.theme$.pipe(
+    map(state => (state.theme === Theme.Light ? '#000000' : '#ffffff'))
+  );
 
   @ViewChild('boardCanvas')
   boardCanvas?: ElementRef<HTMLCanvasElement>;
@@ -62,6 +69,8 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
 
   initialPinchDistance?: number;
 
+  lineColor = '#000000';
+
   objects: TileResponse[] = [];
 
   private subscriptions = new Subscription();
@@ -77,6 +86,12 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscriptions.add(
       this.resetCanvas$.subscribe(() => {
         this.reset();
+      })
+    );
+
+    this.subscriptions.add(
+      this.lineColor$.subscribe(color => {
+        this.lineColor = color;
       })
     );
   }
@@ -142,6 +157,34 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   drawObjects() {
     if (!this.boardCanvasContext) {
       return;
+    }
+
+    // draw lines between objects
+    for (const object of this.objects) {
+      if (!object.nextTileId) {
+        continue;
+      }
+
+      const nextObject = this.objects.find(
+        x => x.id === object.nextTileId
+      ) as TileResponse;
+
+      if (!nextObject) {
+        continue;
+      }
+
+      this.boardCanvasContext.beginPath();
+      this.boardCanvasContext.moveTo(
+        object.x + object.width / 2,
+        object.y + object.height / 2
+      );
+      this.boardCanvasContext.lineTo(
+        nextObject.x + nextObject.width / 2,
+        nextObject.y + nextObject.height / 2
+      );
+      this.boardCanvasContext.strokeStyle = this.lineColor;
+      this.boardCanvasContext.lineWidth = 5;
+      this.boardCanvasContext.stroke();
     }
 
     for (const object of this.objects) {
@@ -336,13 +379,13 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       this.onTouchMove$?.subscribe(e => this.handleTouch(e, this.onPointerMove))
     );
     this.subscriptions.add(
-      this.onWindowResize$?.subscribe(e => this.calculateCanvasOffset())
+      this.onWindowResize$?.subscribe(e => this.calculateCanvasOffset(true))
     );
     this.subscriptions.add(
-      this.onWindowScroll$?.subscribe(e => this.calculateCanvasOffset())
+      this.onWindowScroll$?.subscribe(e => this.calculateCanvasOffset(true))
     );
     this.subscriptions.add(
-      this.onCanvasResize$?.subscribe(e => this.calculateCanvasOffset())
+      this.onCanvasResize$?.subscribe(e => this.calculateCanvasOffset(true))
     );
 
     if (this.boardCanvas) {
