@@ -61,7 +61,7 @@ export class AuthService {
       discordId: Number(discordUser.id),
     };
 
-    const access_token = await this.jwtService.signAsync(tokenPayload);
+    const accessToken = await this.jwtService.signAsync(tokenPayload);
 
     const refreshTokenPayload: JwtRefreshTokenContent = {
       sub: databaseUser.id,
@@ -74,7 +74,7 @@ export class AuthService {
     });
 
     return {
-      token: access_token,
+      token: accessToken,
       refreshToken: refreshToken,
     };
   }
