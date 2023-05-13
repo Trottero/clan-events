@@ -58,4 +58,10 @@ export class BoardApiService {
       request
     );
   }
+
+  deleteTile(clan: string, eventId: string, id: string): any {
+    return this.http.delete(
+      `${this.configService.backEndUrl}/${clan}/events/${eventId}/tiles/${id}`
+    );
+  }
 }

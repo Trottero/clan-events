@@ -71,23 +71,7 @@ export class BoardService {
     tileId: string,
     body: CreateTileRequest,
   ) {
-    const clan = await this.clanService.getClanByName(clanName);
-    const event = await this.eventModel
-      .findOne({ _id: eventId, owner: clan.id })
-      .populate('board.tiles')
-      .exec();
-
-    if (!event) {
-      throw new NotFoundException();
-    }
-
-    const eventHasTile = event.board.tiles.some(
-      (tile) => (tile as TileDocument).id === tileId,
-    );
-
-    if (!eventHasTile) {
-      throw new NotFoundException();
-    }
+    const event = await this.getEventWithTile(clanName, eventId, tileId);
 
     const tile = event.board.tiles.find(
       (tile) => (tile as TileDocument).id === tileId,
@@ -125,23 +109,7 @@ export class BoardService {
     tileId: string,
     body: Partial<CreateTileRequest>,
   ) {
-    const clan = await this.clanService.getClanByName(clanName);
-    const event = await this.eventModel
-      .findOne({ _id: eventId, owner: clan.id })
-      .populate('board.tiles')
-      .exec();
-
-    if (!event) {
-      throw new NotFoundException();
-    }
-
-    const eventHasTile = event.board.tiles.some(
-      (tile) => (tile as TileDocument).id === tileId,
-    );
-
-    if (!eventHasTile) {
-      throw new NotFoundException();
-    }
+    const event = await this.getEventWithTile(clanName, eventId, tileId);
 
     const tile = event.board.tiles.find(
       (tile) => (tile as TileDocument).id === tileId,
@@ -171,5 +139,49 @@ export class BoardService {
 
     await event.save();
     return tile;
+  }
+
+  async deleteTile(clanName: string, eventId: string, tileId: string) {
+    const event = await this.getEventWithTile(clanName, eventId, tileId);
+
+    const tile = event.board.tiles.find(
+      (tile) => (tile as TileDocument).id === tileId,
+    );
+
+    if (!tile) {
+      throw new NotFoundException();
+    }
+
+    event.board.tiles = event.board.tiles.filter(
+      (tile) => (tile as TileDocument).id !== tileId,
+    );
+
+    await event.save();
+  }
+
+  private async getEventWithTile(
+    clanName: string,
+    eventId: string,
+    tileId: string,
+  ) {
+    const clan = await this.clanService.getClanByName(clanName);
+    const event = await this.eventModel
+      .findOne({ _id: eventId, owner: clan.id })
+      .populate('board.tiles')
+      .exec();
+
+    if (!event) {
+      throw new NotFoundException();
+    }
+
+    const eventHasTile = event.board.tiles.some(
+      (tile) => (tile as TileDocument).id === tileId,
+    );
+
+    if (!eventHasTile) {
+      throw new NotFoundException();
+    }
+
+    return event;
   }
 }

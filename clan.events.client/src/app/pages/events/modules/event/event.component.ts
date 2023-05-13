@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EventResponse } from '@common/events';
 import { Observable, Subscription, combineLatest, map, switchMap } from 'rxjs';
@@ -14,7 +20,7 @@ import { EventIdStream } from '../../streams/event-id.stream';
   templateUrl: './event.component.html',
   styleUrls: ['./event.component.scss'],
 })
-export class EventComponent {
+export class EventComponent implements OnInit, OnDestroy {
   selectedClan$ = inject(SelectedClanService).selectedClan$.pipe(
     notNullOrUndefined()
   );
@@ -35,6 +41,18 @@ export class EventComponent {
   );
 
   private subscriptions = new Subscription();
+
+  ngOnInit(): void {
+    this.subscriptions.add(
+      this.event$.subscribe(event => {
+        console.log(event);
+      })
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
 
   back() {
     return this.router.navigate(['../'], { relativeTo: this.route });

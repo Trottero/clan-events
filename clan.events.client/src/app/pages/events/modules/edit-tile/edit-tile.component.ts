@@ -28,6 +28,7 @@ export class EditTileComponent implements OnInit, OnDestroy {
   private readonly eventId$ = inject(EventIdStream);
 
   private readonly triggerSaveSubject = new Subject<void>();
+  private readonly triggerDeleteSubject = new Subject<void>();
   private readonly subscriptions = new Subscription();
 
   selectedTile$ = this.boardService.selectedTile$;
@@ -103,6 +104,23 @@ export class EditTileComponent implements OnInit, OnDestroy {
         )
         .subscribe(() => this.boardService.refreshTiles())
     );
+
+    this.subscriptions.add(
+      this.triggerDeleteSubject
+        .pipe(
+          withLatestFrom(
+            this.selectedTile$.pipe(notNullOrUndefined()),
+            this.selectedClanService.selectedClanName$.pipe(
+              notNullOrUndefined()
+            ),
+            this.eventId$.pipe(notNullOrUndefined())
+          ),
+          switchMap(([_, tile, clan, eventId]) =>
+            this.boardApiService.deleteTile(clan, eventId, tile.id)
+          )
+        )
+        .subscribe(() => this.boardService.refreshTiles())
+    );
   }
 
   ngOnDestroy(): void {
@@ -111,5 +129,9 @@ export class EditTileComponent implements OnInit, OnDestroy {
 
   update() {
     this.triggerSaveSubject.next();
+  }
+
+  delete() {
+    this.triggerDeleteSubject.next();
   }
 }

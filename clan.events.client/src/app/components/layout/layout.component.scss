@@ -19,6 +19,16 @@
       .clan-select {
         max-width: 200px;
         margin-right: 24px;
+
+        ::ng-deep {
+          .mat-mdc-select-value {
+            color: var(--app-text-primary-darker-color);
+          }
+
+          .mat-mdc-select-arrow {
+            color: var(--app-text-primary-darker-color);
+          }
+        }
       }
     }
 
@@ -53,7 +63,7 @@
         background-color: var(--app-background-color);
 
         .view-content {
-          height: 100%;
+          min-height: 100%;
           padding: 24px;
           background-color: var(--app-background-color-z-2);
           border: 1px solid var(--app-border-color-z-2);

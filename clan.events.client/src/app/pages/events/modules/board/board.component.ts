@@ -1,29 +1,5 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-  inject,
-} from '@angular/core';
-import { BoardApiService } from './board.api.service';
-import { SelectedClanService } from 'src/app/clan/services/selected-clan.service';
-import { EventIdStream } from '../../streams/event-id.stream';
-import {
-  Subject,
-  Subscription,
-  combineLatest,
-  shareReplay,
-  startWith,
-  switchMap,
-} from 'rxjs';
-import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
-import {
-  filterMapSuccess,
-  mapToLoadable,
-} from 'src/app/common/operators/loadable';
-import { TileResponse } from '@common/events';
+import { Component, OnDestroy, inject } from '@angular/core';
+import { catchError } from 'rxjs';
 import { BoardService } from './board.service';
 import { SimpleBoardRenderer } from './simple-board-renderer';
 
@@ -35,7 +11,12 @@ import { SimpleBoardRenderer } from './simple-board-renderer';
 export class BoardComponent implements OnDestroy {
   private readonly boardService = inject(BoardService);
 
-  tiles$ = this.boardService.tiles$;
+  tiles$ = this.boardService.tiles$.pipe(
+    catchError(err => {
+      console.error(err.message);
+      return [];
+    })
+  );
 
   selectedTile$ = this.boardService.selectedTile$;
 

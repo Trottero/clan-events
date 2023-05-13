@@ -1,41 +1,48 @@
-<form class=" edit-tile" *ngIf="selectedTile$ | async" [formGroup]="formGroup" (ngSubmit)="update()">
-  <mat-form-field>
-    <mat-label>Name</mat-label>
-    <input matInput [formControl]="nameControl" />
-  </mat-form-field>
+<div class="edit-tile">
+  <span class="message" *ngIf="!(selectedTile$ | async)">Select a tile to edit</span>
 
-  <mat-form-field>
-    <mat-label>Next Tile</mat-label>
-    <mat-select [formControl]="nextTileIdControl">
-      <mat-option [value]="null">None</mat-option>
-      <mat-option *ngFor="let tile of availableTiles$ | async" [value]="tile.id">{{ tile.name }}</mat-option>
-    </mat-select>
-  </mat-form-field>
+  <form *ngIf="selectedTile$ | async" [formGroup]="formGroup" (ngSubmit)="update()">
+    <mat-form-field>
+      <mat-label>Name</mat-label>
+      <input matInput [formControl]="nameControl" />
+    </mat-form-field>
 
-  <mat-form-field>
-    <mat-label>Background Color</mat-label>
-    <input matInput [formControl]="fillColorControl" type="color" />
-  </mat-form-field>
+    <mat-form-field>
+      <mat-label>Next Tile</mat-label>
+      <mat-select [formControl]="nextTileIdControl">
+        <mat-option [value]="null">None</mat-option>
+        <mat-option *ngFor="let tile of availableTiles$ | async" [value]="tile.id">{{ tile.name }}</mat-option>
+      </mat-select>
+    </mat-form-field>
 
-  <mat-form-field>
-    <mat-label>Border Color</mat-label>
-    <input matInput [formControl]="borderColorControl" type="color" />
-  </mat-form-field>
+    <mat-form-field>
+      <mat-label>Background Color</mat-label>
+      <input matInput [formControl]="fillColorControl" type="color" />
+    </mat-form-field>
 
-  <mat-form-field>
-    <mat-label>Border Width</mat-label>
-    <input matInput [formControl]="borderWidthControl" type="number" />
-  </mat-form-field>
+    <mat-form-field>
+      <mat-label>Border Color</mat-label>
+      <input matInput [formControl]="borderColorControl" type="color" />
+    </mat-form-field>
 
-  <mat-form-field>
-    <mat-label>Height</mat-label>
-    <input matInput [formControl]="heightControl" type="number" />
-  </mat-form-field>
+    <mat-form-field>
+      <mat-label>Border Width</mat-label>
+      <input matInput [formControl]="borderWidthControl" type="number" />
+    </mat-form-field>
 
-  <mat-form-field>
-    <mat-label>Width</mat-label>
-    <input matInput [formControl]="widthControl" type="number" />
-  </mat-form-field>
+    <mat-form-field>
+      <mat-label>Height</mat-label>
+      <input matInput [formControl]="heightControl" type="number" />
+    </mat-form-field>
 
-  <button mat-flat-button color="primary" type="submit">Update</button>
-</form>
+    <mat-form-field>
+      <mat-label>Width</mat-label>
+      <input matInput [formControl]="widthControl" type="number" />
+    </mat-form-field>
+
+    <div class="actions">
+      <button mat-flat-button color="warn" type="button" (click)="delete()">Delete</button>
+      <button mat-flat-button color="primary" type="submit">Update</button>
+    </div>
+  </form>
+</div>

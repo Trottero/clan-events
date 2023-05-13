@@ -5,14 +5,27 @@
 
   .board-container {
     display: flex;
-    column-gap: 24px;
+    gap: 24px;
 
     app-board-canvas {
       flex: 1;
     }
 
     app-edit-tile {
-      max-width: 300px;
+      width: 300px;
+    }
+
+    /* break at 1200px and put edit tile below board */
+    @media (max-width: 1200px) {
+      flex-direction: column;
+
+      app-board-canvas {
+        min-width: 0;
+      }
+
+      app-edit-tile {
+        width: 100%;
+      }
     }
   }
 }

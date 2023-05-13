@@ -1,5 +1,14 @@
 import { ClanRole } from '@common/auth/clan.role';
-import { Body, Controller, Get, Param, Patch, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { HasRoleInClan } from 'src/auth/authorized.decorator';
 import { UserClanContext } from 'src/auth/user-clan-context';
 import { User } from 'src/common/decorators/user.decorator';
@@ -59,6 +68,19 @@ export class BoardController {
       params.eventId,
       params.tileId,
       body,
+    );
+  }
+
+  @Delete('tiles/:tileId')
+  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
+  async deleteTile(
+    @User() user: UserClanContext,
+    @Param() params: { clanName: string; eventId: string; tileId: string },
+  ) {
+    return this.boardService.deleteTile(
+      params.clanName,
+      params.eventId,
+      params.tileId,
     );
   }
 }
