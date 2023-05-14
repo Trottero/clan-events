@@ -7,8 +7,24 @@
     display: flex;
     gap: 24px;
 
-    app-board-canvas {
+    .board-canvas-container {
+      position: relative;
       flex: 1;
+    }
+
+    .spinner-overlay {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--app-background-color-z-3);
+      opacity: 0.9;
     }
 
     app-edit-tile {
