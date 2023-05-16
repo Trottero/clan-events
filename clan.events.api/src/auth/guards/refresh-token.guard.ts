@@ -8,10 +8,10 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { AuthConfig } from '../auth.config';
-import { JwtTokenContent } from '@common/auth';
+import { JwtRefreshTokenContent } from '@common/auth';
 
 @Injectable()
-export class ApiTokenGuard implements CanActivate {
+export class RefreshTokenGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
@@ -25,10 +25,10 @@ export class ApiTokenGuard implements CanActivate {
     }
     try {
       const authConfig = this.configService.get<AuthConfig>('auth');
-      const payload = await this.jwtService.verifyAsync<JwtTokenContent>(
+      const payload = await this.jwtService.verifyAsync<JwtRefreshTokenContent>(
         token,
         {
-          secret: authConfig.jwtSecret,
+          secret: authConfig.refreshTokenSecret,
         },
       );
 
@@ -36,9 +36,7 @@ export class ApiTokenGuard implements CanActivate {
         throw new UnauthorizedException();
       }
 
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
-      request['user'] = payload;
+      request['refresh_token'] = payload;
     } catch {
       throw new UnauthorizedException();
     }

@@ -6,7 +6,11 @@ import { DiscordUserService } from 'src/discord/discord.user.service';
 import { DiscordAccessTokenResponse } from 'src/discord/models/discord.token.response';
 import { AuthConfig } from '../auth.config';
 import { UserService } from 'src/user/user.service';
-import { JwtTokenContent } from '@common/auth';
+import {
+  AccessTokenResponse,
+  JwtRefreshTokenContent,
+  JwtTokenContent,
+} from '@common/auth';
 
 @Injectable()
 export class AuthService {
@@ -20,12 +24,12 @@ export class AuthService {
 
   private logger = new Logger(AuthService.name);
 
-  async redeemDiscordCode(discordCode: string): Promise<string> {
+  async redeemDiscordCode(discordCode: string): Promise<AccessTokenResponse> {
     const discordToken = await this.discordAuthService.redeemCode(discordCode);
     return await this.jwtFromDiscordAccessToken(discordToken);
   }
 
-  async refreshCode(refreshToken: string): Promise<string> {
+  async refreshCode(refreshToken: string): Promise<AccessTokenResponse> {
     const discordToken = await this.discordAuthService.refreshToken(
       refreshToken,
     );
@@ -34,7 +38,7 @@ export class AuthService {
 
   async jwtFromDiscordAccessToken(
     discordToken: DiscordAccessTokenResponse,
-  ): Promise<string> {
+  ): Promise<AccessTokenResponse> {
     const discordUser = await this.discordUserService.getUserInfo(
       discordToken.access_token,
     );
@@ -57,8 +61,21 @@ export class AuthService {
       discordId: Number(discordUser.id),
     };
 
-    const jwt = await this.jwtService.signAsync(tokenPayload);
+    const accessToken = await this.jwtService.signAsync(tokenPayload);
 
-    return jwt;
+    const refreshTokenPayload: JwtRefreshTokenContent = {
+      sub: databaseUser.id,
+      discordRefreshToken: discordToken.refresh_token,
+      expiresIn: authConfig.refreshTokenLifetime,
+    };
+
+    const refreshToken = await this.jwtService.signAsync(refreshTokenPayload, {
+      secret: authConfig.refreshTokenSecret,
+    });
+
+    return {
+      token: accessToken,
+      refreshToken: refreshToken,
+    };
   }
 }

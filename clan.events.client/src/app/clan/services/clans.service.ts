@@ -21,7 +21,7 @@ export class ClansService {
 
   clans$ = combineLatest([
     this.refreshClansTriggerSubject.pipe(startWith(undefined)),
-    this.authService.isAuthenticated$.pipe(
+    this.authService.hasValidToken$.pipe(
       filter(isAuthenticated => isAuthenticated)
     ),
   ]).pipe(

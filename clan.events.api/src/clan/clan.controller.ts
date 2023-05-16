@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ClanService } from './clan.service';
 import { ApiTokenGuard } from 'src/auth/guards/api-token.guard';
-import { ClanMembershipService } from './clan-membership.service';
+import { ClanMembershipService } from './management/clan-membership.service';
 import { JwtTokenContent } from '@common/auth';
 import { ClanResponse, ClanWithRole, CreateClanRequest } from '@common/clan';
 import { ClanRole } from '@common/auth/clan.role';
