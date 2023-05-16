@@ -7,7 +7,6 @@ import { ClanModule } from 'src/clan/clan.module';
 import { UserModule } from 'src/user/user.module';
 import { BoardController } from './modules/board/board.controller';
 import { BoardService } from './modules/board/board.service';
-import { Board, BoardSchema } from 'src/database/schemas/board.schema';
 import { Tile, TileSchema } from 'src/database/schemas/tile.schema';
 import { AuthModule } from 'src/auth/auth.module';
 
@@ -15,10 +14,6 @@ import { AuthModule } from 'src/auth/auth.module';
   imports: [
     MongooseModule.forFeature([
       { name: Event.name, schema: EventSchema },
-      {
-        name: Board.name,
-        schema: BoardSchema,
-      },
       {
         name: Tile.name,
         schema: TileSchema,

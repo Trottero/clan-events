@@ -1,39 +1,9 @@
-import { inject } from '@angular/core';
 import { TileResponse } from '@common/events';
-import { Observable, Subscription, combineLatest, map } from 'rxjs';
+import { Observable, combineLatest, map } from 'rxjs';
 import { filterMapSuccess } from 'src/app/common/operators/loadable';
 import { Theme } from 'src/app/shared/theming/theme';
-import { BoardService } from './board.service';
-import { ThemingService } from 'src/app/shared/theming/theming.service';
-
-export interface BoardCanvasObject {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-export abstract class BoardRenderer {
-  protected readonly boardService = inject(BoardService);
-  protected readonly themingService = inject(ThemingService);
-  protected readonly subscriptions = new Subscription();
-
-  abstract canvasObjects$: Observable<BoardCanvasObject[]>;
-
-  abstract render(context: CanvasRenderingContext2D): void;
-  abstract onGrabMove(index: number, x: number, y: number): void;
-  abstract onGrabEnd(index: number, x: number, y: number): void;
-  abstract selectCanvasObject(index?: number): void;
-
-  destroy(): void {
-    this.subscriptions.unsubscribe();
-  }
-
-  renderBackground(
-    context: CanvasRenderingContext2D,
-    cameraOffset: { x: number; y: number }
-  ): void {}
-}
+import { BoardCanvasObject } from './board-canvas-object';
+import { BoardRenderer } from './board-renderer';
 
 export class SimpleBoardRenderer extends BoardRenderer {
   public static readonly GRID_SIZE = 50;

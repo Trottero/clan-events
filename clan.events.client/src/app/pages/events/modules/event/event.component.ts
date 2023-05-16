@@ -20,7 +20,7 @@ import { EventIdStream } from '../../streams/event-id.stream';
   templateUrl: './event.component.html',
   styleUrls: ['./event.component.scss'],
 })
-export class EventComponent implements OnInit, OnDestroy {
+export class EventComponent implements OnDestroy {
   selectedClan$ = inject(SelectedClanService).selectedClan$.pipe(
     notNullOrUndefined()
   );
@@ -41,14 +41,6 @@ export class EventComponent implements OnInit, OnDestroy {
   );
 
   private subscriptions = new Subscription();
-
-  ngOnInit(): void {
-    this.subscriptions.add(
-      this.event$.subscribe(event => {
-        console.log(event);
-      })
-    );
-  }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();

@@ -13,10 +13,8 @@ import {
   CanvasObservables,
   getCanvasObservables,
 } from './board-canvas-observables';
-import {
-  BoardCanvasObject,
-  BoardRenderer,
-} from '../board/simple-board-renderer';
+import { BoardRenderer } from '../board/renderers/board-renderer';
+import { BoardCanvasObject } from '../board/renderers/board-canvas-object';
 import { notNullOrUndefined } from 'src/app/common/operators/not-undefined';
 
 @Component({

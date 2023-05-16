@@ -19,7 +19,8 @@ import { BoardApiService } from './board.api.service';
 import { EventIdStream } from '../../streams/event-id.stream';
 import { State } from 'src/app/common/state';
 import { TileResponse } from '@common/events';
-import { BoardRenderer, SimpleBoardRenderer } from './simple-board-renderer';
+import { SimpleBoardRenderer } from './renderers/simple-board-renderer';
+import { BoardRenderer } from './renderers/board-renderer';
 
 export interface BoardState {
   selectedTileId: string | null;
@@ -75,54 +76,46 @@ export class BoardService {
 
   boardRenderer$ = this.boardRendererSubject.pipe(notNullOrUndefined());
 
+  createTileTrigger$ = this.createTileTriggerSubject.pipe(
+    switchMap(() =>
+      combineLatest([
+        this.selectedClanService.selectedClan$.pipe(notNullOrUndefined()),
+        this.eventId$.pipe(notNullOrUndefined()),
+      ])
+    ),
+    switchMap(([clan, eventId]) =>
+      this.boardApiService.createTile(clan.name, eventId, {
+        name: 'New Tile',
+        borderColor: '#915ead',
+        fillColor: '#decfe6',
+        borderWidth: 5,
+        width: 100,
+        height: 100,
+        x: 0,
+        y: 0,
+      })
+    )
+  );
+
+  updateSelectedTile$ = this.updateSelectedTileSubject.pipe(
+    switchMap(update =>
+      combineLatest([
+        this.selectedClanService.selectedClan$.pipe(notNullOrUndefined()),
+        this.eventId$.pipe(notNullOrUndefined()),
+      ]).pipe(
+        switchMap(([clan, eventId]) =>
+          this.boardApiService.patchTile(clan.name, eventId, update.id, update)
+        )
+      )
+    )
+  );
+
   constructor() {
     this.subscriptions.add(
-      this.createTileTriggerSubject
-        .pipe(
-          switchMap(() =>
-            combineLatest([
-              this.selectedClanService.selectedClan$.pipe(notNullOrUndefined()),
-              this.eventId$.pipe(notNullOrUndefined()),
-            ])
-          ),
-          switchMap(([clan, eventId]) =>
-            this.boardApiService.createTile(clan.name, eventId, {
-              name: 'New Tile',
-              borderColor: '#915ead',
-              fillColor: '#decfe6',
-              borderWidth: 5,
-              width: 100,
-              height: 100,
-              x: 0,
-              y: 0,
-            })
-          )
-        )
-        .subscribe(() => this.refreshTilesSubject.next())
+      this.createTileTrigger$.subscribe(() => this.refreshTilesSubject.next())
     );
 
-    // update
-    this.subscriptions.add(
-      this.updateSelectedTileSubject
-        .pipe(
-          switchMap(update =>
-            combineLatest([
-              this.selectedClanService.selectedClan$.pipe(notNullOrUndefined()),
-              this.eventId$.pipe(notNullOrUndefined()),
-            ]).pipe(
-              switchMap(([clan, eventId]) =>
-                this.boardApiService.patchTile(
-                  clan.name,
-                  eventId,
-                  update.id,
-                  update
-                )
-              )
-            )
-          )
-        )
-        .subscribe()
-    );
+    this.subscriptions.add(this.updateSelectedTile$.subscribe());
   }
 
   setBoardRenderer(boardRenderer: BoardRenderer | null) {

@@ -1,7 +1,7 @@
 import { Component, OnDestroy, inject } from '@angular/core';
 import { catchError } from 'rxjs';
 import { BoardService } from './board.service';
-import { SimpleBoardRenderer } from './simple-board-renderer';
+import { SimpleBoardRenderer } from './renderers/simple-board-renderer';
 
 @Component({
   selector: 'app-board',

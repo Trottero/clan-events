@@ -4,7 +4,6 @@ import { CreateTileRequest } from '@common/events';
 import { Model } from 'mongoose';
 import { ClanService } from 'src/clan/clan.service';
 import { Event } from 'src/database/schemas/event.schema';
-import { UserService } from 'src/user/user.service';
 import { Tile, TileDocument } from 'src/database/schemas/tile.schema';
 
 @Injectable()
@@ -12,7 +11,6 @@ export class BoardService {
   constructor(
     @InjectModel(Event.name) private eventModel: Model<Event>,
     @InjectModel(Tile.name) private tileModel: Model<Tile>,
-    private readonly userService: UserService,
     private readonly clanService: ClanService,
   ) {}
 
