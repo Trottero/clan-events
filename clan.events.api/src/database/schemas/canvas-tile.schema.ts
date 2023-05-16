@@ -18,6 +18,9 @@ export class CanvasTile {
   height: number;
 
   @Prop()
+  fillColor: string;
+
+  @Prop()
   borderWidth: number;
 
   @Prop()

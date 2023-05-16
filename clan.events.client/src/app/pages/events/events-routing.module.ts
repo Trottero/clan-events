@@ -16,14 +16,14 @@ const ROUTES: Route[] = [
       ),
   },
   {
-    path: `:${NAVIGATION_PARAMS.ID}/${NAVIGATION_PATHS.EVENTS_EDIT}`,
+    path: `:${NAVIGATION_PARAMS.EVENT_ID}/${NAVIGATION_PATHS.EVENTS_EDIT}`,
     loadChildren: () =>
       import('./modules/edit-event/edit-event.module').then(
         m => m.EditEventModule
       ),
   },
   {
-    path: `:${NAVIGATION_PARAMS.ID}`,
+    path: `:${NAVIGATION_PARAMS.EVENT_ID}`,
     loadChildren: () =>
       import('./modules/event/event.module').then(m => m.EventModule),
   },

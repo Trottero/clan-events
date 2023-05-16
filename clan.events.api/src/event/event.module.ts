@@ -5,15 +5,26 @@ import { EventController } from './event.controller';
 import { EventService } from './event.service';
 import { ClanModule } from 'src/clan/clan.module';
 import { UserModule } from 'src/user/user.module';
+import { BoardController } from './modules/board/board.controller';
+import { BoardService } from './modules/board/board.service';
+import { Tile, TileSchema } from 'src/database/schemas/tile.schema';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Event.name, schema: EventSchema }]),
+    MongooseModule.forFeature([
+      { name: Event.name, schema: EventSchema },
+      {
+        name: Tile.name,
+        schema: TileSchema,
+      },
+    ]),
     ClanModule,
     UserModule,
+    AuthModule,
   ],
-  controllers: [EventController],
-  providers: [EventService],
-  exports: [EventService],
+  controllers: [EventController, BoardController],
+  providers: [EventService, BoardService],
+  exports: [EventService, BoardService],
 })
 export class EventModule {}

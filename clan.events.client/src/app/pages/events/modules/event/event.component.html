@@ -1,5 +1,4 @@
 <ng-container *ngIf="event$ | async as event">
-
   <div class="actions" *ngIf="selectedClan$ | async as selectedClan">
     <button mat-flat-button (click)="back()">Back</button>
     <a mat-flat-button [routerLink]="['/', selectedClan.name, 'events', event.data.id, 'edit']">Edit</a>
@@ -24,3 +23,5 @@
     <span class="value">{{event.data.board.type}}</span>
   </div>
 </ng-container>
+
+<app-board></app-board>

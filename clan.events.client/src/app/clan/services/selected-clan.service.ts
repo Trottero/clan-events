@@ -2,8 +2,10 @@ import { Injectable, OnDestroy, inject } from '@angular/core';
 import {
   Observable,
   Subscription,
+  catchError,
   filter,
   map,
+  of,
   pairwise,
   shareReplay,
   startWith,

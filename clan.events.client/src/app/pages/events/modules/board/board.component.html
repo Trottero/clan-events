@@ -1,0 +1,14 @@
+<div class="mb-4 d-flex gap-3">
+  <button mat-flat-button color="primary" (click)="createTile()">Create Tile</button>
+  <button mat-flat-button (click)="resetCanvas()">Reset Canvas</button>
+</div>
+
+<div class="board-container">
+  <div class="board-canvas-container">
+    <div class="spinner-overlay" *ngIf="tiles$ | async | isLoading">
+      <mat-spinner></mat-spinner>
+    </div>
+    <app-board-canvas></app-board-canvas>
+  </div>
+  <app-edit-tile></app-edit-tile>
+</div>
