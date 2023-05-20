@@ -1,56 +1,24 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CounterComponent } from './pages/counter/counter.component';
-import { HomeComponent } from './pages/home/home.component';
-import { NotFoundComponent } from './pages/not-found/not-found.component';
-import { CodeRedirectComponent } from './auth/components/code-redirect/code-redirect.component';
-import { ProfileComponent } from './pages/profile/profile.component';
-import { EventsModule } from './pages/events/events.module';
-import { NAVIGATION_PARAMS, NAVIGATION_PATHS } from './config/navigation';
-import { authGuard } from './auth/auth.guard';
-import { SnackbarTestComponent } from './shared/snackbar/snackbar-test/snackbar-test.component';
-
-const routes: Routes = [
-  {
-    path: '',
-    component: HomeComponent,
-  },
-  {
-    path: 'counter',
-    component: CounterComponent,
-  },
-  {
-    path: 'code',
-    component: CodeRedirectComponent,
-  },
-  {
-    path: 'profile',
-    component: ProfileComponent,
-    canActivate: [authGuard],
-  },
-  {
-    path: `:${NAVIGATION_PARAMS.CLAN_NAME}/${NAVIGATION_PATHS.EVENTS}`,
-    loadChildren: () =>
-      import('./pages/events/events.module').then(m => m.EventsModule),
-    canActivate: [authGuard],
-  },
-  {
-    path: 'clan',
-    loadChildren: () => import('./clan/clan.module').then(m => m.ClanModule),
-    canActivate: [authGuard],
-  },
-  {
-    path: 'test/snackbar',
-    component: SnackbarTestComponent,
-  },
-  {
-    path: '**',
-    component: NotFoundComponent,
-  },
-];
+import { CounterComponent } from './features/counter/counter.component';
+import { HomeComponent } from './features/home/home.component';
+import { NotFoundComponent } from './features/not-found/not-found.component';
+import { CodeRedirectComponent } from './shared/auth/modules/code-redirect/code-redirect.component';
+import { ProfileComponent } from './features/profile/profile.component';
+import { NAVIGATION_PARAMS, NAVIGATION_PATHS } from './core/config/navigation';
+import { SnackbarTestComponent } from './core/components/snackbar/snackbar-test/snackbar-test.component';
+import { authGuard } from './shared/auth/auth.guard';
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [
+    RouterModule.forRoot([
+      {
+        path: '',
+        loadChildren: () =>
+          import('./features/features.module').then(m => m.FeaturesModule),
+      },
+    ]),
+  ],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}
