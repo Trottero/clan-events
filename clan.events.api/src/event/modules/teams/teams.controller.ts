@@ -11,17 +11,19 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { HasRoleInClan } from 'src/auth/authorized.decorator';
-import { EventContextGuard } from 'src/event/event-context-guard';
+import {
+  EventContextGuard,
+  GuardEventContext,
+} from 'src/event/event-context-guard';
 import { ClanRequestContext } from 'src/common/decorators/clan-context';
 import { ClanContext } from 'src/common/decorators/clan-context.decorator';
 import {
   EventContext,
   EventRequestContext,
 } from 'src/event/event-context-decorator';
-import { EventTeam } from 'src/database/schemas/event-team.schema';
 import { TeamsService } from './teams.service';
 import { EventDocument } from 'src/database/schemas/event.schema';
-import { UpdateTeamRequest } from '@common/events';
+import { EventTeamResponse, UpdateTeamRequest } from '@common/events';
 
 @Controller(':clanName/events/:eventId/teams')
 export class TeamsController {
@@ -29,12 +31,16 @@ export class TeamsController {
 
   @Get()
   @HasRoleInClan(ClanRole.Owner, ClanRole.Admin, ClanRole.Member)
-  @UseGuards(EventContextGuard)
+  @GuardEventContext()
   async getTeams(
     @ClanContext() clanContext: ClanRequestContext,
     @EventContext() eventContext: EventRequestContext,
-  ): Promise<EventTeam[]> {
-    return eventContext.participants;
+  ): Promise<EventTeamResponse[]> {
+    return eventContext.participants.map((x) => ({
+      id: x.id,
+      name: x.name,
+      members: x.members,
+    }));
   }
 
   @Post()
@@ -44,12 +50,22 @@ export class TeamsController {
     @ClanContext() clanContext: ClanRequestContext,
     @EventContext() eventContext: EventRequestContext,
     @Body() team: UpdateTeamRequest,
-  ): Promise<EventTeam> {
+  ): Promise<EventTeamResponse> {
     try {
-      return await this.teamsService.createTeam(eventContext as EventDocument, {
-        name: team.name,
-        members: [],
-      });
+      const result = await this.teamsService.createTeam(
+        eventContext as EventDocument,
+        {
+          id: null,
+          name: team.name,
+          members: [],
+        },
+      );
+
+      return {
+        id: result.id,
+        name: result.name,
+        members: result.members,
+      };
     } catch (ex: any) {
       throw new BadRequestException(ex.message);
     }
@@ -62,10 +78,14 @@ export class TeamsController {
     @ClanContext() clanContext: ClanRequestContext,
     @EventContext() eventContext: EventRequestContext,
     @Param('id') id: string,
-  ): Promise<EventTeam> {
-    return eventContext.participants.find(
-      (x) => (x as any).id.toString() === id,
-    );
+  ): Promise<EventTeamResponse> {
+    const result = eventContext.participants.find((x) => x.id === id);
+
+    return {
+      id: result.id,
+      name: result.name,
+      members: result.members,
+    };
   }
 
   @Put(':id')
@@ -76,13 +96,19 @@ export class TeamsController {
     @EventContext() eventContext: EventRequestContext,
     @Body() team: UpdateTeamRequest,
     @Param('id') id: string,
-  ): Promise<EventTeam> {
-    return this.teamsService.updateTeam(
+  ): Promise<EventTeamResponse> {
+    const result = await this.teamsService.updateTeam(
       eventContext as EventDocument,
       id,
       team.name,
       team.members,
     );
+
+    return {
+      id: result.id,
+      name: result.name,
+      members: result.members,
+    };
   }
 
   @Delete(':id')

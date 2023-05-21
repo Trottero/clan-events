@@ -28,7 +28,7 @@ export class AuthRedirectComponent implements OnInit {
 
   ngOnInit(): void {
     this.subscription.add(this.codeRedeemer$.subscribe());
-    this.subscription.add(this.navigateToHome$.subscribe());
+    // this.subscription.add(this.navigateToHome$.subscribe());
     this.subscription.add(this.authService.autoRefreshToken$.subscribe());
   }
 

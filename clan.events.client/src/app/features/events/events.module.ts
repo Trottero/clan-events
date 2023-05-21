@@ -9,10 +9,11 @@ import { EventsRoutingModule } from './events-routing.module';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { IsLoadingPipe } from '../../core/common/pipes/is-loading.pipe';
 import { IsSuccessPipe } from '../../core/common/pipes/is-success.pipe';
+import { EventTeamService } from './event-teams.service';
 
 @NgModule({
   declarations: [EventsComponent],
-  providers: [EventsService],
+  providers: [EventsService, EventTeamService],
   imports: [
     CommonModule,
     EventsRoutingModule,

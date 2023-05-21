@@ -4,8 +4,11 @@ import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
+  UseGuards,
+  applyDecorators,
 } from '@nestjs/common';
 import { EventService } from './event.service';
+import { ApiTokenGuard } from 'src/auth/guards/api-token.guard';
 
 @Injectable()
 export class EventContextGuard implements CanActivate {
@@ -14,7 +17,15 @@ export class EventContextGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const clanName = request.params.clanName;
-    const eventId = request.params.id;
+    const eventId = request.params.eventId;
+
+    if (!clanName) {
+      throw new NotFoundException('Clanname not supplied');
+    }
+
+    if (!eventId) {
+      throw new NotFoundException('Eventid not supplied');
+    }
 
     try {
       const event = await this.eventService.getEventById(
@@ -33,7 +44,12 @@ export class EventContextGuard implements CanActivate {
       request['event'] = event;
       return true;
     } catch (ex: any) {
+      console.error(ex);
       throw new NotFoundException(ex.message);
     }
   }
+}
+
+export function GuardEventContext() {
+  return applyDecorators(UseGuards(ApiTokenGuard, EventContextGuard));
 }

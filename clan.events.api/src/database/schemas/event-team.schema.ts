@@ -5,6 +5,8 @@ import { Tile } from './tile.schema';
 
 @Schema()
 export class EventTeam {
+  id?: string;
+
   @Prop()
   name: string;
 
