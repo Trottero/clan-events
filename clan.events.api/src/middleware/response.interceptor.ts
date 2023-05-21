@@ -16,12 +16,12 @@ const IGNORED_ROUTES = [
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
   /**
-   * Intercepts the incoming request and outgoing response, and logs the request URL.
-   * If the URL matches any of the ignored routes, the request is passed through without modification.
+   * Intercepts the incoming request and outgoing response.
+   * If the request URL matches an ignored route, the request is passed through without modification.
    * Otherwise, the response is wrapped in an object containing additional metadata.
-   * @param context The execution context of the request.
-   * @param next The next call handler in the chain.
-   * @returns An observable that emits the modified response.
+   * @param context The execution context.
+   * @param next The next call handler.
+   * @returns An observable containing the modified response.
    */
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const url = context.switchToHttp().getRequest().url.toLowerCase();
