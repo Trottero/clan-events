@@ -7,7 +7,17 @@ import {
   ViewChild,
   inject,
 } from '@angular/core';
-import { Subscription, fromEvent, switchMap } from 'rxjs';
+import {
+  Subscription,
+  combineLatest,
+  forkJoin,
+  fromEvent,
+  map,
+  mergeMap,
+  switchMap,
+  tap,
+  zip,
+} from 'rxjs';
 import { BoardService } from '../board/board.service';
 import {
   CanvasObservables,
@@ -24,9 +34,9 @@ import { notNullOrUndefined } from 'src/app/core/common/operators/not-undefined'
 })
 export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly boardService = inject(BoardService);
-  private readonly boardRenderer$ = this.boardService.boardRenderer$;
+  private readonly boardRenderers$ = this.boardService.boardRenderers$;
 
-  private boardRenderer?: BoardRenderer;
+  private boardRenderers: { [key: string]: BoardRenderer } = {};
 
   resetCanvas$ = this.boardService.resetCanvas$;
 
@@ -45,8 +55,8 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isGrabbing = false;
   grabLocation = { x: 0, y: 0 };
-  grabbedObjectIndex?: number;
-  objects = [] as BoardCanvasObject[];
+  grabbedObj?: { name: string; index: number };
+  objects: { [key: string]: BoardCanvasObject[] } = {};
 
   initialPinchDistance?: number;
 
@@ -54,19 +64,31 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscriptions.add(
-      this.boardRenderer$.subscribe(boardRenderer => {
-        this.boardRenderer = boardRenderer;
+      this.boardRenderers$.subscribe(boardRenderers => {
+        this.boardRenderers = boardRenderers.reduce(
+          (prev, curr) => ({ ...prev, [curr.name]: curr }),
+          {}
+        );
       })
     );
 
     this.subscriptions.add(
-      this.boardRenderer$
+      this.boardRenderers$
         .pipe(
           notNullOrUndefined(),
-          switchMap(boardRenderer => boardRenderer.canvasObjects$)
+          switchMap(boardRenderers =>
+            combineLatest(
+              boardRenderers.map(x =>
+                x.canvasObjects$.pipe(map(objects => ({ [x.name]: objects })))
+              )
+            )
+          )
         )
         .subscribe(objects => {
-          this.objects = objects;
+          this.objects = objects.reduce(
+            (prev, curr) => ({ ...prev, ...curr }),
+            {}
+          );
         })
     );
 
@@ -136,11 +158,9 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     ); // translate back to the top left
 
     // render
-    this.boardRenderer?.renderBackground(
-      this.boardCanvasContext,
-      this.cameraOffset
-    );
-    this.boardRenderer?.render(this.boardCanvasContext);
+    Object.values(this.boardRenderers).forEach(boardRenderer => {
+      boardRenderer.render(this.boardCanvasContext!, this.cameraOffset);
+    });
 
     requestAnimationFrame(() => this.draw());
   }
@@ -191,48 +211,64 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private handleGrab(e: MouseEvent | TouchEvent) {
     if (e instanceof MouseEvent && e.button == 0) {
+      if (!this.boardRenderers) return;
+
       // get location
       const eventLocation = this.getEventOnCameraLocation(e);
       if (!eventLocation) return;
 
       const location = this.cameraToCanvasLocation(eventLocation);
 
-      // check if we are grabbing an object
-      const grabbedObject = this.objects.findIndex(
-        object =>
-          location.x >= object.x &&
-          location.x <= object.x + object.width &&
-          location.y >= object.y &&
-          location.y <= object.y + object.height
+      // check if we are grabbing an object in any of the renderers
+      const grabbedObject = Object.values(this.boardRenderers).reduce(
+        (prev, curr) =>
+          prev.index > -1
+            ? prev
+            : {
+                name: curr.name,
+                index: this.objects[curr.name].findIndex(
+                  object =>
+                    location.x >= object.x &&
+                    location.x <= object.x + object.width &&
+                    location.y >= object.y &&
+                    location.y <= object.y + object.height
+                ),
+              },
+        { name: '', index: -1 }
       );
 
-      if (grabbedObject > -1) {
+      if (grabbedObject.index > -1) {
         this.isGrabbing = true;
-        this.grabbedObjectIndex = grabbedObject;
+        this.grabbedObj = grabbedObject;
         this.grabLocation.x = location.x;
         this.grabLocation.y = location.y;
-        this.boardRenderer?.selectCanvasObject(grabbedObject);
+
+        this.boardRenderers[grabbedObject.name].selectCanvasObject(
+          grabbedObject.index
+        );
       } else {
-        this.boardRenderer?.selectCanvasObject(undefined);
+        Object.values(this.boardRenderers).forEach(boardRenderer =>
+          boardRenderer.selectCanvasObject(undefined)
+        );
       }
     }
   }
 
   private onPointerUp(e: MouseEvent | TouchEvent) {
-    if (this.isGrabbing && this.grabbedObjectIndex !== undefined) {
-      const object = this.objects[this.grabbedObjectIndex];
+    if (this.isGrabbing && this.grabbedObj !== undefined) {
       // update it's new location
-      this.boardRenderer?.onGrabEnd(
-        this.grabbedObjectIndex,
-        object.x,
-        object.y
+      const obj = this.objects[this.grabbedObj.name][this.grabbedObj.index];
+      this.boardRenderers[this.grabbedObj.name].onGrabEnd(
+        this.grabbedObj.index,
+        obj.x,
+        obj.y
       );
     }
 
     this.isPanning = false;
     this.isGrabbing = false;
     this.initialPinchDistance = undefined;
-    this.grabbedObjectIndex = undefined;
+    this.grabbedObj = undefined;
   }
 
   private onPointerMove(e: MouseEvent | TouchEvent) {
@@ -244,22 +280,22 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       this.cameraOffset.y = location.y - this.panStart.y;
     }
 
-    if (this.isGrabbing && this.grabbedObjectIndex !== undefined) {
+    if (this.isGrabbing && this.grabbedObj !== undefined) {
       const location = this.getEventOnCameraLocation(e);
       if (!location) return;
 
       location.x = location.x - this.cameraOffset.x;
       location.y = location.y - this.cameraOffset.y;
 
-      this.objects[this.grabbedObjectIndex].x +=
+      this.objects[this.grabbedObj.name][this.grabbedObj.index].x +=
         location.x - this.grabLocation.x;
-      this.objects[this.grabbedObjectIndex].y +=
+      this.objects[this.grabbedObj.name][this.grabbedObj.index].y +=
         location.y - this.grabLocation.y;
 
-      this.boardRenderer?.onGrabMove(
-        this.grabbedObjectIndex,
-        this.objects[this.grabbedObjectIndex].x,
-        this.objects[this.grabbedObjectIndex].y
+      this.boardRenderers[this.grabbedObj.name].onGrabMove(
+        this.grabbedObj.index,
+        this.objects[this.grabbedObj.name][this.grabbedObj.index].x,
+        this.objects[this.grabbedObj.name][this.grabbedObj.index].y
       );
 
       this.grabLocation.x = location.x;

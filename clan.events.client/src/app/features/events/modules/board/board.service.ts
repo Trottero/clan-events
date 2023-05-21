@@ -46,8 +46,9 @@ export class BoardService {
   private readonly resetCanvasSubject = new Subject<void>();
   private readonly refreshTilesSubject = new Subject<void>();
 
-  private readonly boardRendererSubject =
-    new BehaviorSubject<BoardRenderer | null>(null);
+  private readonly boardRenderersSubject = new BehaviorSubject<BoardRenderer[]>(
+    []
+  );
 
   private boardState = new State<BoardState>(INITIAL_STATE);
 
@@ -74,7 +75,7 @@ export class BoardService {
 
   resetCanvas$ = this.resetCanvasSubject.pipe(startWith(undefined));
 
-  boardRenderer$ = this.boardRendererSubject.pipe(notNullOrUndefined());
+  boardRenderers$ = this.boardRenderersSubject.pipe(notNullOrUndefined());
 
   createTileTrigger$ = this.createTileTriggerSubject.pipe(
     switchMap(() =>
@@ -118,8 +119,8 @@ export class BoardService {
     this.subscriptions.add(this.updateSelectedTile$.subscribe());
   }
 
-  setBoardRenderer(boardRenderer: BoardRenderer | null) {
-    this.boardRendererSubject.next(boardRenderer);
+  setBoardRenderers(boardRenderers: BoardRenderer[]) {
+    this.boardRenderersSubject.next(boardRenderers);
   }
 
   createTile() {

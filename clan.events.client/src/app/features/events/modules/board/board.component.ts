@@ -15,15 +15,15 @@ export class BoardComponent implements OnDestroy {
 
   selectedTile$ = this.boardService.selectedTile$;
 
-  boardRenderer = new SimpleBoardRenderer();
+  boardRenderers = [new GridRenderer(), new SimpleBoardRenderer()];
 
   ngOnInit(): void {
-    this.boardService.setBoardRenderer(this.boardRenderer);
+    this.boardService.setBoardRenderers(this.boardRenderers);
   }
 
   ngOnDestroy(): void {
-    this.boardRenderer.destroy();
-    this.boardService.setBoardRenderer(null);
+    this.boardRenderers.forEach(x => x.destroy());
+    this.boardService.setBoardRenderers([]);
   }
 
   createTile() {
