@@ -9,6 +9,7 @@ import { BoardController } from './modules/board/board.controller';
 import { BoardService } from './modules/board/board.service';
 import { Tile, TileSchema } from 'src/database/schemas/tile.schema';
 import { AuthModule } from 'src/auth/auth.module';
+import { Image, ImageSchema } from 'src/database/schemas/image.schema';
 
 @Module({
   imports: [
@@ -17,6 +18,10 @@ import { AuthModule } from 'src/auth/auth.module';
       {
         name: Tile.name,
         schema: TileSchema,
+      },
+      {
+        name: Image.name,
+        schema: ImageSchema,
       },
     ]),
     ClanModule,
