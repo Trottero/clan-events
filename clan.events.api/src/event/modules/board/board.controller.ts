@@ -42,47 +42,4 @@ export class BoardController {
   ) {
     return this.boardService.createTile(clanContext.name, params.eventId, body);
   }
-
-  @Put('tiles/:tileId')
-  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
-  async updateTile(
-    @ClanContext() clanContext: ClanRequestContext,
-    @Param() params: { eventId: string; tileId: string },
-    @Body() body: CreateTileRequest,
-  ) {
-    return this.boardService.updateTile(
-      clanContext.name,
-      params.eventId,
-      params.tileId,
-      body,
-    );
-  }
-
-  @Patch('tiles/:tileId')
-  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
-  async patchTile(
-    @ClanContext() clanContext: ClanRequestContext,
-    @Param() params: { eventId: string; tileId: string },
-    @Body() body: Partial<CreateTileRequest>,
-  ) {
-    return this.boardService.patchTile(
-      clanContext.name,
-      params.eventId,
-      params.tileId,
-      body,
-    );
-  }
-
-  @Delete('tiles/:tileId')
-  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
-  async deleteTile(
-    @ClanContext() clanContext: ClanRequestContext,
-    @Param() params: { eventId: string; tileId: string },
-  ) {
-    return this.boardService.deleteTile(
-      clanContext.name,
-      params.eventId,
-      params.tileId,
-    );
-  }
 }

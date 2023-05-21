@@ -8,5 +8,7 @@ export * from './requests/get-event-by-id.request';
 export * from './requests/delete-event-by-id.request';
 export * from './requests/update-event.request';
 export * from './requests/create-tile.request';
+export * from './requests/create-challenge.request';
+export * from './requests/update-challenge.request';
 
 export * from './enums/board-type.enum';

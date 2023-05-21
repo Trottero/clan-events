@@ -9,6 +9,8 @@ import { BoardController } from './modules/board/board.controller';
 import { BoardService } from './modules/board/board.service';
 import { Tile, TileSchema } from 'src/database/schemas/tile.schema';
 import { AuthModule } from 'src/auth/auth.module';
+import { TileController } from './modules/tile/tile.controller';
+import { TileService } from './modules/tile/tile.service';
 
 @Module({
   imports: [
@@ -23,8 +25,8 @@ import { AuthModule } from 'src/auth/auth.module';
     UserModule,
     AuthModule,
   ],
-  controllers: [EventController, BoardController],
-  providers: [EventService, BoardService],
+  controllers: [EventController, BoardController, TileController],
+  providers: [EventService, BoardService, TileService],
   exports: [EventService, BoardService],
 })
 export class EventModule {}

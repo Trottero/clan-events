@@ -21,14 +21,8 @@ export class AuthRedirectComponent implements OnInit {
     shareReplay(1)
   );
 
-  navigateToHome$ = this.authService.isAuthenticated$.pipe(
-    filter(x => x),
-    switchMap(() => from(this.router.navigate(['/profile'])))
-  );
-
   ngOnInit(): void {
     this.subscription.add(this.codeRedeemer$.subscribe());
-    this.subscription.add(this.navigateToHome$.subscribe());
     this.subscription.add(this.authService.autoRefreshToken$.subscribe());
   }
 
