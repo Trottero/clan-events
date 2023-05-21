@@ -20,8 +20,10 @@ import { BoardApiService } from './board.api.service';
 import { EventIdStream } from '../../streams/event-id.stream';
 import { State } from 'src/app/core/common/observable/state';
 import { TileResponse } from '@common/events';
-import { SimpleBoardRenderer } from './renderers/simple-board-renderer';
+import { TileRenderer } from './renderers/tile-renderer';
 import { BoardRenderer } from './renderers/board-renderer';
+import { RendererPriorityMap } from 'src/app/features/events/modules/board/renderers/renderer-priority-map';
+import { GridRenderer } from './renderers/grid-renderer';
 
 export interface BoardState {
   selectedTileId: string | null;
@@ -48,9 +50,7 @@ export class BoardService {
   private readonly refreshTilesSubject = new Subject<void>();
   private readonly updateBackgroundSubject = new Subject<File>();
 
-  private readonly boardRenderersSubject = new BehaviorSubject<BoardRenderer[]>(
-    []
-  );
+  private readonly renderersSubject = new RendererPriorityMap();
 
   private boardState = new State<BoardState>(INITIAL_STATE);
 
@@ -77,7 +77,13 @@ export class BoardService {
 
   resetCanvas$ = this.resetCanvasSubject.pipe(startWith(undefined));
 
-  boardRenderers$ = this.boardRenderersSubject.pipe(notNullOrUndefined());
+  renderers$ = this.renderersSubject.renderers$;
+
+  isGridEnabled$ = this.renderers$.pipe(
+    map(renderers =>
+      renderers.some(renderer => renderer instanceof GridRenderer)
+    )
+  );
 
   createTileTrigger$ = this.createTileTriggerSubject.pipe(
     switchMap(() =>
@@ -147,8 +153,16 @@ export class BoardService {
     this.subscriptions.add(this.updateBackgroundImage$.subscribe());
   }
 
-  setBoardRenderers(boardRenderers: BoardRenderer[]) {
-    this.boardRenderersSubject.next(boardRenderers);
+  registerRenderer(boardRenderer: BoardRenderer, priority: number) {
+    this.renderersSubject.set(boardRenderer.name, boardRenderer, priority);
+  }
+
+  unregisterRenderer(name: string) {
+    this.renderersSubject.delete(name);
+  }
+
+  unregisterAllRenderers() {
+    this.renderersSubject.clear();
   }
 
   createTile() {

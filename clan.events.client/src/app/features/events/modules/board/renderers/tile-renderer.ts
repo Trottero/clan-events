@@ -6,8 +6,8 @@ import { BoardCanvasObject } from './board-canvas-object';
 import { BoardRenderer } from './board-renderer';
 import { GridRenderer } from './grid-renderer';
 
-export class SimpleBoardRenderer extends BoardRenderer {
-  override name: string = SimpleBoardRenderer.name;
+export class TileRenderer extends BoardRenderer {
+  override name: string = TileRenderer.name;
 
   tiles$ = this.boardService.tiles$.pipe(filterMapSuccess(x => x.value));
 
@@ -23,41 +23,58 @@ export class SimpleBoardRenderer extends BoardRenderer {
     map(state => (state.theme === Theme.Light ? '#333333de' : '#e2d7ec'))
   );
 
+  isGridEnabled$ = this.boardService.isGridEnabled$;
+
   private state = {
     tiles: [] as TileResponse[],
     lineColor: '#000000',
     textColor: '#000000',
+    isGridEnabled: false,
   };
 
   constructor() {
     super();
 
     this.subscriptions.add(
-      combineLatest([this.tiles$, this.lineColor$, this.textColor$]).subscribe(
-        ([tiles, lineColor, textColor]) => {
-          this.state = {
-            tiles: tiles.data,
-            lineColor,
-            textColor,
-          };
-        }
-      )
+      combineLatest([
+        this.tiles$,
+        this.lineColor$,
+        this.textColor$,
+        this.isGridEnabled$,
+      ]).subscribe(([tiles, lineColor, textColor, isGridRendered]) => {
+        this.state = {
+          tiles: tiles.data,
+          lineColor,
+          textColor,
+          isGridEnabled: isGridRendered,
+        };
+      })
     );
   }
 
   override onGrabEnd(index: number, x: number, y: number): void {
     const tile = this.state.tiles[index];
     // snap to grid
-    tile.x = x - (x % GridRenderer.GRID_HALF_SIZE);
-    tile.y = y - (y % GridRenderer.GRID_HALF_SIZE);
+    if (this.state.isGridEnabled) {
+      tile.x = x - (x % GridRenderer.GRID_HALF_SIZE);
+      tile.y = y - (y % GridRenderer.GRID_HALF_SIZE);
+    } else {
+      tile.x = x;
+      tile.y = y;
+    }
     this.boardService.updateTilePosition(tile.id, tile.x, tile.y);
   }
 
   override onGrabMove(index: number, x: number, y: number): void {
     const tile = this.state.tiles[index];
     // snap to grid
-    tile.x = x - (x % GridRenderer.GRID_HALF_SIZE);
-    tile.y = y - (y % GridRenderer.GRID_HALF_SIZE);
+    if (this.state.isGridEnabled) {
+      tile.x = x - (x % GridRenderer.GRID_HALF_SIZE);
+      tile.y = y - (y % GridRenderer.GRID_HALF_SIZE);
+    } else {
+      tile.x = x;
+      tile.y = y;
+    }
   }
 
   override render(context: CanvasRenderingContext2D): void {

@@ -34,9 +34,9 @@ import { notNullOrUndefined } from 'src/app/core/common/operators/not-undefined'
 })
 export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly boardService = inject(BoardService);
-  private readonly boardRenderers$ = this.boardService.boardRenderers$;
+  private readonly boardRenderers$ = this.boardService.renderers$;
 
-  private boardRenderers: { [key: string]: BoardRenderer } = {};
+  private boardRenderers: BoardRenderer[] = [];
 
   resetCanvas$ = this.boardService.resetCanvas$;
 
@@ -65,10 +65,7 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.subscriptions.add(
       this.boardRenderers$.subscribe(boardRenderers => {
-        this.boardRenderers = boardRenderers.reduce(
-          (prev, curr) => ({ ...prev, [curr.name]: curr }),
-          {}
-        );
+        this.boardRenderers = boardRenderers;
       })
     );
 
@@ -243,7 +240,7 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
         this.grabLocation.x = location.x;
         this.grabLocation.y = location.y;
 
-        this.boardRenderers[grabbedObject.name].selectCanvasObject(
+        this.getBoardRenderer(grabbedObject.name)?.selectCanvasObject(
           grabbedObject.index
         );
       } else {
@@ -258,7 +255,7 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.isGrabbing && this.grabbedObj !== undefined) {
       // update it's new location
       const obj = this.objects[this.grabbedObj.name][this.grabbedObj.index];
-      this.boardRenderers[this.grabbedObj.name].onGrabEnd(
+      this.getBoardRenderer(this.grabbedObj.name)?.onGrabEnd(
         this.grabbedObj.index,
         obj.x,
         obj.y
@@ -292,7 +289,7 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       this.objects[this.grabbedObj.name][this.grabbedObj.index].y +=
         location.y - this.grabLocation.y;
 
-      this.boardRenderers[this.grabbedObj.name].onGrabMove(
+      this.getBoardRenderer(this.grabbedObj.name)?.onGrabMove(
         this.grabbedObj.index,
         this.objects[this.grabbedObj.name][this.grabbedObj.index].x,
         this.objects[this.grabbedObj.name][this.grabbedObj.index].y
@@ -335,6 +332,10 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       x: rect.left,
       y: rect.top,
     };
+  }
+
+  private getBoardRenderer(name: string): BoardRenderer | undefined {
+    return this.boardRenderers.find(renderer => renderer.name == name);
   }
 
   private registerSubscriptions() {
