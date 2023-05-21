@@ -41,12 +41,12 @@ export class TileRenderer extends BoardRenderer {
         this.lineColor$,
         this.textColor$,
         this.isGridEnabled$,
-      ]).subscribe(([tiles, lineColor, textColor, isGridRendered]) => {
+      ]).subscribe(([tiles, lineColor, textColor, isGridEnabled]) => {
         this.state = {
           tiles: tiles.data,
           lineColor,
           textColor,
-          isGridEnabled: isGridRendered,
+          isGridEnabled,
         };
       })
     );
