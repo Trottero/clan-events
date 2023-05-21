@@ -26,8 +26,4 @@ export class FileInputComponent {
     const file = files[0];
     this.fileSelected.emit(file);
   }
-
-  onFakeButtonClick(event: Event) {
-    event.preventDefault();
-  }
 }
