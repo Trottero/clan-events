@@ -24,12 +24,6 @@ import { BackgroundImageRenderer } from './renderers/background-image-renderer';
 })
 export class BoardComponent implements OnDestroy {
   private readonly boardService = inject(BoardService);
-  private readonly boardApiService = inject(BoardApiService);
-  private readonly eventId$ = inject(EventIdStream);
-  private readonly selectedClan$ = inject(SelectedClanService).selectedClan$;
-
-  private readonly updateBackgroundSubject = new Subject<File>();
-  private readonly subscriptions = new Subscription();
 
   tiles$ = this.boardService.tiles$;
 
@@ -45,20 +39,6 @@ export class BoardComponent implements OnDestroy {
 
   ngOnInit(): void {
     this.boardService.setBoardRenderers(this.boardRenderers);
-
-    this.subscriptions.add(
-      this.updateBackgroundSubject
-        .pipe(
-          withLatestFrom(
-            this.selectedClan$.pipe(notNullOrUndefined()),
-            this.eventId$.pipe(notNullOrUndefined())
-          ),
-          switchMap(([file, clan, eventId]) =>
-            this.boardApiService.updateBackground(clan.name, eventId, file)
-          )
-        )
-        .subscribe()
-    );
   }
 
   ngOnDestroy(): void {
@@ -74,13 +54,7 @@ export class BoardComponent implements OnDestroy {
     this.boardService.resetCanvas();
   }
 
-  updateBackground(event: Event) {
-    const files = (event.target as HTMLInputElement).files;
-    if (!files || files.length === 0) {
-      return;
-    }
-
-    const file = files[0];
-    this.updateBackgroundSubject.next(file);
+  onFileSelected(file: File) {
+    this.boardService.updateBackground(file);
   }
 }

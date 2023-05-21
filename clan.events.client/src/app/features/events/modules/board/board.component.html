@@ -1,11 +1,9 @@
 <div class="mb-4 d-flex gap-3">
   <button mat-flat-button color="primary" (click)="createTile()">Create Tile</button>
   <button mat-flat-button (click)="resetCanvas()">Reset Canvas</button>
+  <app-file-input (fileSelected)="onFileSelected($event)" accept="image/*"></app-file-input>
 </div>
 
-<input type="file" (change)="updateBackground($event)" accept="image/*" #fileInput>
-
-<img [src]="backgroundImage$ | async" class="board-background" (click)="fileInput.click()">
 
 <div class="board-container">
   <div class="board-canvas-container">

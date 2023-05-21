@@ -6,7 +6,7 @@ import {
   shareReplay,
   Subject,
   Subscription,
-  catchError,
+  withLatestFrom,
   BehaviorSubject,
   map,
 } from 'rxjs';
@@ -46,6 +46,7 @@ export class BoardService {
   >();
   private readonly resetCanvasSubject = new Subject<void>();
   private readonly refreshTilesSubject = new Subject<void>();
+  private readonly updateBackgroundSubject = new Subject<File>();
 
   private readonly boardRenderersSubject = new BehaviorSubject<BoardRenderer[]>(
     []
@@ -112,11 +113,22 @@ export class BoardService {
     )
   );
 
+  updateBackgroundImage$ = this.updateBackgroundSubject.pipe(
+    withLatestFrom(
+      this.selectedClanService.selectedClan$.pipe(notNullOrUndefined()),
+      this.eventId$.pipe(notNullOrUndefined())
+    ),
+    switchMap(([file, clan, eventId]) =>
+      this.boardApiService.updateBackground(clan.name, eventId, file)
+    )
+  );
+
   backgroundImageUri$ = combineLatest([
+    this.updateBackgroundImage$.pipe(startWith(undefined)),
     this.selectedClanService.selectedClan$.pipe(notNullOrUndefined()),
     this.eventId$.pipe(notNullOrUndefined()),
   ]).pipe(
-    switchMap(([clan, eventId]) =>
+    switchMap(([_, clan, eventId]) =>
       this.boardApiService.getBackground(clan.name, eventId)
     ),
     map(blob => {
@@ -132,6 +144,7 @@ export class BoardService {
     );
 
     this.subscriptions.add(this.updateSelectedTile$.subscribe());
+    this.subscriptions.add(this.updateBackgroundImage$.subscribe());
   }
 
   setBoardRenderers(boardRenderers: BoardRenderer[]) {
@@ -150,6 +163,10 @@ export class BoardService {
     this.boardState.next({
       selectedTileId: tileId,
     });
+  }
+
+  updateBackground(file: File) {
+    this.updateBackgroundSubject.next(file);
   }
 
   updateTilePosition(tileId: string, x: number, y: number) {

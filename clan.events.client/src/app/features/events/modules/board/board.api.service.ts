@@ -69,9 +69,10 @@ export class BoardApiService {
     const formData = new FormData();
     formData.append('file', file);
 
-    return this.http.post<any>(
+    return this.http.post(
       `${this.configService.backEndUrl}/${clan}/events/${eventId}/background`,
-      formData
+      formData,
+      { responseType: 'blob' }
     );
   }
 
