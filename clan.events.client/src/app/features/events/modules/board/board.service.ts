@@ -8,6 +8,7 @@ import {
   Subscription,
   catchError,
   BehaviorSubject,
+  map,
 } from 'rxjs';
 import { SelectedClanService } from 'src/app/features/clan/services/selected-clan.service';
 import {
@@ -109,6 +110,20 @@ export class BoardService {
         )
       )
     )
+  );
+
+  backgroundImageUri$ = combineLatest([
+    this.selectedClanService.selectedClan$.pipe(notNullOrUndefined()),
+    this.eventId$.pipe(notNullOrUndefined()),
+  ]).pipe(
+    switchMap(([clan, eventId]) =>
+      this.boardApiService.getBackground(clan.name, eventId)
+    ),
+    map(blob => {
+      const urlCreator = window.URL || window.webkitURL;
+      return urlCreator.createObjectURL(blob);
+    }),
+    shareReplay(1)
   );
 
   constructor() {

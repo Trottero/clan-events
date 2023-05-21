@@ -3,6 +3,10 @@
   <button mat-flat-button (click)="resetCanvas()">Reset Canvas</button>
 </div>
 
+<input type="file" (change)="updateBackground($event)" accept="image/*" #fileInput>
+
+<img [src]="backgroundImage$ | async" class="board-background" (click)="fileInput.click()">
+
 <div class="board-container">
   <div class="board-canvas-container">
     <div class="spinner-overlay" *ngIf="tiles$ | async | isLoading">

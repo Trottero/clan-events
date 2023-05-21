@@ -34,7 +34,6 @@ export class GridRenderer extends BoardRenderer {
     context: CanvasRenderingContext2D,
     cameraOffset: { x: number; y: number }
   ): void {
-    console.log('rendering grid');
     context.fillStyle = this.state.lineColor;
     // draw grid
     const gridStartX = cameraOffset.x % GridRenderer.GRID_SIZE;
