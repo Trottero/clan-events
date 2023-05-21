@@ -28,7 +28,6 @@
     "@nestjs/jwt": "^10.0.3",
     "@nestjs/mongoose": "^9.2.2",
     "@nestjs/platform-express": "^9.4.1",
-    "@nestjs/serve-static": "^3.0.1",
     "axios": "^1.4.0",
     "cache-manager": "^5.2.1",
     "clan.events.common": "^1.0.0",
