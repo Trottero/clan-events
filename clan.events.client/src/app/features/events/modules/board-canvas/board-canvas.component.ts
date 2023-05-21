@@ -7,17 +7,7 @@ import {
   ViewChild,
   inject,
 } from '@angular/core';
-import {
-  Subscription,
-  combineLatest,
-  forkJoin,
-  fromEvent,
-  map,
-  mergeMap,
-  switchMap,
-  tap,
-  zip,
-} from 'rxjs';
+import { Subscription, combineLatest, fromEvent, map, switchMap } from 'rxjs';
 import { BoardService } from '../board/board.service';
 import {
   CanvasObservables,
@@ -55,7 +45,7 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isGrabbing = false;
   grabLocation = { x: 0, y: 0 };
-  grabbedObj?: { name: string; index: number };
+  grabbedObj?: { renderer: string; index: number };
   objects: { [key: string]: BoardCanvasObject[] } = {};
 
   initialPinchDistance?: number;
@@ -222,7 +212,7 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
           prev.index > -1
             ? prev
             : {
-                name: curr.name,
+                renderer: curr.name,
                 index: this.objects[curr.name].findIndex(
                   object =>
                     location.x >= object.x &&
@@ -231,7 +221,7 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
                     location.y <= object.y + object.height
                 ),
               },
-        { name: '', index: -1 }
+        { renderer: '', index: -1 }
       );
 
       if (grabbedObject.index > -1) {
@@ -240,7 +230,7 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
         this.grabLocation.x = location.x;
         this.grabLocation.y = location.y;
 
-        this.getBoardRenderer(grabbedObject.name)?.selectCanvasObject(
+        this.getBoardRenderer(grabbedObject.renderer)?.selectCanvasObject(
           grabbedObject.index
         );
       } else {
@@ -254,8 +244,8 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
   private onPointerUp(e: MouseEvent | TouchEvent) {
     if (this.isGrabbing && this.grabbedObj !== undefined) {
       // update it's new location
-      const obj = this.objects[this.grabbedObj.name][this.grabbedObj.index];
-      this.getBoardRenderer(this.grabbedObj.name)?.onGrabEnd(
+      const obj = this.objects[this.grabbedObj.renderer][this.grabbedObj.index];
+      this.getBoardRenderer(this.grabbedObj.renderer)?.onGrabEnd(
         this.grabbedObj.index,
         obj.x,
         obj.y
@@ -284,15 +274,15 @@ export class BoardCanvasComponent implements OnInit, AfterViewInit, OnDestroy {
       location.x = location.x - this.cameraOffset.x;
       location.y = location.y - this.cameraOffset.y;
 
-      this.objects[this.grabbedObj.name][this.grabbedObj.index].x +=
+      this.objects[this.grabbedObj.renderer][this.grabbedObj.index].x +=
         location.x - this.grabLocation.x;
-      this.objects[this.grabbedObj.name][this.grabbedObj.index].y +=
+      this.objects[this.grabbedObj.renderer][this.grabbedObj.index].y +=
         location.y - this.grabLocation.y;
 
-      this.getBoardRenderer(this.grabbedObj.name)?.onGrabMove(
+      this.getBoardRenderer(this.grabbedObj.renderer)?.onGrabMove(
         this.grabbedObj.index,
-        this.objects[this.grabbedObj.name][this.grabbedObj.index].x,
-        this.objects[this.grabbedObj.name][this.grabbedObj.index].y
+        this.objects[this.grabbedObj.renderer][this.grabbedObj.index].x,
+        this.objects[this.grabbedObj.renderer][this.grabbedObj.index].y
       );
 
       this.grabLocation.x = location.x;
