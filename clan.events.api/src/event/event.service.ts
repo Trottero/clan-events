@@ -46,6 +46,7 @@ export class EventService {
   ): Promise<EventDocument[]> {
     const clan = await this.clanService.getClanByName(clanName);
     const accessStatus = this.getAccesForUserRole(user.clanRole);
+
     const events = await this.eventModel
       .find({
         owner: clan.id,

@@ -15,6 +15,7 @@ import {
   EventTeam,
   EventTeamSchema,
 } from 'src/database/schemas/event-team.schema';
+import { Image, ImageSchema } from 'src/database/schemas/image.schema';
 
 @Module({
   imports: [
@@ -27,6 +28,10 @@ import {
       {
         name: EventTeam.name,
         schema: EventTeamSchema,
+      },
+      {
+        name: Image.name,
+        schema: ImageSchema,
       },
     ]),
     ClanModule,

@@ -5,6 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatCommonModule, MatNativeDateModule } from '@angular/material/core';
 
 import { SharedModule } from './shared/shared.module';
 import { CoreModule } from './core/core.module';
@@ -18,6 +19,7 @@ import { CoreModule } from './core/core.module';
     BrowserAnimationsModule,
     SharedModule,
     CoreModule,
+    MatNativeDateModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

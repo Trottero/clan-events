@@ -1,0 +1,12 @@
+<label class="file">
+    <input type="file" (change)="onFileSelected($event)" [accept]="accept" #fileInput />
+    <span class="file-custom">
+        <ng-container *ngIf="file$ | async as file">
+            <span class="file-name">{{file.name}}</span>
+        </ng-container>
+        <ng-container *ngIf="!(file$ | async)">
+            <span class="file-name">No file selected</span>
+        </ng-container>
+        <button mat-flat-button color="accent" class="file-button" (click)="fileInput.click()">Browse</button>
+    </span>
+  </label>
