@@ -93,9 +93,7 @@ export class EditEventComponent implements OnInit, OnDestroy {
   }
 
   cancel(): void {
-    this.subscription.add(
-      this.id$.subscribe(id => this.router.navigate(['/events', id]))
-    );
+    this.router.navigate(['../'], { relativeTo: this.route });
   }
 
   update(): void {

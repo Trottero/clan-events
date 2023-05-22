@@ -6,7 +6,6 @@ import {
   shareReplay,
   Subject,
   Subscription,
-  catchError,
   BehaviorSubject,
 } from 'rxjs';
 import { SelectedClanService } from 'src/app/features/clan/services/selected-clan.service';
@@ -19,7 +18,6 @@ import { BoardApiService } from './board.api.service';
 import { EventIdStream } from '../../streams/event-id.stream';
 import { State } from 'src/app/core/common/observable/state';
 import { TileResponse } from '@common/events';
-import { SimpleBoardRenderer } from './renderers/simple-board-renderer';
 import { BoardRenderer } from './renderers/board-renderer';
 
 export interface BoardState {

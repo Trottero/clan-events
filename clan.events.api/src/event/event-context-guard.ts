@@ -19,14 +19,17 @@ export class EventContextGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const clanName = request.params.clanName;
-    const eventId = request.params.id;
+    let eventId = request.params.id;
 
     if (!clanName) {
       throw new NotFoundException('Clanname not supplied');
     }
 
     if (!eventId) {
-      throw new NotFoundException('Eventid not supplied');
+      eventId = request.params.eventId;
+      if (!eventId) {
+        throw new NotFoundException('Eventid not supplied');
+      }
     }
 
     try {

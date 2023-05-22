@@ -67,13 +67,13 @@ export class TeamsController {
     }
   }
 
-  @Get(':id')
+  @Get(':teamId')
   @HasRoleInClan(ClanRole.Owner, ClanRole.Admin, ClanRole.Member)
   @GuardEventContext()
   async getTeam(
     @ClanContext() clanContext: ClanRequestContext,
     @EventContext() eventContext: EventRequestContext,
-    @Param('id') id: string,
+    @Param('teamId') id: string,
   ): Promise<EventTeamResponse> {
     const result = eventContext.participants.find((x) => x.id === id);
 
@@ -84,14 +84,14 @@ export class TeamsController {
     };
   }
 
-  @Put(':id')
+  @Put(':teamId')
   @HasRoleInClan(ClanRole.Owner, ClanRole.Admin, ClanRole.Member)
   @GuardEventContext()
   async updateTeam(
     @ClanContext() clanContext: ClanRequestContext,
     @EventContext() eventContext: EventRequestContext,
     @Body() team: UpdateTeamRequest,
-    @Param('id') id: string,
+    @Param('teamId') id: string,
   ): Promise<EventTeamResponse> {
     const result = await this.teamsService.updateTeam(
       eventContext as EventDocument,
@@ -107,13 +107,13 @@ export class TeamsController {
     };
   }
 
-  @Delete(':id')
+  @Delete(':teamId')
   @HasRoleInClan(ClanRole.Owner, ClanRole.Admin, ClanRole.Member)
   @GuardEventContext()
   async deleteTeam(
     @ClanContext() clanContext: ClanRequestContext,
     @EventContext() eventContext: EventRequestContext,
-    @Param('id') id: string,
+    @Param('teamId') id: string,
   ): Promise<void> {
     return this.teamsService.deleteTeam(eventContext as EventDocument, id);
   }
