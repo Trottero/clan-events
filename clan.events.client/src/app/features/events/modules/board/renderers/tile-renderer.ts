@@ -4,10 +4,10 @@ import { filterMapSuccess } from 'src/app/core/common/operators/loadable';
 import { Theme } from 'src/app/core/components/theming/theme';
 import { BoardCanvasObject } from './board-canvas-object';
 import { BoardRenderer } from './board-renderer';
+import { GridRenderer } from './grid-renderer';
 
-export class SimpleBoardRenderer extends BoardRenderer {
-  public static readonly GRID_SIZE = 50;
-  public static readonly GRID_HALF_SIZE = SimpleBoardRenderer.GRID_SIZE / 2;
+export class TileRenderer extends BoardRenderer {
+  override name: string = TileRenderer.name;
 
   tiles$ = this.boardService.tiles$.pipe(filterMapSuccess(x => x.value));
 
@@ -23,82 +23,63 @@ export class SimpleBoardRenderer extends BoardRenderer {
     map(state => (state.theme === Theme.Light ? '#333333de' : '#e2d7ec'))
   );
 
+  isGridEnabled$ = this.boardService.isGridEnabled$;
+
   private state = {
     tiles: [] as TileResponse[],
     lineColor: '#000000',
     textColor: '#000000',
+    isGridEnabled: false,
   };
 
   constructor() {
     super();
 
     this.subscriptions.add(
-      combineLatest([this.tiles$, this.lineColor$, this.textColor$]).subscribe(
-        ([tiles, lineColor, textColor]) => {
-          this.state = {
-            tiles: tiles.data,
-            lineColor,
-            textColor,
-          };
-        }
-      )
+      combineLatest([
+        this.tiles$,
+        this.lineColor$,
+        this.textColor$,
+        this.isGridEnabled$,
+      ]).subscribe(([tiles, lineColor, textColor, isGridEnabled]) => {
+        this.state = {
+          tiles: tiles.data,
+          lineColor,
+          textColor,
+          isGridEnabled,
+        };
+      })
     );
   }
 
   override onGrabEnd(index: number, x: number, y: number): void {
     const tile = this.state.tiles[index];
     // snap to grid
-    tile.x = x - (x % SimpleBoardRenderer.GRID_HALF_SIZE);
-    tile.y = y - (y % SimpleBoardRenderer.GRID_HALF_SIZE);
+    if (this.state.isGridEnabled) {
+      tile.x = x - (x % GridRenderer.GRID_HALF_SIZE);
+      tile.y = y - (y % GridRenderer.GRID_HALF_SIZE);
+    } else {
+      tile.x = x;
+      tile.y = y;
+    }
     this.boardService.updateTilePosition(tile.id, tile.x, tile.y);
   }
 
   override onGrabMove(index: number, x: number, y: number): void {
     const tile = this.state.tiles[index];
     // snap to grid
-    tile.x = x - (x % SimpleBoardRenderer.GRID_HALF_SIZE);
-    tile.y = y - (y % SimpleBoardRenderer.GRID_HALF_SIZE);
+    if (this.state.isGridEnabled) {
+      tile.x = x - (x % GridRenderer.GRID_HALF_SIZE);
+      tile.y = y - (y % GridRenderer.GRID_HALF_SIZE);
+    } else {
+      tile.x = x;
+      tile.y = y;
+    }
   }
 
   override render(context: CanvasRenderingContext2D): void {
     this.renderEdges(context);
     this.renderTiles(context);
-  }
-
-  override renderBackground(
-    context: CanvasRenderingContext2D,
-    cameraOffset: { x: number; y: number }
-  ): void {
-    context.fillStyle = this.state.lineColor;
-    // draw grid
-    const gridStartX = cameraOffset.x % SimpleBoardRenderer.GRID_SIZE;
-    const gridStartY = cameraOffset.y % SimpleBoardRenderer.GRID_SIZE;
-
-    for (
-      let x = gridStartX;
-      x < context.canvas.width;
-      x += SimpleBoardRenderer.GRID_SIZE
-    ) {
-      context.fillRect(
-        -cameraOffset.x + x,
-        -cameraOffset.y,
-        1,
-        context.canvas.height
-      );
-    }
-
-    for (
-      let y = gridStartY;
-      y < context.canvas.height;
-      y += SimpleBoardRenderer.GRID_SIZE
-    ) {
-      context.fillRect(
-        -cameraOffset.x,
-        -cameraOffset.y + y,
-        context.canvas.width,
-        1
-      );
-    }
   }
 
   override selectCanvasObject(index?: number): void {

@@ -9,7 +9,7 @@ import { CounterComponent } from './features/counter/counter.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ProfileComponent } from './features/profile/profile.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatCommonModule } from '@angular/material/core';
+import { MatCommonModule, MatNativeDateModule } from '@angular/material/core';
 
 import { MatButtonModule } from '@angular/material/button';
 import { SharedModule } from './shared/shared.module';
@@ -24,6 +24,7 @@ import { CoreModule } from './core/core.module';
     BrowserAnimationsModule,
     SharedModule,
     CoreModule,
+    MatNativeDateModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

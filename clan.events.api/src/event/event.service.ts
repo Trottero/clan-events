@@ -41,6 +41,10 @@ export class EventService {
     const userObj = await this.userService.getUserByUsername(user.username);
     const clan = await this.clanService.getClanByName(clanName);
 
+    if (!clan) {
+      throw new NotFoundException();
+    }
+
     const events = await this.eventModel
       .find({
         owner: clan.id,
