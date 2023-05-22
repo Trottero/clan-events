@@ -1,4 +1,4 @@
-<h2>Create new Event</h2>
+<h2>Edit Event</h2>
 
 <button mat-flat-button (click)="back()">Back</button>
 
@@ -32,6 +32,15 @@
     <mat-label>Select</mat-label>
     <mat-select [formControl]="boardType">
       <mat-option *ngFor="let option of boardTypeOptions$ | async" [value]="option.value">
+        {{option.label}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Select</mat-label>
+    <mat-select [formControl]="eventVisibility">
+      <mat-option *ngFor="let option of eventVisibilityOptions$ | async" [value]="option.value">
         {{option.label}}
       </mat-option>
     </mat-select>

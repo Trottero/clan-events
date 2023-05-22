@@ -9,6 +9,8 @@ import {
 } from '@nestjs/common';
 import { EventService } from './event.service';
 import { ApiTokenGuard } from 'src/auth/guards/api-token.guard';
+import { ClanContextGuard } from 'src/auth/guards/clan-context.guard';
+import { RoleInClanGuard } from 'src/auth/guards/role-in-clan.guard';
 
 @Injectable()
 export class EventContextGuard implements CanActivate {
@@ -17,7 +19,7 @@ export class EventContextGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const clanName = request.params.clanName;
-    const eventId = request.params.eventId;
+    const eventId = request.params.id;
 
     if (!clanName) {
       throw new NotFoundException('Clanname not supplied');
@@ -51,5 +53,12 @@ export class EventContextGuard implements CanActivate {
 }
 
 export function GuardEventContext() {
-  return applyDecorators(UseGuards(ApiTokenGuard, EventContextGuard));
+  return applyDecorators(
+    UseGuards(
+      ApiTokenGuard,
+      ClanContextGuard,
+      RoleInClanGuard,
+      EventContextGuard,
+    ),
+  );
 }

@@ -6,7 +6,7 @@ import { Observable, map } from 'rxjs';
 import { ConfigService } from 'src/app/core/config/config.service';
 
 @Injectable()
-export class EventTeamService {
+export class EventTeamsService {
   private readonly http = inject(HttpClient);
   private readonly configService = inject(ConfigService);
 

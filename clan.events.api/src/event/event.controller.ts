@@ -24,34 +24,36 @@ import {
 import { PaginatedModel } from '@common/responses';
 import { convertToEventListResponse } from './converters/event-list.converter';
 import { convertToEventResponse } from './converters/event.converter';
-import { JwtTokenContent } from '@common/auth';
 import { User } from 'src/common/decorators/user.decorator';
 import { ApiTokenGuard } from 'src/auth/guards/api-token.guard';
+import { UserClanContext } from 'src/auth/user-clan-context';
 import { HasRoleInClan } from 'src/auth/authorized.decorator';
-import { RoleInClan } from 'src/auth/role-in-clan.decorator';
+import { EventContextGuard, GuardEventContext } from './event-context-guard';
+import { ClanRole } from '@common/auth/clan.role';
 
 @Controller(':clanName/events')
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
   @Get()
-  @UseGuards(ApiTokenGuard)
+  @HasRoleInClan()
   async getEventsForUser(
     @Query() params: GetEventsRequest,
-    @User() user: JwtTokenContent,
+    @User() user: UserClanContext,
     @Param('clanName') clanName: string,
   ): Promise<PaginatedModel<EventListItem>> {
     const { page, pageSize } = params;
 
     const result = await this.eventService.getPaginatedEventsForUserInClan(
-      user,
       clanName,
+      user,
       page,
       pageSize,
     );
+
     const count = await this.eventService.countEventsForUserInClan(
-      user,
       clanName,
+      user,
     );
 
     return convertToEventListResponse(result, {
@@ -63,9 +65,9 @@ export class EventController {
   }
 
   @Get(':id')
-  @UseGuards(ApiTokenGuard)
+  @GuardEventContext()
   async getEventById(
-    @User() user: JwtTokenContent,
+    @User() user: UserClanContext,
     @Param() { clanName, id }: GetEventByIdRequest,
   ): Promise<EventResponse> {
     const event = await this.eventService.getEventById(user, clanName, id);
@@ -74,9 +76,9 @@ export class EventController {
   }
 
   @Post()
-  @UseGuards(ApiTokenGuard)
+  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
   public async createEventForUser(
-    @User() user: JwtTokenContent,
+    @User() user: UserClanContext,
     @Body() body: CreateEventRequest,
     @Param('clanName') clanName: string,
   ): Promise<any> {
@@ -85,16 +87,16 @@ export class EventController {
   }
 
   @Delete(':id')
-  @UseGuards(ApiTokenGuard)
+  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
   public async deleteEventById(
-    @User() user: JwtTokenContent,
+    @User() user: UserClanContext,
     @Param() { id }: DeleteEventByIdRequest,
   ): Promise<any> {
     await this.eventService.deleteEventById(user, id);
   }
 
   @Put(':id')
-  @UseGuards(ApiTokenGuard)
+  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
   public async updateEventById(
     @Body() body: UpdateEventRequest,
     @Param() { id }: UpdateEventParams,

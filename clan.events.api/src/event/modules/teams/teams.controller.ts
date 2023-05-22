@@ -8,13 +8,9 @@ import {
   Param,
   Post,
   Put,
-  UseGuards,
 } from '@nestjs/common';
 import { HasRoleInClan } from 'src/auth/authorized.decorator';
-import {
-  EventContextGuard,
-  GuardEventContext,
-} from 'src/event/event-context-guard';
+import { GuardEventContext } from 'src/event/event-context-guard';
 import { ClanRequestContext } from 'src/common/decorators/clan-context';
 import { ClanContext } from 'src/common/decorators/clan-context.decorator';
 import {
@@ -45,7 +41,7 @@ export class TeamsController {
 
   @Post()
   @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
-  @UseGuards(EventContextGuard)
+  @GuardEventContext()
   async createTeam(
     @ClanContext() clanContext: ClanRequestContext,
     @EventContext() eventContext: EventRequestContext,
@@ -73,7 +69,7 @@ export class TeamsController {
 
   @Get(':id')
   @HasRoleInClan(ClanRole.Owner, ClanRole.Admin, ClanRole.Member)
-  @UseGuards(EventContextGuard)
+  @GuardEventContext()
   async getTeam(
     @ClanContext() clanContext: ClanRequestContext,
     @EventContext() eventContext: EventRequestContext,
@@ -90,7 +86,7 @@ export class TeamsController {
 
   @Put(':id')
   @HasRoleInClan(ClanRole.Owner, ClanRole.Admin, ClanRole.Member)
-  @UseGuards(EventContextGuard)
+  @GuardEventContext()
   async updateTeam(
     @ClanContext() clanContext: ClanRequestContext,
     @EventContext() eventContext: EventRequestContext,
@@ -113,7 +109,7 @@ export class TeamsController {
 
   @Delete(':id')
   @HasRoleInClan(ClanRole.Owner, ClanRole.Admin, ClanRole.Member)
-  @UseGuards(EventContextGuard)
+  @GuardEventContext()
   async deleteTeam(
     @ClanContext() clanContext: ClanRequestContext,
     @EventContext() eventContext: EventRequestContext,

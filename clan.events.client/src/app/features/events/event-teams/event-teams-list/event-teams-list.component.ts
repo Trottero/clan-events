@@ -1,37 +1,42 @@
 import { Component, inject } from '@angular/core';
-import { EventTeamService } from '../../event-teams.service';
+import { EventTeamsService } from '../event-teams.service';
 import { EventIdStream } from '../../streams/event-id.stream';
 import { SelectedClanService } from 'src/app/features/clan/services/selected-clan.service';
-import {
-  combineLatest,
-  shareReplay,
-  switchMap,
-  take,
-} from 'rxjs';
+import { combineLatest, shareReplay, switchMap, take } from 'rxjs';
 import { MatTableModule } from '@angular/material/table';
 import { MatCommonModule } from '@angular/material/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { notNullOrUndefined } from 'src/app/core/common/operators/not-undefined';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-event-teams-list',
   templateUrl: './event-teams-list.component.html',
   styleUrls: ['./event-teams-list.component.scss'],
   standalone: true,
-  imports: [CommonModule, MatCommonModule, MatTableModule, MatIconModule],
+  imports: [
+    CommonModule,
+    MatCommonModule,
+    RouterModule,
+    MatTableModule,
+    MatIconModule,
+    MatButtonModule,
+  ],
 })
 export class EventTeamsListComponent {
-  private readonly eventTeamService = inject(EventTeamService);
+  private readonly eventTeamService = inject(EventTeamsService);
   private readonly eventStream$ = inject(EventIdStream).pipe(
     notNullOrUndefined()
   );
+
   private readonly selectedClanName$ = inject(
     SelectedClanService
   ).selectedClanName$.pipe(notNullOrUndefined());
 
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   eventTeams$ = combineLatest([this.eventStream$, this.selectedClanName$]).pipe(
     switchMap(([eventId, clanName]) =>
@@ -44,14 +49,9 @@ export class EventTeamsListComponent {
     combineLatest([this.eventStream$, this.selectedClanName$])
       .pipe(take(1))
       .subscribe(([eventId, clanName]) =>
-        this.router.navigate([
-          'clans',
-          clanName,
-          'events',
-          eventId,
-          'teams',
-          teamId,
-        ])
+        this.router.navigate([teamId], {
+          relativeTo: this.route,
+        })
       );
   }
 

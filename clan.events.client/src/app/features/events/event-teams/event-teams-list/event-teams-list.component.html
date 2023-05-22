@@ -1,8 +1,8 @@
 <div class="d-flex justify-content-between">
   <h2 class="mr-2">Teams</h2>
-  <!-- <a [routerLink]="['/clan', 'new']"> -->
-  <!-- <button mat-raised-button color="primary" type="button">Create</button> -->
-  <!-- </a> -->
+  <a [routerLink]="['new']">
+    <button mat-raised-button color="primary" type="button">Create</button>
+  </a>
 </div>
 
 <div *ngIf="eventTeams$ | async as eventTeams">

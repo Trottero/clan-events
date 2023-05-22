@@ -18,15 +18,17 @@ export class RoleInClanGuard implements CanActivate {
       CLAN_ROLES_KEY,
       [context.getHandler(), context.getClass()],
     );
-    if (!requiredRoles) {
-      return true;
-    }
+
     const request = context.switchToHttp().getRequest();
     const clanName = request.clan as ClanDocument;
     const token = request.user as JwtTokenContent;
     const roles = await this.cachedRolesService.getRoles(token.sub);
     const roleInClan = roles[clanName.id];
     request['user']['clanRole'] = roleInClan;
+
+    if (!requiredRoles || requiredRoles.length === 0) {
+      return true;
+    }
 
     return !!roleInClan && requiredRoles.some((role) => roleInClan == role);
   }

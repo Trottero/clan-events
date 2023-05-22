@@ -1,4 +1,5 @@
 import { BoardType } from '../enums/board-type.enum';
+import { EventVisibility } from '../enums/event-visibility.enum';
 
 export interface EventResponse {
   id: string;
@@ -10,6 +11,7 @@ export interface EventResponse {
   board: BoardDto;
   clanName: string;
   clanDisplayName: string;
+  eventVisibility: EventVisibility;
 }
 
 export interface BoardDto {

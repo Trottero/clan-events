@@ -12,3 +12,4 @@ export * from './requests/create-tile.request';
 export * from './requests/update-team.request';
 
 export * from './enums/board-type.enum';
+export * from './enums/event-visibility.enum';

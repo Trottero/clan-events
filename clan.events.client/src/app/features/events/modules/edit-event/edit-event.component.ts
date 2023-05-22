@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BoardType, EventResponse } from '@common/events';
+import { BoardType, EventResponse, EventVisibility } from '@common/events';
 import { Response } from '@common/responses';
 import {
   of,
@@ -11,6 +11,7 @@ import {
   Observable,
   map,
   shareReplay,
+  tap,
 } from 'rxjs';
 import { EventsService } from '../../events.service';
 import { FormControl, FormGroup } from '@ngneat/reactive-forms';
@@ -32,11 +33,12 @@ export class EditEventComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
 
   id$: Observable<string> = this.route.paramMap.pipe(
-    map(params => params.get('id')),
+    map(params => params.get('eventId')),
     notNullOrUndefined()
   );
 
   event$: Observable<Response<EventResponse>> = this.id$.pipe(
+    tap(id => console.log(id)),
     withLatestFrom(this.selectedClan$),
     switchMap(([id, clan]) => this.eventsService.getEventById(id, clan.name))
   );
@@ -47,11 +49,19 @@ export class EditEventComponent implements OnInit, OnDestroy {
       .filter(value => value.value !== BoardType.Unknown)
   ).pipe(shareReplay(1));
 
+  eventVisibilityOptions$ = of(
+    Object.values(EventVisibility).map(value => ({ label: value, value }))
+  ).pipe(shareReplay(1));
+
   name = new FormControl<string>('', [Validators.required]);
   description = new FormControl<string>('', [Validators.required]);
   startsAt = new FormControl<Date>(new Date(), [Validators.required]);
   endsAt = new FormControl<Date>(new Date(), [Validators.required]);
   boardType = new FormControl<BoardType>(BoardType.Unknown, [
+    Validators.required,
+  ]);
+
+  eventVisibility = new FormControl<EventVisibility>(EventVisibility.Private, [
     Validators.required,
   ]);
 
@@ -61,6 +71,7 @@ export class EditEventComponent implements OnInit, OnDestroy {
     startsAt: this.startsAt,
     endsAt: this.endsAt,
     boardType: this.boardType,
+    eventVisibility: this.eventVisibility,
   });
 
   private updateEventSubject = new Subject<void>();
@@ -100,6 +111,7 @@ export class EditEventComponent implements OnInit, OnDestroy {
           startsAt: event.data.startsAt,
           endsAt: event.data.endsAt,
           boardType: event.data.board.type,
+          eventVisibility: event.data.eventVisibility,
         });
       })
     );
