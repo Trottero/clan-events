@@ -25,6 +25,7 @@ import { CoreModule } from './core/core.module';
     MatNativeDateModule,
     SharedModule,
     CoreModule,
+    MatNativeDateModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

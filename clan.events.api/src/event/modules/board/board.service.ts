@@ -5,12 +5,14 @@ import { Model } from 'mongoose';
 import { ClanService } from 'src/clan/clan.service';
 import { Event } from 'src/database/schemas/event.schema';
 import { Tile, TileDocument } from 'src/database/schemas/tile.schema';
+import { Image } from 'src/database/schemas/image.schema';
 
 @Injectable()
 export class BoardService {
   constructor(
     @InjectModel(Event.name) private eventModel: Model<Event>,
     @InjectModel(Tile.name) private tileModel: Model<Tile>,
+    @InjectModel(Image.name) private imageModel: Model<Image>,
     private readonly clanService: ClanService,
   ) {}
 
@@ -61,6 +63,45 @@ export class BoardService {
     await event.save();
 
     return tile;
+  }
+
+  async updateBackground(
+    name: string,
+    eventId: string,
+    file: Express.Multer.File,
+  ) {
+    const clan = await this.clanService.getClanByName(name);
+    const event = await this.eventModel
+      .findOne({ _id: eventId, owner: clan.id })
+      .exec();
+
+    if (!event) {
+      throw new NotFoundException();
+    }
+
+    const image = new this.imageModel<Image>({
+      mimeType: file.mimetype,
+      buffer: file.buffer,
+    });
+
+    event.board.background = image;
+
+    await event.save();
+
+    return image;
+  }
+
+  async getBackground(name: string, eventId: string) {
+    const clan = await this.clanService.getClanByName(name);
+    const event = await this.eventModel
+      .findOne({ _id: eventId, owner: clan.id })
+      .exec();
+
+    if (!event) {
+      throw new NotFoundException();
+    }
+
+    return event.board.background;
   }
 
   private async getEventWithTile(

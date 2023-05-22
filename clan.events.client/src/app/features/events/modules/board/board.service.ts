@@ -6,8 +6,9 @@ import {
   shareReplay,
   Subject,
   Subscription,
-  catchError,
+  withLatestFrom,
   BehaviorSubject,
+  map,
 } from 'rxjs';
 import { SelectedClanService } from 'src/app/features/clan/services/selected-clan.service';
 import {
@@ -19,8 +20,10 @@ import { BoardApiService } from './board.api.service';
 import { EventIdStream } from '../../streams/event-id.stream';
 import { State } from 'src/app/core/common/observable/state';
 import { TileResponse } from '@common/events';
-import { SimpleBoardRenderer } from './renderers/simple-board-renderer';
+import { TileRenderer } from './renderers/tile-renderer';
 import { BoardRenderer } from './renderers/board-renderer';
+import { RendererPriorityMap } from 'src/app/features/events/modules/board/renderers/renderer-priority-map';
+import { GridRenderer } from './renderers/grid-renderer';
 
 export interface BoardState {
   selectedTileId: string | null;
@@ -45,9 +48,9 @@ export class BoardService {
   >();
   private readonly resetCanvasSubject = new Subject<void>();
   private readonly refreshTilesSubject = new Subject<void>();
+  private readonly updateBackgroundSubject = new Subject<File>();
 
-  private readonly boardRendererSubject =
-    new BehaviorSubject<BoardRenderer | null>(null);
+  private readonly renderersSubject = new RendererPriorityMap();
 
   private boardState = new State<BoardState>(INITIAL_STATE);
 
@@ -74,7 +77,13 @@ export class BoardService {
 
   resetCanvas$ = this.resetCanvasSubject.pipe(startWith(undefined));
 
-  boardRenderer$ = this.boardRendererSubject.pipe(notNullOrUndefined());
+  renderers$ = this.renderersSubject.renderers$;
+
+  isGridEnabled$ = this.renderers$.pipe(
+    map(renderers =>
+      renderers.some(renderer => renderer instanceof GridRenderer)
+    )
+  );
 
   createTileTrigger$ = this.createTileTriggerSubject.pipe(
     switchMap(() =>
@@ -110,16 +119,50 @@ export class BoardService {
     )
   );
 
+  updateBackgroundImage$ = this.updateBackgroundSubject.pipe(
+    withLatestFrom(
+      this.selectedClanService.selectedClan$.pipe(notNullOrUndefined()),
+      this.eventId$.pipe(notNullOrUndefined())
+    ),
+    switchMap(([file, clan, eventId]) =>
+      this.boardApiService.updateBackground(clan.name, eventId, file)
+    )
+  );
+
+  backgroundImageUri$ = combineLatest([
+    this.updateBackgroundImage$.pipe(startWith(undefined)),
+    this.selectedClanService.selectedClan$.pipe(notNullOrUndefined()),
+    this.eventId$.pipe(notNullOrUndefined()),
+  ]).pipe(
+    switchMap(([_, clan, eventId]) =>
+      this.boardApiService.getBackground(clan.name, eventId)
+    ),
+    map(blob => {
+      const urlCreator = window.URL || window.webkitURL;
+      return urlCreator.createObjectURL(blob);
+    }),
+    shareReplay(1)
+  );
+
   constructor() {
     this.subscriptions.add(
       this.createTileTrigger$.subscribe(() => this.refreshTilesSubject.next())
     );
 
     this.subscriptions.add(this.updateSelectedTile$.subscribe());
+    this.subscriptions.add(this.updateBackgroundImage$.subscribe());
   }
 
-  setBoardRenderer(boardRenderer: BoardRenderer | null) {
-    this.boardRendererSubject.next(boardRenderer);
+  registerRenderer(boardRenderer: BoardRenderer, priority: number) {
+    this.renderersSubject.set(boardRenderer.name, boardRenderer, priority);
+  }
+
+  unregisterRenderer(name: string) {
+    this.renderersSubject.delete(name);
+  }
+
+  unregisterAllRenderers() {
+    this.renderersSubject.clear();
   }
 
   createTile() {
@@ -134,6 +177,10 @@ export class BoardService {
     this.boardState.next({
       selectedTileId: tileId,
     });
+  }
+
+  updateBackground(file: File) {
+    this.updateBackgroundSubject.next(file);
   }
 
   updateTilePosition(tileId: string, x: number, y: number) {

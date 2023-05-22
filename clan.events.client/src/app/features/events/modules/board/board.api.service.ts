@@ -64,4 +64,22 @@ export class BoardApiService {
       `${this.configService.backEndUrl}/${clan}/events/${eventId}/tiles/${id}`
     );
   }
+
+  updateBackground(clan: string, eventId: string, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.http.post(
+      `${this.configService.backEndUrl}/${clan}/events/${eventId}/background`,
+      formData,
+      { responseType: 'blob' }
+    );
+  }
+
+  getBackground(clanName: string, eventId: string) {
+    return this.http.get(
+      `${this.configService.backEndUrl}/${clanName}/events/${eventId}/background`,
+      { responseType: 'blob' }
+    );
+  }
 }

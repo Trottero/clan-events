@@ -11,6 +11,7 @@ import { Tile, TileSchema } from 'src/database/schemas/tile.schema';
 import { AuthModule } from 'src/auth/auth.module';
 import { TileController } from './modules/tile/tile.controller';
 import { TileService } from './modules/tile/tile.service';
+import { Image, ImageSchema } from 'src/database/schemas/image.schema';
 
 @Module({
   imports: [
@@ -19,6 +20,10 @@ import { TileService } from './modules/tile/tile.service';
       {
         name: Tile.name,
         schema: TileSchema,
+      },
+      {
+        name: Image.name,
+        schema: ImageSchema,
       },
     ]),
     ClanModule,
