@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { HasRoleInClan } from 'src/auth/authorized.decorator';
 import {
+  ChallengeResponse,
   CreateChallengeRequest,
   CreateTileRequest,
   UpdateChallengeRequest,
@@ -71,12 +72,18 @@ export class TileController {
   async getChallenges(
     @ClanContext() clanContext: ClanRequestContext,
     @Param() params: { eventId: string; tileId: string },
-  ) {
-    return this.tileService.getChallenges(
+  ): Promise<ChallengeResponse[]> {
+    const documents = await this.tileService.getChallenges(
       clanContext.name,
       params.eventId,
       params.tileId,
     );
+
+    return documents.map((document) => ({
+      id: document.id,
+      description: document.description,
+      nextTile: document.nextTile?.toString(),
+    }));
   }
 
   @Post('challenges')

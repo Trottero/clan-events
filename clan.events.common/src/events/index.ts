@@ -1,6 +1,7 @@
 export * from './responses/event-list.response';
 export * from './responses/event.response';
 export * from './responses/tile.response';
+export * from './responses/challenge.response';
 
 export * from './requests/create-event.request';
 export * from './requests/get-events.request';

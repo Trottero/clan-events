@@ -1,5 +1,7 @@
 <div class="mb-4 d-flex gap-3">
-  <button mat-flat-button color="primary" (click)="createTile()">Create Tile</button>
+  <button mat-flat-button color="primary" (click)="createTile()">
+    Create Tile
+  </button>
   <button mat-flat-button (click)="resetCanvas()">Reset Canvas</button>
 </div>
 
@@ -10,5 +12,8 @@
     </div>
     <app-board-canvas></app-board-canvas>
   </div>
-  <app-edit-tile></app-edit-tile>
+  <div class="board-sidebar">
+    <app-tile-challenges></app-tile-challenges>
+    <app-edit-tile></app-edit-tile>
+  </div>
 </div>

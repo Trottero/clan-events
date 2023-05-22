@@ -7,7 +7,7 @@ export type ChallengeDocument = mongoose.HydratedDocument<Challenge>;
 @Schema()
 export class Challenge {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Tile' })
-  nextTile?: Tile;
+  nextTile?: mongoose.Types.ObjectId;
 
   @Prop()
   description: string;

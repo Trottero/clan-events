@@ -11,7 +11,7 @@ export class Tile {
   name: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Tile' })
-  nextTile?: Tile;
+  nextTile?: mongoose.Types.ObjectId;
 
   @Prop({ type: [ChallengeSchema] })
   challenges: Challenge[];

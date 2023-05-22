@@ -1,0 +1,20 @@
+.challenge-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--app-background-color-z-4);
+  border-radius: 4px;
+  border: 1px solid var(--app-border-color-z-4);
+  padding: 24px;
+
+  .edit > form {
+    display: flex;
+    align-items: center;
+    column-gap: 24px;
+
+    .buttons {
+      display: flex;
+      column-gap: 6px;
+    }
+  }
+}

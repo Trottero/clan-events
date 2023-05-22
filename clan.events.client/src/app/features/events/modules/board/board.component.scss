@@ -26,8 +26,11 @@ mat-spinner {
     opacity: 0.9;
   }
 
-  app-edit-tile {
-    width: 300px;
+  .board-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 400px;
   }
 
   /* break at 1200px and put edit tile below board */

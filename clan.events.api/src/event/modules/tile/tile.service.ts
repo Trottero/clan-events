@@ -60,10 +60,12 @@ export class TileService {
 
     tile.challenges.push({
       description: challenge.description,
-      nextTile,
+      nextTile: nextTile ? (nextTile as TileDocument).id : null,
     });
 
-    await event.save();
+    await event.updateOne({
+      board: event.board,
+    });
   }
 
   async updateChallenge(
@@ -92,9 +94,11 @@ export class TileService {
     }
 
     const nextTile = challenge.nextTile
-      ? event.board.tiles.find(
-          (tile) => (tile as TileDocument).id === challenge.nextTile,
-        )
+      ? (
+          event.board.tiles.find(
+            (tile) => (tile as TileDocument).id === challenge.nextTile,
+          ) as TileDocument
+        )?.id
       : null;
 
     challengeToUpdate.description = challenge.description;
@@ -153,10 +157,10 @@ export class TileService {
     // get next tile in event
     const nextTile = event.board.tiles.find(
       (tile) => (tile as TileDocument).id === body.nextTileId,
-    );
+    ) as TileDocument | undefined;
 
     tile.name = body.name;
-    tile.nextTile = nextTile;
+    tile.nextTile = nextTile?.id;
     tile.canvas = {
       x: body.x,
       y: body.y,
@@ -191,10 +195,10 @@ export class TileService {
     // get next tile in event
     const nextTile = event.board.tiles.find(
       (tile) => (tile as TileDocument).id === body.nextTileId,
-    );
+    ) as TileDocument | undefined;
 
     tile.name = body.name ?? tile.name;
-    tile.nextTile = body.nextTileId ? nextTile : tile.nextTile;
+    tile.nextTile = body.nextTileId ? nextTile?.id : tile.nextTile;
     tile.canvas = {
       x: body.x ?? tile.canvas.x,
       y: body.y ?? tile.canvas.y,

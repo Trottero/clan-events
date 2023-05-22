@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { BoardCanvasModule } from '../board-canvas/board-canvas.module';
 import { BoardService } from './board.service';
 import { EditTileModule } from '../edit-tile/edit-tile.module';
+import { TileChallengesModule } from '../tile-challenges/tile-challenges.module';
 
 @NgModule({
   declarations: [BoardComponent],
@@ -21,6 +22,7 @@ import { EditTileModule } from '../edit-tile/edit-tile.module';
 
     EditTileModule,
     BoardCanvasModule,
+    TileChallengesModule,
 
     MatButtonModule,
     MatProgressSpinnerModule,
