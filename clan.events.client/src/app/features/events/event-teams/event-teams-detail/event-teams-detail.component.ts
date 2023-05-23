@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCommonModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -8,6 +8,7 @@ import { EventTeamsService } from '../event-teams.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
   Subject,
+  Subscription,
   combineLatest,
   map,
   of,
@@ -44,11 +45,10 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     MatAutocompleteModule,
   ],
 })
-export class EventTeamsDetailComponent {
+export class EventTeamsDetailComponent implements OnInit, OnDestroy {
   private readonly eventTeamsService = inject(EventTeamsService);
   private readonly eventStream$ = inject(EventIdStream).pipe(
-    notNullOrUndefined(),
-    shareReplay(1)
+    notNullOrUndefined()
   );
 
   private readonly clanApiService = inject(ClanApiService);
@@ -151,6 +151,16 @@ export class EventTeamsDetailComponent {
   );
 
   @ViewChild('table') table?: MatTable<EventTeamMemberResponse>;
+
+  private readonly subscriptions = new Subscription();
+
+  ngOnInit(): void {
+    this.subscriptions.add(this.updateTeam$.subscribe());
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
 
   submitTeam() {
     this.updateTeamTrigger$.next();

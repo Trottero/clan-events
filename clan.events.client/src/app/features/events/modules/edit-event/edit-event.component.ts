@@ -38,7 +38,6 @@ export class EditEventComponent implements OnInit, OnDestroy {
   );
 
   event$: Observable<Response<EventResponse>> = this.id$.pipe(
-    tap(id => console.log(id)),
     withLatestFrom(this.selectedClan$),
     switchMap(([id, clan]) => this.eventsService.getEventById(id, clan.name))
   );
