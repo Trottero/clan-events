@@ -53,16 +53,14 @@ export class EventTeamsDetailComponent implements OnInit, OnDestroy {
 
   private readonly clanApiService = inject(ClanApiService);
 
-  private readonly selectedClanService = inject(SelectedClanService);
-
-  private readonly selectedClanName$ =
-    this.selectedClanService.selectedClanName$.pipe(
-      notNullOrUndefined(),
-      shareReplay(1)
-    );
+  private readonly selectedClanName$ = inject(
+    SelectedClanService
+  ).selectedClanName$.pipe(notNullOrUndefined(), shareReplay(1));
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+
+  private readonly subscriptions = new Subscription();
 
   teamId$ = this.route.paramMap.pipe(
     map(params => params.get('teamId')),
@@ -115,11 +113,7 @@ export class EventTeamsDetailComponent implements OnInit, OnDestroy {
             name: '',
             members: [],
           })
-    ),
-    tap(team => {
-      this.teamName.setValue(team.name);
-      this.teamMembers = team.members;
-    })
+    )
   );
 
   teamMembers: EventTeamMemberResponse[] = [];
@@ -152,10 +146,14 @@ export class EventTeamsDetailComponent implements OnInit, OnDestroy {
 
   @ViewChild('table') table?: MatTable<EventTeamMemberResponse>;
 
-  private readonly subscriptions = new Subscription();
-
   ngOnInit(): void {
     this.subscriptions.add(this.updateTeam$.subscribe());
+    this.subscriptions.add(
+      this.team$.subscribe(team => {
+        this.teamName.setValue(team.name);
+        this.teamMembers = team.members;
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -184,7 +182,6 @@ export class EventTeamsDetailComponent implements OnInit, OnDestroy {
     });
     this.searchTermControl.setValue('');
     this.table?.renderRows();
-    this.table?.updateStickyFooterRowStyles();
     this.updateTeamTrigger$.next();
   }
 
