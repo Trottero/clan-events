@@ -57,20 +57,11 @@ export class ClanService {
     return this.getClanByName(displayName);
   }
 
-  async deleteClan(name: string, ownerDiscordId: number) {
+  async deleteClan(name: string) {
     const safeName = sanitizeClanName(name);
     const clan = await this.getClanByName(name);
     if (!clan) {
       throw new Error('Clan not found');
-    }
-
-    if (
-      clan.members?.length &&
-      !clan.members.find(
-        (x) => x.user.discordId == ownerDiscordId && x.role === ClanRole.Owner,
-      )
-    ) {
-      throw new Error('You are not the owner of this clan');
     }
 
     const clanToDelete = await this.clanModel

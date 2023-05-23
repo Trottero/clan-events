@@ -11,7 +11,7 @@ import { AuthConfig } from '../auth.config';
 import { JwtTokenContent } from '@common/auth';
 
 @Injectable()
-export class ApiTokenGuard implements CanActivate {
+export class EnsureApiTokenGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,

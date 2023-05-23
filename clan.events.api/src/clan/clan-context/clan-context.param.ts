@@ -1,9 +1,9 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { ClanRequestContext } from './clan-context';
+import { ClanContext } from './clan-context.model';
 
-export const ClanContext = createParamDecorator(
+export const ClanContextParam = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
-    return request.clan as ClanRequestContext;
+    return request.clan as ClanContext;
   },
 );

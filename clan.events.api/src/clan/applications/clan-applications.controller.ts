@@ -8,21 +8,20 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { HasRoleInClan } from 'src/auth/authorized.decorator';
-import { ApiTokenGuard } from 'src/auth/guards/api-token.guard';
+import { RequiresClanRoles } from 'src/clan/decorators/requires-clan-roles.decorator';
+import { EnsureApiTokenGuard } from 'src/auth/guards/ensure-api-token.guard';
 import { ClanApplication } from 'src/database/schemas/clan-application.schema';
-import { ClanContextGuard } from 'src/auth/guards/clan-context.guard';
+import { ClanContextGuard } from 'src/clan/clan-context/clan-context.guard';
 import { ClanApplicationService } from './clan-application.service';
-import { JwtTokenContent } from '@common/auth';
 import {
   ApproveClanApplicationRequest,
   ClanMemberResponse,
   DeleteClanApplicationRequest,
 } from '@common/clan';
-import { User } from 'src/common/decorators/user.decorator';
-import { ClanDocument } from 'src/database/schemas/clan.schema';
-import { ClanContext } from '../../common/decorators/clan-context.decorator';
-import { ClanRequestContext } from '../../common/decorators/clan-context';
+import { UserClanRoleParam } from 'src/clan/clan-role/user-clan-role.param';
+import { ClanContextParam } from '../clan-context/clan-context.param';
+import { ClanContext } from '../clan-context/clan-context.model';
+import { UserClanRole } from '../clan-role/user-clan-role.model';
 
 @Controller('clan/:clanName/applications')
 export class ClanApplicationsController {
@@ -31,9 +30,9 @@ export class ClanApplicationsController {
   ) {}
 
   @Get()
-  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
+  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin)
   async getApplications(
-    @ClanContext() clanContext: ClanRequestContext,
+    @ClanContextParam() clanContext: ClanContext,
   ): Promise<ClanApplication[]> {
     return await this.clanApplicationService.getApplicationsForClan(
       clanContext.id,
@@ -41,10 +40,10 @@ export class ClanApplicationsController {
   }
 
   @Post()
-  @UseGuards(ApiTokenGuard, ClanContextGuard)
+  @UseGuards(EnsureApiTokenGuard, ClanContextGuard)
   async applyToClan(
-    @User() user: JwtTokenContent,
-    @ClanContext() clanContext: ClanRequestContext,
+    @UserClanRoleParam() user: UserClanRole,
+    @ClanContextParam() clanContext: ClanContext,
   ): Promise<ClanApplication> {
     try {
       return await this.clanApplicationService.applyForClan(
@@ -59,9 +58,9 @@ export class ClanApplicationsController {
   }
 
   @Post('approve')
-  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
+  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin)
   async approveApplication(
-    @ClanContext() clanContext: ClanDocument,
+    @ClanContextParam() clanContext: ClanContext,
     @Body() body: ApproveClanApplicationRequest,
   ): Promise<ClanMemberResponse> {
     const result = await this.clanApplicationService.approveApplication(
@@ -77,9 +76,9 @@ export class ClanApplicationsController {
   }
 
   @Delete()
-  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
+  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin)
   async deleteApplication(
-    @ClanContext() clanContext: ClanRequestContext,
+    @ClanContextParam() clanContext: ClanContext,
     @Body() body: DeleteClanApplicationRequest,
   ): Promise<void> {
     return await this.clanApplicationService.deleteApplication(

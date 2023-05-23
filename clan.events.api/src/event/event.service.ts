@@ -10,8 +10,8 @@ import { JwtTokenContent } from '@common/auth';
 import { ClanService } from 'src/clan/clan.service';
 import { Event, EventDocument } from 'src/database/schemas/event.schema';
 import { UserService } from 'src/user/user.service';
-import { UserClanContext } from 'src/auth/user-clan-context';
 import { ClanRole } from '@common/auth/clan.role';
+import { UserClanRole } from 'src/clan/clan-role/user-clan-role.model';
 
 @Injectable()
 export class EventService {
@@ -23,7 +23,7 @@ export class EventService {
 
   async countEventsForUserInClan(
     clanName: string,
-    user: UserClanContext,
+    user: UserClanRole,
   ): Promise<number> {
     const clan = await this.clanService.getClanByName(clanName);
 
@@ -40,7 +40,7 @@ export class EventService {
 
   async getPaginatedEventsForUserInClan(
     clanName: string,
-    user: UserClanContext,
+    user: UserClanRole,
     page: number,
     pageSize: number,
   ): Promise<EventDocument[]> {
@@ -63,7 +63,7 @@ export class EventService {
   }
 
   async getEventById(
-    user: UserClanContext,
+    user: UserClanRole,
     clanName: string,
     id: string,
   ): Promise<EventDocument | null> {
@@ -128,8 +128,7 @@ export class EventService {
    * @param user the user requesting the event to be deleted
    * @param id the id of the event to be deleted
    */
-  deleteEventById(user: JwtTokenContent, id: string) {
-    // TODO: check if user is admin of the clan
+  deleteEventById(id: string) {
     return this.eventModel.deleteOne({ _id: id }).exec();
   }
 
