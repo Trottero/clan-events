@@ -59,6 +59,7 @@ export class ClanManagementController {
       displayName: result.displayName,
       members: result.members.map((x) => {
         return {
+          id: x.user.id,
           name: x.user.name,
           discordId: x.user.discordId,
           clanRole: x.role,

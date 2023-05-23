@@ -35,7 +35,11 @@ export class TeamsController {
     return eventContext.participants.map((x) => ({
       id: x.id,
       name: x.name,
-      members: x.members,
+      members: x.members.map((z) => ({
+        id: z.id,
+        name: z.name,
+        discordId: z.discordId,
+      })),
     }));
   }
 
@@ -60,7 +64,11 @@ export class TeamsController {
       return {
         id: result.id,
         name: result.name,
-        members: result.members,
+        members: result.members.map((x) => ({
+          id: x.id,
+          name: x.name,
+          discordId: x.discordId,
+        })),
       };
     } catch (ex: any) {
       throw new BadRequestException(ex.message);
@@ -80,7 +88,11 @@ export class TeamsController {
     return {
       id: result.id,
       name: result.name,
-      members: result.members,
+      members: result.members.map((x) => ({
+        id: x.id,
+        name: x.name,
+        discordId: x.discordId,
+      })),
     };
   }
 
@@ -103,7 +115,11 @@ export class TeamsController {
     return {
       id: result.id,
       name: result.name,
-      members: result.members,
+      members: result.members.map((x) => ({
+        id: x.id,
+        name: x.name,
+        discordId: x.discordId,
+      })),
     };
   }
 
