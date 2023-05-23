@@ -4,13 +4,8 @@ import {
   Injectable,
   NotFoundException,
   UnauthorizedException,
-  UseGuards,
-  applyDecorators,
 } from '@nestjs/common';
-import { EventService } from './event.service';
-import { ApiTokenGuard } from 'src/auth/guards/api-token.guard';
-import { ClanContextGuard } from 'src/auth/guards/clan-context.guard';
-import { RoleInClanGuard } from 'src/auth/guards/role-in-clan.guard';
+import { EventService } from '../event.service';
 
 @Injectable()
 export class EventContextGuard implements CanActivate {
@@ -19,17 +14,14 @@ export class EventContextGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const clanName = request.params.clanName;
-    let eventId = request.params.id;
+    const eventId = request.params.eventId;
 
     if (!clanName) {
       throw new NotFoundException('Clanname not supplied');
     }
 
     if (!eventId) {
-      eventId = request.params.eventId;
-      if (!eventId) {
-        throw new NotFoundException('Eventid not supplied');
-      }
+      throw new NotFoundException('Eventid not supplied');
     }
 
     try {
@@ -53,15 +45,4 @@ export class EventContextGuard implements CanActivate {
       throw new NotFoundException(ex.message);
     }
   }
-}
-
-export function GuardEventContext() {
-  return applyDecorators(
-    UseGuards(
-      ApiTokenGuard,
-      ClanContextGuard,
-      RoleInClanGuard,
-      EventContextGuard,
-    ),
-  );
 }

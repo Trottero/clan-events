@@ -1,3 +1,3 @@
 export interface DeleteEventByIdRequest {
-  id: string;
+  eventId: string;
 }

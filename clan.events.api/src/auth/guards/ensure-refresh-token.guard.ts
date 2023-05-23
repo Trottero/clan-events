@@ -11,7 +11,7 @@ import { AuthConfig } from '../auth.config';
 import { JwtRefreshTokenContent } from '@common/auth';
 
 @Injectable()
-export class RefreshTokenGuard implements CanActivate {
+export class EnsureRefreshTokenGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,

@@ -8,7 +8,7 @@ import {
   ClanMembership,
   ClanMembershipDocument,
 } from 'src/database/schemas/clan-membership.schema';
-import { CachedRolesService } from 'src/auth/services/cached-roles.service';
+import { CachedRolesService } from 'src/clan/services/cached-roles.service';
 import { ClanRole } from '@common/auth/clan.role';
 
 @Injectable()

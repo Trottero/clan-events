@@ -5,7 +5,7 @@ import {
   ClanApplication,
   ClanApplicationDocument,
 } from 'src/database/schemas/clan-application.schema';
-import { ClanRequestContext } from '../../common/decorators/clan-context';
+import { ClanContext } from '../clan-context/clan-context.model';
 import { ClanMembershipService } from '../management/clan-membership.service';
 import { ClanRole } from '@common/auth/clan.role';
 import { ClanMembership } from 'src/database/schemas/clan-membership.schema';
@@ -26,7 +26,7 @@ export class ClanApplicationService {
   }
 
   async applyForClan(
-    clan: ClanRequestContext,
+    clan: ClanContext,
     userId: string,
     discordId: number,
     discordName: string,
@@ -65,7 +65,7 @@ export class ClanApplicationService {
   ): Promise<ClanMembership> {
     // Check if user has an open application
     const hasApplication = await this.userHasActiveApplication(
-      clan as unknown as ClanRequestContext,
+      clan as unknown as ClanContext,
       discordId,
     );
 
@@ -75,10 +75,7 @@ export class ClanApplicationService {
 
     await this.deleteApplication(clan.id, discordId);
 
-    this.checkIfNotAlreadyInClan(
-      clan as unknown as ClanRequestContext,
-      discordId,
-    );
+    this.checkIfNotAlreadyInClan(clan as unknown as ClanContext, discordId);
 
     return await this.clanMembershipService.addMemberToClan(
       clan,
@@ -87,16 +84,13 @@ export class ClanApplicationService {
     );
   }
 
-  private async userHasActiveApplication(
-    clan: ClanRequestContext,
-    discordId: number,
-  ) {
+  private async userHasActiveApplication(clan: ClanContext, discordId: number) {
     const existing = await this.getApplicationsForClan(clan.id);
     const hasApplication = existing.some((x) => x.discordId === discordId);
     return hasApplication;
   }
 
-  private checkIfNotAlreadyInClan(clan: ClanRequestContext, discordId: number) {
+  private checkIfNotAlreadyInClan(clan: ClanContext, discordId: number) {
     const isInClan = clan.members.some((x) => x.user.discordId == discordId);
     if (isInClan) {
       throw new Error('This user is already in the clan');

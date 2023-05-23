@@ -10,15 +10,15 @@ import {
   Request,
 } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
-import { ApiTokenGuard } from './guards/api-token.guard';
-import { User } from 'src/common/decorators/user.decorator';
+import { EnsureApiTokenGuard } from './guards/ensure-api-token.guard';
 import {
   AccessTokenResponse,
   DiscordCodeRedeemRequest,
   JwtRefreshTokenContent,
   JwtTokenContent,
 } from '@common/auth';
-import { RefreshTokenGuard } from './guards/refresh-token.guard';
+import { EnsureRefreshTokenGuard } from './guards/ensure-refresh-token.guard';
+import { JwtTokenContentParam } from './decorators/jwt-token-content.param';
 
 @Controller('auth')
 export class AuthController {
@@ -40,7 +40,7 @@ export class AuthController {
     }
   }
 
-  @UseGuards(RefreshTokenGuard)
+  @UseGuards(EnsureRefreshTokenGuard)
   @HttpCode(HttpStatus.OK)
   @Post('refresh')
   async refreshToken(@Request() req): Promise<AccessTokenResponse> {
@@ -60,9 +60,11 @@ export class AuthController {
     }
   }
 
-  @UseGuards(ApiTokenGuard)
+  @UseGuards(EnsureApiTokenGuard)
   @Get('me')
-  async getUserInfo(@User() user: JwtTokenContent): Promise<JwtTokenContent> {
+  async getUserInfo(
+    @JwtTokenContentParam() user: JwtTokenContent,
+  ): Promise<JwtTokenContent> {
     return user;
   }
 }
