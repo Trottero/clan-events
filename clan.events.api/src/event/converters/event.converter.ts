@@ -17,5 +17,6 @@ export function convertToEventResponse(event: EventDocument): EventResponse {
     })),
     clanName: event.owner.name,
     clanDisplayName: event.owner.displayName,
+    eventVisibility: event.visibility,
   };
 }

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Validators } from '@angular/forms';
-import { BoardType, CreateEventRequest } from '@common/events';
+import { BoardType, CreateEventRequest, EventVisibility } from '@common/events';
 import { FormControl, FormGroup } from '@ngneat/reactive-forms';
 import {
   Observable,
@@ -41,11 +41,18 @@ export class CreateEventComponent implements OnInit, OnDestroy {
       .filter(value => value.value !== BoardType.Unknown)
   ).pipe(shareReplay(1));
 
+  eventVisibilityOptions$ = of(
+    Object.values(EventVisibility).map(value => ({ label: value, value }))
+  ).pipe(shareReplay(1));
+
   name = new FormControl<string>('', [Validators.required]);
   description = new FormControl<string>('', [Validators.required]);
   startsAt = new FormControl<Date>(INITIAL_START_DATE, [Validators.required]);
   endsAt = new FormControl<Date>(INITIAL_END_DATE, [Validators.required]);
   boardType = new FormControl<BoardType>(BoardType.Tilerace, [
+    Validators.required,
+  ]);
+  eventVisibility = new FormControl<EventVisibility>(EventVisibility.Private, [
     Validators.required,
   ]);
 
@@ -55,6 +62,7 @@ export class CreateEventComponent implements OnInit, OnDestroy {
     startsAt: this.startsAt,
     endsAt: this.endsAt,
     boardType: this.boardType,
+    eventVisibility: this.eventVisibility,
   });
 
   private createEventSubject = new Subject<void>();
@@ -74,6 +82,7 @@ export class CreateEventComponent implements OnInit, OnDestroy {
                 startsAt: value.startsAt,
                 endsAt: value.endsAt,
                 boardType: value.boardType,
+                eventVisibility: value.eventVisibility,
               })
               .pipe(
                 map(event => ({

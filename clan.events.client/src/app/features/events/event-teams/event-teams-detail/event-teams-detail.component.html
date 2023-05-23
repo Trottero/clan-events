@@ -1,0 +1,64 @@
+<div *ngIf="team$ | async as team">
+  <form [formGroup]="formGroup" (ngSubmit)="submitTeam()">
+    <div class="d-flex justify-content-between mb-3">
+      <button mat-raised-button color="primary" type="button" [routerLink]="['../']">Back</button>
+      <button mat-raised-button color="primary" type="submit">Save</button>
+    </div>
+    <h1>Editing: {{team.name}}</h1>
+    <mat-form-field>
+      <input type="text" matInput [formControl]="teamName" placeholder="Team Name" />
+    </mat-form-field>
+  </form>
+
+  <h2>Members ({{teamMembers.length}})</h2>
+
+  <div class="d-flex align-items-center mb-3">
+    <mat-form-field class="example-full-width" appearance="fill" [subscriptSizing]="'dynamic'">
+      <mat-label>Add member</mat-label>
+      <input type="text" placeholder="Type discord name" aria-label="Add member" matInput
+        [formControl]="searchTermControl" [matAutocomplete]="auto">
+      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+        <mat-option *ngFor="let option of clanMemberOptions$ | async" [value]="option">
+          {{option.name}}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+
+    <button mat-button class="ms-3" (click)="addMember()">
+      <mat-icon>
+        add
+      </mat-icon>
+      Add To Team
+    </button>
+  </div>
+
+  <table mat-table #table [dataSource]="teamMembers" class="mat-elevation-z8">
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name </th>
+      <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="delete-action">
+      <th mat-header-cell *matHeaderCellDef> </th>
+      <td mat-cell *matCellDef="let element">
+        <mat-icon (click)="removeMember(element)">
+          delete
+        </mat-icon>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="no-members" *ngIf="!teamMembers|| !teamMembers.length">
+      <td mat-footer-cell *matFooterCellDef colspan="2">
+        No members found. Add some!
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="['name', 'delete-action']"></tr>
+    <tr mat-row matRipple *matRowDef="let row; columns: ['name', 'delete-action'];"></tr>
+
+    <ng-container *ngIf="!teamMembers|| !teamMembers.length">
+      <tr mat-footer-row *matFooterRowDef="['no-members']"></tr>
+    </ng-container>
+  </table>
+
+</div>

@@ -1,11 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateEventRequest, UpdateEventRequest } from '@common/events';
+import {
+  CreateEventRequest,
+  EventVisibility,
+  UpdateEventRequest,
+} from '@common/events';
 import { Model } from 'mongoose';
 import { JwtTokenContent } from '@common/auth';
 import { ClanService } from 'src/clan/clan.service';
 import { Event, EventDocument } from 'src/database/schemas/event.schema';
 import { UserService } from 'src/user/user.service';
+import { UserClanContext } from 'src/auth/user-clan-context';
+import { ClanRole } from '@common/auth/clan.role';
 
 @Injectable()
 export class EventService {
@@ -16,40 +22,36 @@ export class EventService {
   ) {}
 
   async countEventsForUserInClan(
-    user: JwtTokenContent,
     clanName: string,
+    user: UserClanContext,
   ): Promise<number> {
-    const userObj = await this.userService.getUserByUsername(user.username);
     const clan = await this.clanService.getClanByName(clanName);
 
+    const accessStatus = this.getAccesForUserRole(user.clanRole);
     return this.eventModel
       .countDocuments({
         owner: clan.id,
-        'participants.members': {
-          $eq: userObj.id,
+        visibility: {
+          $in: accessStatus,
         },
       })
       .exec();
   }
 
   async getPaginatedEventsForUserInClan(
-    user: JwtTokenContent,
     clanName: string,
+    user: UserClanContext,
     page: number,
     pageSize: number,
   ): Promise<EventDocument[]> {
-    const userObj = await this.userService.getUserByUsername(user.username);
     const clan = await this.clanService.getClanByName(clanName);
-
-    if (!clan) {
-      throw new NotFoundException();
-    }
+    const accessStatus = this.getAccesForUserRole(user.clanRole);
 
     const events = await this.eventModel
       .find({
         owner: clan.id,
-        'participants.members': {
-          $eq: userObj.id,
+        visibility: {
+          $in: accessStatus,
         },
       })
       .sort({ createdAt: -1 })
@@ -61,18 +63,18 @@ export class EventService {
   }
 
   async getEventById(
-    user: JwtTokenContent,
+    user: UserClanContext,
     clanName: string,
     id: string,
   ): Promise<EventDocument | null> {
-    const userObj = await this.userService.getUserByUsername(user.username);
     const clan = await this.clanService.getClanByName(clanName);
+    const accessStatus = this.getAccesForUserRole(user.clanRole);
 
     const hasAccess = await this.eventModel.exists({
       _id: id,
       owner: clan.id,
-      'participants.members': {
-        $eq: userObj.id,
+      visibility: {
+        $in: accessStatus,
       },
     });
 
@@ -99,6 +101,7 @@ export class EventService {
         type: event.boardType,
         tiles: [],
       },
+      visibility: event.eventVisibility,
       owner: clan,
       description: event.description,
       startsAt: event.startsAt,
@@ -150,5 +153,21 @@ export class EventService {
     result.populate('participants.members');
 
     return result;
+  }
+
+  private getAccesForUserRole(role?: ClanRole) {
+    switch (role) {
+      case ClanRole.Admin:
+      case ClanRole.Owner:
+        return [
+          EventVisibility.Public,
+          EventVisibility.Private,
+          EventVisibility.Members,
+        ];
+      case ClanRole.Member:
+        return [EventVisibility.Public, EventVisibility.Members];
+      default:
+        return [EventVisibility.Public];
+    }
   }
 }
