@@ -18,7 +18,8 @@
   --app-border-color-z-4: #{if($is-dark, #6c6889, #eeeeee)};
 
   --app-text-color: #{if($is-dark, #f3eff4, #333333)};
-  --app-text-color-muted: #{if($is-dark, #83809f, #b0a9a9)};
+  --app-text-color-muted: #{if($is-dark, #9693b2, #8e8e8e)};
+  --app-text-color-muted-light: #{if($is-dark, #d6d3e5, #5a5a5a)};
 
   --app-success-color: #34eb27;
   --app-error-color: #f44336;

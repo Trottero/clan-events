@@ -1,7 +1,10 @@
+import { ChallengeResponse } from './challenge.response';
+
 export interface TileResponse {
   id: string;
   name: string;
   nextTileId?: string;
+  challenges: ChallengeResponse[];
 
   // canvas
   image?: string;

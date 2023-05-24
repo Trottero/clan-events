@@ -1,4 +1,8 @@
 <div class="challenges-list">
+  <mat-spinner
+    *ngIf="(challenges$ | async | isLoading) && selectedTile$ | async"
+  ></mat-spinner>
+
   <button
     mat-flat-button
     color="primary"

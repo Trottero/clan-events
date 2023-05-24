@@ -1,6 +1,12 @@
 <div class="challenge-item" *ngIf="challenge$ | async as challenge">
-  <div class="description" *ngIf="(mode$ | async) === 'view'">
-    {{ challenge.description }}
+  <div class="view" *ngIf="(mode$ | async) === 'view'">
+    <span *ngIf="nextTile$ | async as nextTile" class="next-tile">
+      <span class="label">Next</span>{{ nextTile.name }}
+    </span>
+    <span class="description">
+      <span class="label">Requirements</span>
+      {{ challenge.description }}
+    </span>
   </div>
 
   <div class="edit" *ngIf="(mode$ | async) === 'edit'">

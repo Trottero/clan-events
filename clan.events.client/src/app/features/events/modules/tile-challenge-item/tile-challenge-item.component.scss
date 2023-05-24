@@ -6,15 +6,44 @@
   border-radius: 4px;
   border: 1px solid var(--app-border-color-z-4);
   padding: 24px;
+  gap: 12px;
 
-  .edit > form {
+  .view {
     display: flex;
-    align-items: center;
-    column-gap: 24px;
+    flex-direction: column;
+    gap: 4px;
 
-    .buttons {
+    .label {
+      font-weight: 500;
+      color: var(--app-text-color-muted-light);
+      margin-right: 8px;
+    }
+
+    .next-tile {
       display: flex;
-      column-gap: 6px;
+      align-items: center;
+      font-weight: 400;
+    }
+  }
+
+  .edit {
+    width: 100%;
+
+    form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 12px 0;
+
+      mat-form-field {
+        width: 100%;
+      }
+
+      .buttons {
+        display: flex;
+        justify-content: flex-end;
+        column-gap: 12px;
+      }
     }
   }
 }

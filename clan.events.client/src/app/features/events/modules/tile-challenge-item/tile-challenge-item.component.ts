@@ -51,6 +51,18 @@ export class TileChallengeItemComponent implements OnInit, OnDestroy {
     ),
   ]).pipe(map(([tileId, tiles]) => tiles.filter(tile => tile.id !== tileId)));
 
+  nextTile$ = combineLatest([
+    this.challenge$,
+    this.boardService.tiles$.pipe(
+      notNullOrUndefined(),
+      filterMapSuccess(tiles => tiles.value.data)
+    ),
+  ]).pipe(
+    map(([challenge, tiles]) =>
+      tiles.find(tile => tile.id === challenge.nextTile)
+    )
+  );
+
   descriptionControl = new FormControl<string>('', [Validators.required]);
   nextTileControl = new FormControl<TileResponse | null>(null);
 
