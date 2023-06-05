@@ -139,11 +139,10 @@ export class TileRenderer extends BoardRenderer {
     context.strokeStyle = this.state.lineColor;
     context.lineWidth = 5;
     context.stroke();
+    context.setLineDash([]);
   }
 
   private renderTiles(context: CanvasRenderingContext2D): void {
-    context.setLineDash([]);
-
     // set shadow
     context.shadowColor = 'rgba(0, 0, 0, 0.1)';
     context.shadowBlur = 10;
