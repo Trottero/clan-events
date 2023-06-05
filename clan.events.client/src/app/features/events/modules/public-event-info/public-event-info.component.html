@@ -3,7 +3,8 @@
     <h2>
       {{event.name}}
     </h2>
-    <a mat-raised-button color="primary" [routerLink]="['edit']">
+    <a mat-raised-button color="primary" [routerLink]="['edit']"
+      *ngIf="(role$ | async) == roleEnum.Admin || (role$ | async) == roleEnum.Owner">
       Edit
     </a>
   </div>

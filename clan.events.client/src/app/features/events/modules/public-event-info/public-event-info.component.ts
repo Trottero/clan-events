@@ -18,6 +18,7 @@ import { CommonModule } from '@angular/common';
 import { MatCommonModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
+import { ClanRole } from '@common/auth/clan.role';
 
 @Component({
   selector: 'app-public-event-info',
@@ -67,6 +68,11 @@ export class PublicEventInfoComponent {
     )
   );
 
+  role$ = this.selectedClanService.selectedClan$.pipe(
+    notNullOrUndefined(),
+    map(x => x.role)
+  );
+
   eventStatus$ = combineLatest([
     this.secondsBeforeStart$,
     this.secondsBeforeEnd$,
@@ -87,6 +93,8 @@ export class PublicEventInfoComponent {
       return 'Finished';
     })
   );
+
+  roleEnum = ClanRole;
 
   private timeToText(seconds: number): string {
     const computeTime = Math.abs(seconds);
