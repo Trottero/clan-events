@@ -17,6 +17,7 @@ import { CoreModule } from './core/core.module';
     AppRoutingModule,
     HttpClientModule,
     BrowserAnimationsModule,
+    MatNativeDateModule,
     SharedModule,
     CoreModule,
     MatNativeDateModule,

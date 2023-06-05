@@ -1,0 +1,32 @@
+<div class="challenges-list">
+  <mat-spinner
+    *ngIf="(challenges$ | async | isLoading) && selectedTile$ | async"
+  ></mat-spinner>
+
+  <button
+    mat-flat-button
+    color="primary"
+    class="create-challenge"
+    (click)="createChallenge()"
+    *ngIf="challenges$ | async | isSuccess"
+  >
+    Create Challenge
+  </button>
+  <div class="empty" *ngIf="!(selectedTile$ | async)">
+    Select a tile to view challenges
+  </div>
+
+  <ng-container *ngIf="challenges$ | async | isSuccess as challenges">
+    <div class="empty" *ngIf="challenges.data.length === 0">
+      No challenges found. Add a challenge to get started.
+    </div>
+  </ng-container>
+
+  <div class="items" *ngIf="challenges$ | async | isSuccess as challenges">
+    <app-tile-challenge-item
+      *ngFor="let challenge of challenges.data"
+      [challenge]="challenge"
+      [tileId]="(selectedTile$ | async)?.id"
+    ></app-tile-challenge-item>
+  </div>
+</div>

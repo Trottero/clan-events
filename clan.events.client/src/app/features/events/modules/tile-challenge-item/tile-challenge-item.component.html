@@ -1,0 +1,55 @@
+<div class="challenge-item" *ngIf="challenge$ | async as challenge">
+  <div class="view" *ngIf="(mode$ | async) === 'view'">
+    <span *ngIf="nextTile$ | async as nextTile" class="next-tile">
+      <span class="label">Next</span>{{ nextTile.name }}
+    </span>
+    <span class="description">
+      <span class="label">Requirements</span>
+      {{ challenge.description }}
+    </span>
+  </div>
+
+  <div class="edit" *ngIf="(mode$ | async) === 'edit'">
+    <form [formGroup]="formGroup" (submit)="saveChallenge()">
+      <mat-form-field appearance="fill">
+        <mat-label>Description</mat-label>
+        <textarea matInput [formControl]="descriptionControl"></textarea>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Next Tile</mat-label>
+        <mat-select [formControl]="nextTileControl">
+          <mat-option [value]="null">None</mat-option>
+          <mat-option
+            *ngFor="let tile of availableTiles$ | async"
+            [value]="tile"
+            >{{ tile.name }}</mat-option
+          >
+        </mat-select>
+      </mat-form-field>
+
+      <div class="buttons">
+        <button mat-flat-button (click)="cancelEditChallenge()" type="button">
+          Cancel
+        </button>
+        <button
+          mat-flat-button
+          color="accent"
+          type="submit"
+          [disabled]="formGroup.invalid"
+        >
+          Save
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="actions" *ngIf="(mode$ | async) === 'view'">
+    <button mat-icon-button color="accent" (click)="editChallenge()">
+      <mat-icon>edit</mat-icon>
+    </button>
+    <button mat-icon-button color="warn" (click)="deleteChallenge()">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+</div>

@@ -92,28 +92,49 @@ export class TileRenderer extends BoardRenderer {
 
   private renderEdges(context: CanvasRenderingContext2D): void {
     for (const object of this.state.tiles) {
-      if (!object.nextTileId) {
-        continue;
+      const nextTileChallenges = object.challenges.filter(x => !!x.nextTile);
+
+      if (object.nextTileId) {
+        this.drawEdgeBetweenTiles(object.id, object.nextTileId, false, context);
       }
 
-      const nextObject = this.state.tiles.find(
-        x => x.id === object.nextTileId
-      ) as TileResponse;
-
-      if (!nextObject) {
-        continue;
+      for (const challenge of nextTileChallenges) {
+        if (challenge.nextTile !== object.nextTileId) {
+          this.drawEdgeBetweenTiles(
+            object.id,
+            challenge.nextTile!,
+            true,
+            context
+          );
+        }
       }
-
-      context.beginPath();
-      context.moveTo(object.x + object.width / 2, object.y + object.height / 2);
-      context.lineTo(
-        nextObject.x + nextObject.width / 2,
-        nextObject.y + nextObject.height / 2
-      );
-      context.strokeStyle = this.state.lineColor;
-      context.lineWidth = 5;
-      context.stroke();
     }
+  }
+
+  private drawEdgeBetweenTiles(
+    tileId: string,
+    nextTileId: string,
+    dashed: boolean,
+    context: CanvasRenderingContext2D
+  ): void {
+    const tile = this.state.tiles.find(x => x.id === tileId);
+    const nextTile = this.state.tiles.find(x => x.id === nextTileId);
+
+    if (!tile || !nextTile) {
+      return;
+    }
+
+    context.setLineDash(dashed ? [10, 10] : []);
+    context.beginPath();
+    context.moveTo(tile.x + tile.width / 2, tile.y + tile.height / 2);
+    context.lineTo(
+      nextTile.x + nextTile.width / 2,
+      nextTile.y + nextTile.height / 2
+    );
+    context.strokeStyle = this.state.lineColor;
+    context.lineWidth = 5;
+    context.stroke();
+    context.setLineDash([]);
   }
 
   private renderTiles(context: CanvasRenderingContext2D): void {
@@ -122,8 +143,6 @@ export class TileRenderer extends BoardRenderer {
     context.shadowBlur = 10;
     context.shadowOffsetX = -2;
     context.shadowOffsetY = 5;
-
-    // draw lines between objects
 
     for (const object of this.state.tiles) {
       context.fillStyle = object.fillColor;

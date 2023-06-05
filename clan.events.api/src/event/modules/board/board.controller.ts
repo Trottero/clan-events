@@ -3,13 +3,10 @@ import {
   BadRequestException,
   Body,
   Controller,
-  Delete,
   Get,
   NotFoundException,
   Param,
-  Patch,
   Post,
-  Put,
   Res,
   StreamableFile,
   UploadedFile,
@@ -48,49 +45,6 @@ export class BoardController {
     @Body() body: CreateTileRequest,
   ) {
     return this.boardService.createTile(clanContext.name, params.eventId, body);
-  }
-
-  @Put('tiles/:tileId')
-  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin)
-  async updateTile(
-    @ClanContextParam() clanContext: ClanContext,
-    @Param() params: { eventId: string; tileId: string },
-    @Body() body: CreateTileRequest,
-  ) {
-    return this.boardService.updateTile(
-      clanContext.name,
-      params.eventId,
-      params.tileId,
-      body,
-    );
-  }
-
-  @Patch('tiles/:tileId')
-  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin)
-  async patchTile(
-    @ClanContextParam() clanContext: ClanContext,
-    @Param() params: { eventId: string; tileId: string },
-    @Body() body: Partial<CreateTileRequest>,
-  ) {
-    return this.boardService.patchTile(
-      clanContext.name,
-      params.eventId,
-      params.tileId,
-      body,
-    );
-  }
-
-  @Delete('tiles/:tileId')
-  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin)
-  async deleteTile(
-    @ClanContextParam() clanContext: ClanContext,
-    @Param() params: { eventId: string; tileId: string },
-  ) {
-    return this.boardService.deleteTile(
-      clanContext.name,
-      params.eventId,
-      params.tileId,
-    );
   }
 
   @Post('background')

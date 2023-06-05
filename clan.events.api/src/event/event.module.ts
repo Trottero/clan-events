@@ -9,6 +9,8 @@ import { BoardController } from './modules/board/board.controller';
 import { BoardService } from './modules/board/board.service';
 import { Tile, TileSchema } from 'src/database/schemas/tile.schema';
 import { AuthModule } from 'src/auth/auth.module';
+import { TileController } from './modules/tile/tile.controller';
+import { TileService } from './modules/tile/tile.service';
 import { TeamsService } from './modules/teams/teams.service';
 import { TeamsController } from './modules/teams/teams.controller';
 import {
@@ -38,8 +40,13 @@ import { Image, ImageSchema } from 'src/database/schemas/image.schema';
     UserModule,
     AuthModule,
   ],
-  controllers: [EventController, BoardController, TeamsController],
-  providers: [EventService, BoardService, TeamsService],
+  controllers: [
+    EventController,
+    BoardController,
+    TileController,
+    TeamsController,
+  ],
+  providers: [EventService, BoardService, TileService, TeamsService],
   exports: [EventService, BoardService, TeamsService],
 })
 export class EventModule {}
