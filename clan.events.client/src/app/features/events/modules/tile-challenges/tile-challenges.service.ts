@@ -71,7 +71,8 @@ export class TileChallengesService implements OnDestroy {
         request.id,
         request
       );
-    })
+    }),
+    share()
   );
 
   deleteChallenge$ = this.deleteChallengeSubject.pipe(
@@ -87,7 +88,8 @@ export class TileChallengesService implements OnDestroy {
         selectedTile.id,
         challengeId
       );
-    })
+    }),
+    share()
   );
 
   challenges$ = combineLatest([
@@ -110,7 +112,15 @@ export class TileChallengesService implements OnDestroy {
   );
 
   constructor() {
-    this.subscriptions.add(this.createChallenge$.subscribe());
+    this.subscriptions.add(
+      combineLatest([
+        this.createChallenge$.pipe(startWith(undefined)),
+        this.updateChallenge$.pipe(startWith(undefined)),
+        this.deleteChallenge$.pipe(startWith(undefined)),
+      ]).subscribe(([create, update, deleteChallenge]) => {
+        this.boardService.refreshTiles();
+      })
+    );
   }
 
   ngOnDestroy() {

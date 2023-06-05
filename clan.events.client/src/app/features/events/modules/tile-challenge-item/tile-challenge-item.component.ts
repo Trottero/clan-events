@@ -78,7 +78,6 @@ export class TileChallengeItemComponent implements OnInit, OnDestroy {
       this.saveSubject
         .pipe(withLatestFrom(this.formGroup.value$))
         .subscribe(([_, value]) => {
-          console.log(value);
           this.tileChallengesService.updateChallenge({
             id: this.challenge?.id ?? '',
             description: value.description,
@@ -96,7 +95,6 @@ export class TileChallengeItemComponent implements OnInit, OnDestroy {
           });
 
           const nextTile = tiles.find(tile => tile.id === challenge.nextTile);
-          console.log(challenge, nextTile);
           this.nextTileControl.setValue(nextTile ?? null, {
             emitEvent: false,
           });
