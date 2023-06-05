@@ -1,52 +1,48 @@
-<h2>Edit Event</h2>
+  <form class="edit-event-form" [formGroup]="formGroup" (ngSubmit)="update()">
+    <h2>Edit Event</h2>
+    <mat-form-field appearance="fill">
+      <mat-label>Name</mat-label>
+      <input title="Name" matInput [formControl]="name" />
+    </mat-form-field>
 
-<button mat-flat-button (click)="back()">Back</button>
+    <mat-form-field appearance="fill">
+      <mat-label>Description</mat-label>
+      <textarea title="Description" matInput [formControl]="description"></textarea>
+    </mat-form-field>
 
+    <mat-form-field appearance="fill">
+      <mat-label>Enter a date range</mat-label>
+      <mat-date-range-input [rangePicker]="picker">
+        <input matStartDate [formControl]="startsAt" placeholder="Start date">
+        <input matEndDate [formControl]="endsAt" placeholder="End date">
+      </mat-date-range-input>
+      <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker></mat-date-range-picker>
 
-<form class="edit-event-form" [formGroup]="formGroup" (ngSubmit)="update()">
-  <mat-form-field appearance="fill">
-    <mat-label>Name</mat-label>
-    <input matInput [formControl]="name" />
-  </mat-form-field>
+      <mat-error *ngIf="startsAt.hasError('matStartDateInvalid')">Invalid start date</mat-error>
+      <mat-error *ngIf="endsAt.hasError('matEndDateInvalid')">Invalid end date</mat-error>
+    </mat-form-field>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Description</mat-label>
-    <textarea matInput [formControl]="description"></textarea>
-  </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Board Type</mat-label>
+      <mat-select [formControl]="boardType">
+        <mat-option *ngFor="let option of boardTypeOptions$ | async" [value]="option.value">
+          {{option.label}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Enter a date range</mat-label>
-    <mat-date-range-input [rangePicker]="picker">
-      <input matStartDate [formControl]="startsAt" placeholder="Start date">
-      <input matEndDate [formControl]="endsAt" placeholder="End date">
-    </mat-date-range-input>
-    <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
-    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-    <mat-date-range-picker #picker></mat-date-range-picker>
+    <mat-form-field appearance="fill">
+      <mat-label>Visibility</mat-label>
+      <mat-select [formControl]="eventVisibility">
+        <mat-option *ngFor="let option of eventVisibilityOptions$ | async" [value]="option.value">
+          {{option.label}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
-    <mat-error *ngIf="startsAt.hasError('matStartDateInvalid')">Invalid start date</mat-error>
-    <mat-error *ngIf="endsAt.hasError('matEndDateInvalid')">Invalid end date</mat-error>
-  </mat-form-field>
-
-  <mat-form-field appearance="fill">
-    <mat-label>Select</mat-label>
-    <mat-select [formControl]="boardType">
-      <mat-option *ngFor="let option of boardTypeOptions$ | async" [value]="option.value">
-        {{option.label}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <mat-form-field appearance="fill">
-    <mat-label>Select</mat-label>
-    <mat-select [formControl]="eventVisibility">
-      <mat-option *ngFor="let option of eventVisibilityOptions$ | async" [value]="option.value">
-        {{option.label}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <button mat-flat-button type="button" (click)="cancel()">Cancel</button>
-  <button mat-flat-button color="primary" type="submit"
-    [disabled]="!(formGroup.valid$ | async) || !(formGroup.dirty$ | async)">Update</button>
-</form>
+    <button mat-flat-button type="button" (click)="cancel()">Cancel</button>
+    <button mat-flat-button color="primary" type="submit"
+      [disabled]="!(formGroup.valid$ | async) || (!(formGroup.dirty$ | async) && !formGroup.pristine)">Update</button>
+  </form>

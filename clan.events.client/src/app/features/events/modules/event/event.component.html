@@ -1,7 +1,7 @@
 <ng-container *ngIf="event$ | async as event">
   <div class="actions" *ngIf="selectedClan$ | async as selectedClan">
     <button mat-flat-button (click)="back()">Back</button>
-    <a mat-flat-button [routerLink]="['/', selectedClan.name, 'events', event.data.id, 'edit']">Edit</a>
+    <button mat-flat-button (click)="openEditModal()">Edit</button>
     <button mat-flat-button color="warn" (click)="delete(event.data.id)">
       Delete
     </button>

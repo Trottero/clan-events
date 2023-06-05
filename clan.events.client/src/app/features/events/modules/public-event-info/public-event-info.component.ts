@@ -46,7 +46,8 @@ export class PublicEventInfoComponent {
       this.eventsService
         .getEventById(id, selectedClan.name)
         .pipe(map(x => x.data))
-    )
+    ),
+    shareReplay(1)
   );
 
   currentTime$ = timer(0, 1000).pipe(

@@ -3,10 +3,13 @@
     <h2>
       {{event.name}}
     </h2>
-    <a [routerLink]="['edit', 'board']">
-      <button mat-raised-button color="primary" type="button">Edit</button>
+    <a mat-raised-button color="primary" [routerLink]="['edit']">
+      Edit
     </a>
   </div>
+  <p>
+    {{event.description}}
+  </p>
   <b>
     {{eventStatus$ | async}}
   </b>
