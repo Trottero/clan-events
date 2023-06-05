@@ -10,6 +10,7 @@ import { BoardCanvasModule } from '../board-canvas/board-canvas.module';
 import { BoardService } from './board.service';
 import { EditTileModule } from '../edit-tile/edit-tile.module';
 import { FileInputComponent } from 'src/app/core/components/file-input/file-input.component';
+import { TileChallengesModule } from '../tile-challenges/tile-challenges.module';
 
 @NgModule({
   declarations: [BoardComponent],
@@ -22,6 +23,7 @@ import { FileInputComponent } from 'src/app/core/components/file-input/file-inpu
 
     EditTileModule,
     BoardCanvasModule,
+    TileChallengesModule,
     FileInputComponent,
 
     MatButtonModule,

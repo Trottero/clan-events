@@ -1,0 +1,26 @@
+.challenges-list {
+  padding: 24px;
+  background-color: var(--app-background-color-z-3);
+  border-radius: 4px;
+  border: 1px solid var(--app-border-color-z-3);
+
+  mat-spinner {
+    margin: 50px auto;
+  }
+
+  .create-challenge {
+    margin-bottom: 12px;
+  }
+
+  .empty {
+    font-style: italic;
+    text-align: center;
+    color: var(--app-text-color-muted);
+  }
+
+  .items {
+    display: flex;
+    flex-direction: column;
+    row-gap: 6px;
+  }
+}

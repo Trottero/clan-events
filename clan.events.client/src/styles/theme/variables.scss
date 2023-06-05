@@ -3,6 +3,7 @@
 @mixin app-theme-css-variables($theme) {
   $is-dark: map-get($theme, is-dark);
 
+  --app-background-color-z-4: #{if($is-dark, lighten(#151420, 15%), #f8f8f8)};
   --app-background-color-z-3: #{if($is-dark, lighten(#151420, 10%), #fefefe)};
   --app-background-color-z-2: #{if(
       $is-dark,
@@ -14,9 +15,11 @@
   --app-border-color: #{if($is-dark, #302c52, #d4d4d4)};
   --app-border-color-z-2: #{if($is-dark, #454160, #d1d1d1)};
   --app-border-color-z-3: #{if($is-dark, #524f6a, #e4e4e4)};
+  --app-border-color-z-4: #{if($is-dark, #6c6889, #eeeeee)};
 
   --app-text-color: #{if($is-dark, #f3eff4, #333333)};
-  --app-text-color-muted: #{if($is-dark, #83809f, #b0a9a9)};
+  --app-text-color-muted: #{if($is-dark, #9693b2, #8e8e8e)};
+  --app-text-color-muted-light: #{if($is-dark, #d6d3e5, #5a5a5a)};
 
   --app-success-color: #34eb27;
   --app-error-color: #f44336;

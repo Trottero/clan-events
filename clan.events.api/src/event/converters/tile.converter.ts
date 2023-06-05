@@ -19,5 +19,10 @@ export function convertToTileResponse(tile: TileDocument): TileResponse {
     y: tile.canvas.y,
     image: tile.canvas.image,
     nextTileId: tile.nextTile?.toString(),
+    challenges: tile.challenges.map((challenge) => ({
+      id: challenge.id.toString(),
+      description: challenge.description,
+      nextTile: challenge.nextTile?.toString(),
+    })),
   };
 }

@@ -1,10 +1,14 @@
 <div class="mb-4 d-flex gap-3">
-  <button mat-flat-button color="primary" (click)="createTile()">Create Tile</button>
+  <button mat-flat-button color="primary" (click)="createTile()">
+    Create Tile
+  </button>
   <button mat-flat-button (click)="resetCanvas()">Reset Canvas</button>
   <button mat-flat-button (click)="toggleGrid()">Toggle Grid</button>
-  <app-file-input (fileSelected)="onFileSelected($event)" accept="image/*"></app-file-input>
+  <app-file-input
+    (fileSelected)="onFileSelected($event)"
+    accept="image/*"
+  ></app-file-input>
 </div>
-
 
 <div class="board-container">
   <div class="board-canvas-container">
@@ -13,5 +17,9 @@
     </div>
     <app-board-canvas></app-board-canvas>
   </div>
-  <app-edit-tile></app-edit-tile>
+  <div class="board-sidebar">
+    <app-tile-challenges></app-tile-challenges>
+  </div>
 </div>
+
+<app-edit-tile></app-edit-tile>

@@ -5,6 +5,7 @@ mat-spinner {
 .board-container {
   display: flex;
   gap: 24px;
+  margin-bottom: 24px;
 
   .board-canvas-container {
     position: relative;
@@ -26,8 +27,11 @@ mat-spinner {
     opacity: 0.9;
   }
 
-  app-edit-tile {
-    width: 300px;
+  .board-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 400px;
   }
 
   /* break at 1200px and put edit tile below board */
@@ -38,7 +42,7 @@ mat-spinner {
       min-width: 0;
     }
 
-    app-edit-tile {
+    .board-sidebar {
       width: 100%;
     }
   }

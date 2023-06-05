@@ -7,7 +7,6 @@ import {
   Subject,
   Subscription,
   withLatestFrom,
-  BehaviorSubject,
   map,
 } from 'rxjs';
 import { SelectedClanService } from 'src/app/features/clan/services/selected-clan.service';
@@ -20,7 +19,6 @@ import { BoardApiService } from './board.api.service';
 import { EventIdStream } from '../../streams/event-id.stream';
 import { State } from 'src/app/core/common/observable/state';
 import { TileResponse } from '@common/events';
-import { TileRenderer } from './renderers/tile-renderer';
 import { BoardRenderer } from './renderers/board-renderer';
 import { RendererPriorityMap } from 'src/app/features/events/modules/board/renderers/renderer-priority-map';
 import { GridRenderer } from './renderers/grid-renderer';
