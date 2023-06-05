@@ -103,7 +103,7 @@ export class EditEventComponent implements OnInit, OnDestroy {
           startsAt: event.data.startsAt,
           endsAt: event.data.endsAt,
           boardType: event.data.board.type,
-          eventVisibility: event.data.eventVisibility,
+          eventVisibility: event.data.visibility,
         });
       })
     );
@@ -122,6 +122,7 @@ export class EditEventComponent implements OnInit, OnDestroy {
                 startsAt: value.startsAt ?? new Date(),
                 endsAt: value.endsAt ?? new Date(),
                 boardType: value.boardType ?? BoardType.Unknown,
+                visibility: value.eventVisibility ?? EventVisibility.Private,
               })
               .pipe(map(event => ({ event, clan })))
           )

@@ -11,7 +11,7 @@ export interface EventResponse {
   board: BoardDto;
   clanName: string;
   clanDisplayName: string;
-  eventVisibility: EventVisibility;
+  visibility: EventVisibility;
 }
 
 export interface BoardDto {

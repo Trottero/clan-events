@@ -147,6 +147,7 @@ export class EventService {
     oldEvent.startsAt = event.startsAt;
     oldEvent.endsAt = event.endsAt;
     oldEvent.board.type = event.boardType;
+    oldEvent.visibility = event.visibility;
 
     const result: EventDocument = await oldEvent.save();
     result.populate('participants.members');
