@@ -124,12 +124,7 @@ export class TileRenderer extends BoardRenderer {
       return;
     }
 
-    if (dashed) {
-      context.setLineDash([10, 10]);
-    } else {
-      context.setLineDash([]);
-    }
-
+    context.setLineDash(dashed ? [10, 10] : []);
     context.beginPath();
     context.moveTo(tile.x + tile.width / 2, tile.y + tile.height / 2);
     context.lineTo(
