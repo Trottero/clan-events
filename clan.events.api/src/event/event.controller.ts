@@ -8,7 +8,6 @@ import {
   Post,
   Put,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import { EventService } from './event.service';
 import {
@@ -24,34 +23,35 @@ import {
 import { PaginatedModel } from '@common/responses';
 import { convertToEventListResponse } from './converters/event-list.converter';
 import { convertToEventResponse } from './converters/event.converter';
-import { JwtTokenContent } from '@common/auth';
-import { User } from 'src/common/decorators/user.decorator';
-import { ApiTokenGuard } from 'src/auth/guards/api-token.guard';
-import { HasRoleInClan } from 'src/auth/authorized.decorator';
-import { RoleInClan } from 'src/auth/role-in-clan.decorator';
+import { UserClanRoleParam } from 'src/clan/clan-role/user-clan-role.param';
+import { RequiresClanRoles } from 'src/clan/decorators/requires-clan-roles.decorator';
+import { ClanRole } from '@common/auth/clan.role';
+import { UserClanRole } from 'src/clan/clan-role/user-clan-role.model';
+import { WithEventContext } from './event-context/with-event-context.decorator';
 
 @Controller(':clanName/events')
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
   @Get()
-  @UseGuards(ApiTokenGuard)
+  @RequiresClanRoles()
   async getEventsForUser(
     @Query() params: GetEventsRequest,
-    @User() user: JwtTokenContent,
+    @UserClanRoleParam() user: UserClanRole,
     @Param('clanName') clanName: string,
   ): Promise<PaginatedModel<EventListItem>> {
     const { page, pageSize } = params;
 
     const result = await this.eventService.getPaginatedEventsForUserInClan(
-      user,
       clanName,
+      user,
       page,
       pageSize,
     );
+
     const count = await this.eventService.countEventsForUserInClan(
-      user,
       clanName,
+      user,
     );
 
     return convertToEventListResponse(result, {
@@ -62,21 +62,21 @@ export class EventController {
     });
   }
 
-  @Get(':id')
-  @UseGuards(ApiTokenGuard)
+  @Get(':eventId')
+  @WithEventContext()
   async getEventById(
-    @User() user: JwtTokenContent,
-    @Param() { clanName, id }: GetEventByIdRequest,
+    @UserClanRoleParam() user: UserClanRole,
+    @Param() { clanName, eventId }: GetEventByIdRequest,
   ): Promise<EventResponse> {
-    const event = await this.eventService.getEventById(user, clanName, id);
+    const event = await this.eventService.getEventById(user, clanName, eventId);
     if (!event) throw new HttpException('Event not found', 404);
     return convertToEventResponse(event);
   }
 
   @Post()
-  @UseGuards(ApiTokenGuard)
+  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin)
   public async createEventForUser(
-    @User() user: JwtTokenContent,
+    @UserClanRoleParam() user: UserClanRole,
     @Body() body: CreateEventRequest,
     @Param('clanName') clanName: string,
   ): Promise<any> {
@@ -84,22 +84,21 @@ export class EventController {
     return convertToEventResponse(event);
   }
 
-  @Delete(':id')
-  @UseGuards(ApiTokenGuard)
+  @Delete(':eventId')
+  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin)
   public async deleteEventById(
-    @User() user: JwtTokenContent,
-    @Param() { id }: DeleteEventByIdRequest,
+    @Param() { eventId }: DeleteEventByIdRequest,
   ): Promise<any> {
-    await this.eventService.deleteEventById(user, id);
+    await this.eventService.deleteEventById(eventId);
   }
 
-  @Put(':id')
-  @UseGuards(ApiTokenGuard)
+  @Put(':eventId')
+  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin)
   public async updateEventById(
     @Body() body: UpdateEventRequest,
-    @Param() { id }: UpdateEventParams,
+    @Param() { eventId }: UpdateEventParams,
   ): Promise<any> {
-    const event = await this.eventService.updateEvent(id, body);
+    const event = await this.eventService.updateEvent(eventId, body);
     return convertToEventResponse(event);
   }
 }

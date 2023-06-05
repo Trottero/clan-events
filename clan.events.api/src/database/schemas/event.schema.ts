@@ -7,6 +7,7 @@ import {
   EventActionSchema,
   registerEventActionsSchemas,
 } from './event-action.schema';
+import { EventVisibility } from '@common/events';
 
 export type EventDocument = mongoose.HydratedDocument<Event>;
 
@@ -20,6 +21,13 @@ export class Event {
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Clan' })
   owner?: Clan;
+
+  @Prop({
+    type: String,
+    default: EventVisibility.Private,
+    enum: Object.values(EventVisibility),
+  })
+  visibility: EventVisibility;
 
   @Prop()
   startsAt: Date;

@@ -8,13 +8,13 @@ import {
   Body,
 } from '@nestjs/common';
 import { ClanService } from './clan.service';
-import { ApiTokenGuard } from 'src/auth/guards/api-token.guard';
+import { EnsureApiTokenGuard } from 'src/auth/guards/ensure-api-token.guard';
 import { ClanMembershipService } from './management/clan-membership.service';
 import { JwtTokenContent } from '@common/auth';
 import { ClanResponse, ClanWithRole, CreateClanRequest } from '@common/clan';
 import { ClanRole } from '@common/auth/clan.role';
 import { MongoErrorCode } from 'src/database/mongo-error-codes';
-import { User } from 'src/common/decorators/user.decorator';
+import { UserClanRoleParam } from 'src/clan/clan-role/user-clan-role.param';
 
 @Controller('clan')
 export class ClanController {
@@ -23,13 +23,15 @@ export class ClanController {
     private readonly clanMembershipService: ClanMembershipService,
   ) {}
 
-  @UseGuards(ApiTokenGuard)
+  @UseGuards(EnsureApiTokenGuard)
   @Get()
-  async getAllClans(@User() user: JwtTokenContent): Promise<ClanWithRole[]> {
+  async getAllClans(
+    @UserClanRoleParam() user: JwtTokenContent,
+  ): Promise<ClanWithRole[]> {
     return await this.clanService.getClansForUser(user.sub);
   }
 
-  @UseGuards(ApiTokenGuard)
+  @UseGuards(EnsureApiTokenGuard)
   @Post()
   async createClan(
     @Request() req,

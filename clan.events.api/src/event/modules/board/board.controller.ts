@@ -3,25 +3,22 @@ import {
   BadRequestException,
   Body,
   Controller,
-  Delete,
   Get,
   NotFoundException,
   Param,
-  Patch,
   Post,
-  Put,
   Res,
   StreamableFile,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { HasRoleInClan } from 'src/auth/authorized.decorator';
+import { RequiresClanRoles } from 'src/clan/decorators/requires-clan-roles.decorator';
 
 import { BoardService } from './board.service';
 import { CreateTileRequest } from '@common/events';
 import { convertToTileResponse } from 'src/event/converters/tile.converter';
-import { ClanRequestContext } from 'src/common/decorators/clan-context';
-import { ClanContext } from 'src/common/decorators/clan-context.decorator';
+import { ClanContext } from 'src/clan/clan-context/clan-context.model';
+import { ClanContextParam } from 'src/clan/clan-context/clan-context.param';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 
@@ -30,9 +27,9 @@ export class BoardController {
   constructor(private boardService: BoardService) {}
 
   @Get('tiles')
-  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin, ClanRole.Member)
+  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin, ClanRole.Member)
   async getTiles(
-    @ClanContext() clanContext: ClanRequestContext,
+    @ClanContextParam() clanContext: ClanContext,
     @Param() params: { eventId: string },
   ) {
     return (
@@ -41,9 +38,9 @@ export class BoardController {
   }
 
   @Post('tiles')
-  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
+  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin)
   async createTile(
-    @ClanContext() clanContext: ClanRequestContext,
+    @ClanContextParam() clanContext: ClanContext,
     @Param() params: { eventId: string },
     @Body() body: CreateTileRequest,
   ) {
@@ -51,10 +48,10 @@ export class BoardController {
   }
 
   @Post('background')
-  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
+  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin)
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
-    @ClanContext() clanContext: ClanRequestContext,
+    @ClanContextParam() clanContext: ClanContext,
     @Param() params: { eventId: string },
     @UploadedFile() file: Express.Multer.File,
     @Res({ passthrough: true }) res: Response,
@@ -81,9 +78,9 @@ export class BoardController {
   }
 
   @Get('background')
-  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin, ClanRole.Member)
+  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin, ClanRole.Member)
   async getBackground(
-    @ClanContext() clanContext: ClanRequestContext,
+    @ClanContextParam() clanContext: ClanContext,
     @Param() params: { eventId: string },
     @Res({ passthrough: true }) res: Response,
   ) {

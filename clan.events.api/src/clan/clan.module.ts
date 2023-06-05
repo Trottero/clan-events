@@ -17,6 +17,8 @@ import {
 } from 'src/database/schemas/clan-application.schema';
 import { ClanApplicationsController } from './applications/clan-applications.controller';
 import { ClanApplicationService } from './applications/clan-application.service';
+import { CachedRolesService } from './services/cached-roles.service';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -27,13 +29,19 @@ import { ClanApplicationService } from './applications/clan-application.service'
       { name: ClanMembership.name, schema: ClanMembershipSchema },
       { name: ClanApplication.name, schema: ClanApplicationSchema },
     ]),
+    CacheModule.register(),
   ],
   controllers: [
     ClanController,
     ClanManagementController,
     ClanApplicationsController,
   ],
-  providers: [ClanService, ClanMembershipService, ClanApplicationService],
-  exports: [ClanService, ClanMembershipService],
+  providers: [
+    ClanService,
+    ClanMembershipService,
+    ClanApplicationService,
+    CachedRolesService,
+  ],
+  exports: [ClanService, ClanMembershipService, CachedRolesService],
 })
 export class ClanModule {}

@@ -9,25 +9,25 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { HasRoleInClan } from 'src/auth/authorized.decorator';
 import {
   ChallengeResponse,
   CreateChallengeRequest,
   CreateTileRequest,
   UpdateChallengeRequest,
 } from '@common/events';
-import { ClanRequestContext } from 'src/common/decorators/clan-context';
-import { ClanContext } from 'src/common/decorators/clan-context.decorator';
+import { ClanContextParam } from 'src/clan/clan-context/clan-context.param';
 import { TileService } from './tile.service';
+import { RequiresClanRoles } from 'src/clan/decorators/requires-clan-roles.decorator';
+import { ClanContext } from 'src/clan/clan-context/clan-context.model';
 
 @Controller(':clanName/events/:eventId/tiles/:tileId')
 export class TileController {
   constructor(private tileService: TileService) {}
 
   @Put()
-  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
+  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin)
   async updateTile(
-    @ClanContext() clanContext: ClanRequestContext,
+    @ClanContextParam() clanContext: ClanContext,
     @Param() params: { eventId: string; tileId: string },
     @Body() body: CreateTileRequest,
   ) {
@@ -40,9 +40,9 @@ export class TileController {
   }
 
   @Patch()
-  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
+  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin)
   async patchTile(
-    @ClanContext() clanContext: ClanRequestContext,
+    @ClanContextParam() clanContext: ClanContext,
     @Param() params: { eventId: string; tileId: string },
     @Body() body: Partial<CreateTileRequest>,
   ) {
@@ -55,9 +55,9 @@ export class TileController {
   }
 
   @Delete()
-  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
+  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin)
   async deleteTile(
-    @ClanContext() clanContext: ClanRequestContext,
+    @ClanContextParam() clanContext: ClanContext,
     @Param() params: { eventId: string; tileId: string },
   ) {
     return this.tileService.deleteTile(
@@ -68,9 +68,9 @@ export class TileController {
   }
 
   @Get('challenges')
-  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin, ClanRole.Member)
+  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin, ClanRole.Member)
   async getChallenges(
-    @ClanContext() clanContext: ClanRequestContext,
+    @ClanContextParam() clanContext: ClanContext,
     @Param() params: { eventId: string; tileId: string },
   ): Promise<ChallengeResponse[]> {
     const documents = await this.tileService.getChallenges(
@@ -87,9 +87,9 @@ export class TileController {
   }
 
   @Post('challenges')
-  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
+  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin)
   async createChallenge(
-    @ClanContext() clanContext: ClanRequestContext,
+    @ClanContextParam() clanContext: ClanContext,
     @Param() params: { eventId: string; tileId: string },
     @Body() body: CreateChallengeRequest,
   ) {
@@ -102,9 +102,9 @@ export class TileController {
   }
 
   @Put('challenges/:challengeId')
-  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin)
+  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin)
   async updateChallenge(
-    @ClanContext() clanContext: ClanRequestContext,
+    @ClanContextParam() clanContext: ClanContext,
     @Param() params: { eventId: string; tileId: string; challengeId: string },
     @Body() body: UpdateChallengeRequest,
   ) {
@@ -118,9 +118,9 @@ export class TileController {
   }
 
   @Delete('challenges/:challengeId')
-  @HasRoleInClan(ClanRole.Owner, ClanRole.Admin, ClanRole.Member)
+  @RequiresClanRoles(ClanRole.Owner, ClanRole.Admin, ClanRole.Member)
   async deleteChallenge(
-    @ClanContext() clanContext: ClanRequestContext,
+    @ClanContextParam() clanContext: ClanContext,
     @Param() params: { eventId: string; tileId: string; challengeId: string },
   ) {
     return this.tileService.deleteChallenge(
