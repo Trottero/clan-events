@@ -1,0 +1,13 @@
+<div *ngIf="event$ | async as event">
+  <div class="d-flex justify-content-between">
+    <h2>
+      {{event.name}}
+    </h2>
+    <a [routerLink]="['edit', 'board']">
+      <button mat-raised-button color="primary" type="button">Edit</button>
+    </a>
+  </div>
+  <b>
+    {{eventStatus$ | async}}
+  </b>
+</div>

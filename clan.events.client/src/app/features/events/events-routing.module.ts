@@ -31,16 +31,16 @@ const ROUTES: Route[] = [
       import('./event-teams/event-teams-routes').then(m => m.EventTeamsRoutes),
   },
   {
-    path: `:${NAVIGATION_PARAMS.EVENT_ID}/public`,
+    path: `:${NAVIGATION_PARAMS.EVENT_ID}/${NAVIGATION_PATHS.EVENTS_EDIT}/board`,
     loadComponent: () =>
-      import('./modules/board-public/board-public.component').then(
-        m => m.BoardPublicComponent
-      ),
+      import('./modules/event/event.component').then(m => m.EventComponent),
   },
   {
     path: `:${NAVIGATION_PARAMS.EVENT_ID}`,
-    loadChildren: () =>
-      import('./modules/event/event.module').then(m => m.EventModule),
+    loadComponent: () =>
+      import('./modules/board-public/public-event.component').then(
+        m => m.PublicEventComponent
+      ),
   },
   {
     path: '**',

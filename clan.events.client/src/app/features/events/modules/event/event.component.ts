@@ -2,10 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnDestroy,
-  OnInit,
   inject,
 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { EventResponse } from '@common/events';
 import { Observable, Subscription, combineLatest, map, switchMap } from 'rxjs';
 import { Response } from '@common/responses';
@@ -13,12 +12,17 @@ import { EventsService } from '../../events.service';
 import { notNullOrUndefined } from 'src/app/core/common/operators/not-undefined';
 import { SelectedClanService } from 'src/app/features/clan/services/selected-clan.service';
 import { EventIdStream } from '../../streams/event-id.stream';
+import { BoardModule } from '../board/board.module';
+import { MatButtonModule } from '@angular/material/button';
+import { CommonModule } from '@angular/common';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-event',
   templateUrl: './event.component.html',
   styleUrls: ['./event.component.scss'],
+  standalone: true,
+  imports: [CommonModule, RouterModule, BoardModule, MatButtonModule],
 })
 export class EventComponent implements OnDestroy {
   selectedClan$ = inject(SelectedClanService).selectedClan$.pipe(
