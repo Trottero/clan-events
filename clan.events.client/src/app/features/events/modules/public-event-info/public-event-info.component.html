@@ -1,0 +1,17 @@
+<div *ngIf="event$ | async as event">
+  <div class="d-flex justify-content-between">
+    <h2>
+      {{event.name}}
+    </h2>
+    <a mat-raised-button color="primary" [routerLink]="['edit']"
+      *ngIf="(role$ | async) == roleEnum.Admin || (role$ | async) == roleEnum.Owner">
+      Edit
+    </a>
+  </div>
+  <p>
+    {{event.description}}
+  </p>
+  <b>
+    {{eventStatus$ | async}}
+  </b>
+</div>

@@ -18,6 +18,8 @@ import { FormControl, FormGroup } from '@ngneat/reactive-forms';
 import { Validators } from '@angular/forms';
 import { notNullOrUndefined } from 'src/app/core/common/operators/not-undefined';
 import { SelectedClanService } from 'src/app/features/clan/services/selected-clan.service';
+import { MatDialogRef } from '@angular/material/dialog';
+import { EventIdStream } from '../../streams/event-id.stream';
 
 @Component({
   selector: 'app-edit-event',
@@ -30,12 +32,10 @@ export class EditEventComponent implements OnInit, OnDestroy {
   );
   private readonly eventsService = inject(EventsService);
   private readonly router = inject(Router);
-  private readonly route = inject(ActivatedRoute);
+  private readonly eventIdStream = inject(EventIdStream);
+  private readonly dialogRef = inject(MatDialogRef);
 
-  id$: Observable<string> = this.route.paramMap.pipe(
-    map(params => params.get('eventId')),
-    notNullOrUndefined()
-  );
+  id$ = this.eventIdStream.pipe(notNullOrUndefined());
 
   event$: Observable<Response<EventResponse>> = this.id$.pipe(
     withLatestFrom(this.selectedClan$),
@@ -84,15 +84,10 @@ export class EditEventComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
-    this.formGroup.dirty$;
-  }
-
-  back() {
-    this.router.navigate(['../'], { relativeTo: this.route });
   }
 
   cancel(): void {
-    this.router.navigate(['../'], { relativeTo: this.route });
+    this.dialogRef.close();
   }
 
   update(): void {
@@ -108,7 +103,7 @@ export class EditEventComponent implements OnInit, OnDestroy {
           startsAt: event.data.startsAt,
           endsAt: event.data.endsAt,
           boardType: event.data.board.type,
-          eventVisibility: event.data.eventVisibility,
+          eventVisibility: event.data.visibility,
         });
       })
     );
@@ -127,14 +122,12 @@ export class EditEventComponent implements OnInit, OnDestroy {
                 startsAt: value.startsAt ?? new Date(),
                 endsAt: value.endsAt ?? new Date(),
                 boardType: value.boardType ?? BoardType.Unknown,
+                visibility: value.eventVisibility ?? EventVisibility.Private,
               })
               .pipe(map(event => ({ event, clan })))
-          ),
-          switchMap(({ event, clan }) =>
-            this.router.navigate(['/', clan.name, 'events', event.data.id])
           )
         )
-        .subscribe()
+        .subscribe(_ => this.dialogRef.close())
     );
   }
 }

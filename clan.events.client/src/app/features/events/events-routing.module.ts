@@ -19,21 +19,21 @@ const ROUTES: Route[] = [
       ),
   },
   {
-    path: `:${NAVIGATION_PARAMS.EVENT_ID}/${NAVIGATION_PATHS.EVENTS_EDIT}`,
-    loadChildren: () =>
-      import('./modules/edit-event/edit-event.module').then(
-        m => m.EditEventModule
-      ),
-  },
-  {
     path: `:${NAVIGATION_PARAMS.EVENT_ID}/${NAVIGATION_PATHS.EVENTS_TEAMS}`,
     loadChildren: () =>
       import('./event-teams/event-teams-routes').then(m => m.EventTeamsRoutes),
   },
   {
+    path: `:${NAVIGATION_PARAMS.EVENT_ID}/${NAVIGATION_PATHS.EVENTS_EDIT}`,
+    loadComponent: () =>
+      import('./modules/event/event.component').then(m => m.EventComponent),
+  },
+  {
     path: `:${NAVIGATION_PARAMS.EVENT_ID}`,
-    loadChildren: () =>
-      import('./modules/event/event.module').then(m => m.EventModule),
+    loadComponent: () =>
+      import('./modules/board-public/public-event.component').then(
+        m => m.PublicEventComponent
+      ),
   },
   {
     path: '**',
