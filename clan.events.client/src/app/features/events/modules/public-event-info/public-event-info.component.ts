@@ -19,6 +19,12 @@ import { MatCommonModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
 import { ClanRole } from '@common/auth/clan.role';
+import * as dayjs from 'dayjs';
+import * as duration from 'dayjs/plugin/duration';
+import * as relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(duration);
+dayjs.extend(relativeTime);
 
 @Component({
   selector: 'app-public-event-info',
@@ -79,43 +85,20 @@ export class PublicEventInfoComponent {
   ]).pipe(
     map(([secondsBeforeStart, secondsBeforeEnd]) => {
       if (secondsBeforeStart > 0) {
-        const timeText = this.timeToText(secondsBeforeStart);
-        return secondsBeforeStart > 0
-          ? `Starts in ${timeText}`
-          : `Started ${timeText} ago`;
+        return `Starts ${dayjs
+          .duration(secondsBeforeStart, 'seconds')
+          .humanize(true)}`;
       }
       if (secondsBeforeEnd > 0) {
-        const timeText = this.timeToText(secondsBeforeEnd);
-        return secondsBeforeEnd > 0
-          ? `Ends in ${timeText}`
-          : `Ended ${timeText} ago`;
+        return `Ends ${dayjs
+          .duration(secondsBeforeEnd, 'seconds')
+          .humanize(true)}`;
       }
-      return 'Finished';
+      return `Ended ${dayjs
+        .duration(secondsBeforeEnd, 'seconds')
+        .humanize(true)}`;
     })
   );
 
   roleEnum = ClanRole;
-
-  private timeToText(seconds: number): string {
-    const computeTime = Math.abs(seconds);
-
-    if (computeTime < 60) {
-      return computeTime != 1
-        ? `${computeTime} seconds`
-        : `${computeTime} second`;
-    }
-
-    const minutes = Math.floor(computeTime / 60);
-    if (minutes < 60) {
-      return minutes != 1 ? `${minutes} minutes` : `${minutes} minute`;
-    }
-
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) {
-      return hours != 1 ? `${hours} hours` : `${hours} hour`;
-    }
-
-    const days = Math.floor(hours / 24);
-    return days != 1 ? `${days} days` : `${days} day`;
-  }
 }
