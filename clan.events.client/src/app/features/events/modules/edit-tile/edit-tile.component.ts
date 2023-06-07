@@ -36,7 +36,7 @@ export class EditTileComponent implements OnInit, OnDestroy {
   availableTiles$ = combineLatest([
     this.boardService.tiles$.pipe(
       notNullOrUndefined(),
-      filterMapSuccess(tiles => tiles.value.data)
+      filterMapSuccess(tiles => tiles.value)
     ),
     this.boardService.selectedTile$.pipe(notNullOrUndefined()),
   ]).pipe(

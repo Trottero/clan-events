@@ -79,7 +79,7 @@ export class EventController {
     @UserClanRoleParam() user: UserClanRole,
     @Body() body: CreateEventRequest,
     @Param('clanName') clanName: string,
-  ): Promise<any> {
+  ): Promise<EventResponse> {
     const event = await this.eventService.createEvent(user, clanName, body);
     return convertToEventResponse(event);
   }
@@ -97,7 +97,7 @@ export class EventController {
   public async updateEventById(
     @Body() body: UpdateEventRequest,
     @Param() { eventId }: UpdateEventParams,
-  ): Promise<any> {
+  ): Promise<EventResponse> {
     const event = await this.eventService.updateEvent(eventId, body);
     return convertToEventResponse(event);
   }

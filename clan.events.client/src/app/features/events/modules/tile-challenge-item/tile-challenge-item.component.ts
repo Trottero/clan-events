@@ -47,7 +47,7 @@ export class TileChallengeItemComponent implements OnInit, OnDestroy {
     this.tileId$.pipe(notNullOrUndefined()),
     this.boardService.tiles$.pipe(
       notNullOrUndefined(),
-      filterMapSuccess(tiles => tiles.value.data)
+      filterMapSuccess(tiles => tiles.value)
     ),
   ]).pipe(map(([tileId, tiles]) => tiles.filter(tile => tile.id !== tileId)));
 
@@ -55,7 +55,7 @@ export class TileChallengeItemComponent implements OnInit, OnDestroy {
     this.challenge$,
     this.boardService.tiles$.pipe(
       notNullOrUndefined(),
-      filterMapSuccess(tiles => tiles.value.data)
+      filterMapSuccess(tiles => tiles.value)
     ),
   ]).pipe(
     map(([challenge, tiles]) =>

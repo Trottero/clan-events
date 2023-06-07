@@ -12,4 +12,5 @@ export interface UpdateEventRequest {
   endsAt: Date;
   boardType: BoardType;
   visibility: EventVisibility;
+  startingTile?: string;
 }

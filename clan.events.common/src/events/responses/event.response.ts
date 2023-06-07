@@ -16,6 +16,7 @@ export interface EventResponse {
 
 export interface BoardDto {
   type: BoardType;
+  startingTile?: string;
 }
 
 export interface EventTeamDto {

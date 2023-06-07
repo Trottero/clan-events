@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Response } from '@common/responses';
-import { CreateTileRequest } from '@common/events';
+import { BoardResponse, CreateTileRequest } from '@common/events';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ConfigService } from 'src/app/core/config/config.service';
@@ -18,8 +18,8 @@ export class BoardApiService {
   getTiles(
     clanName: string,
     eventId: string
-  ): Observable<Response<TileResponse[]>> {
-    return this.http.get<Response<TileResponse[]>>(
+  ): Observable<Response<BoardResponse>> {
+    return this.http.get<Response<BoardResponse>>(
       `${this.configService.backEndUrl}/${clanName}/events/${eventId}/tiles`
     );
   }
