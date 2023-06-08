@@ -5,7 +5,7 @@ import {
   EventVisibility,
   UpdateEventRequest,
 } from '@common/events';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { JwtTokenContent } from '@common/auth';
 import { ClanService } from 'src/clan/clan.service';
 import { Event, EventDocument } from 'src/database/schemas/event.schema';
@@ -141,6 +141,10 @@ export class EventService {
     if (!oldEvent) {
       throw new NotFoundException('Event not found');
     }
+
+    oldEvent.board.startingTile = event.startingTile
+      ? new mongoose.Types.ObjectId(event.startingTile)
+      : null;
 
     oldEvent.name = event.name;
     oldEvent.description = event.description;

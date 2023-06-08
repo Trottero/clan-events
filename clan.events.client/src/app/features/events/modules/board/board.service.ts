@@ -52,22 +52,27 @@ export class BoardService {
 
   private boardState = new State<BoardState>(INITIAL_STATE);
 
-  tiles$ = combineLatest([
+  board$ = combineLatest([
     this.refreshTilesSubject.pipe(startWith(undefined)),
     this.selectedClanService.selectedClan$.pipe(notNullOrUndefined()),
     this.eventId$.pipe(notNullOrUndefined()),
   ]).pipe(
     switchMap(([_, clan, eventId]) =>
-      this.boardApiService.getTiles(clan.name, eventId).pipe(mapToLoadable())
+      this.boardApiService.getTiles(clan.name, eventId)
     ),
     shareReplay(1)
+  );
+
+  tiles$ = this.board$.pipe(
+    map(x => x.data.tiles),
+    mapToLoadable()
   );
 
   selectedTile$ = this.boardState.pipe(
     switchMap(state =>
       this.tiles$.pipe(
         filterMapSuccess(tiles =>
-          tiles.value.data.find(t => t.id === state.selectedTileId)
+          tiles.value.find(t => t.id === state.selectedTileId)
         )
       )
     )

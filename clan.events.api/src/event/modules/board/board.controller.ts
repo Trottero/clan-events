@@ -15,12 +15,13 @@ import {
 import { RequiresClanRoles } from 'src/clan/decorators/requires-clan-roles.decorator';
 
 import { BoardService } from './board.service';
-import { CreateTileRequest } from '@common/events';
+import { BoardResponse, CreateTileRequest } from '@common/events';
 import { convertToTileResponse } from 'src/event/converters/tile.converter';
 import { ClanContext } from 'src/clan/clan-context/clan-context.model';
 import { ClanContextParam } from 'src/clan/clan-context/clan-context.param';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
+import { TileDocument } from 'src/database/schemas/tile.schema';
 
 @Controller(':clanName/events/:eventId')
 export class BoardController {
@@ -31,10 +32,15 @@ export class BoardController {
   async getTiles(
     @ClanContextParam() clanContext: ClanContext,
     @Param() params: { eventId: string },
-  ) {
-    return (
-      await this.boardService.getTiles(clanContext.name, params.eventId)
-    ).map(convertToTileResponse);
+  ): Promise<BoardResponse> {
+    const board = await this.boardService.getBoard(
+      clanContext.name,
+      params.eventId,
+    );
+    return {
+      tiles: (board.tiles as TileDocument[]).map(convertToTileResponse),
+      type: board.type,
+    };
   }
 
   @Post('tiles')

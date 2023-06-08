@@ -6,6 +6,7 @@ import { ClanService } from 'src/clan/clan.service';
 import { Event } from 'src/database/schemas/event.schema';
 import { Tile, TileDocument } from 'src/database/schemas/tile.schema';
 import { Image } from 'src/database/schemas/image.schema';
+import { Board } from 'src/database/schemas/board.schema';
 
 @Injectable()
 export class BoardService {
@@ -16,7 +17,7 @@ export class BoardService {
     private readonly clanService: ClanService,
   ) {}
 
-  async getTiles(clanName: string, eventId: string): Promise<TileDocument[]> {
+  async getBoard(clanName: string, eventId: string): Promise<Board> {
     const clan = await this.clanService.getClanByName(clanName);
     const event = await this.eventModel
       .findOne({ _id: eventId, owner: clan.id })
@@ -26,7 +27,7 @@ export class BoardService {
       throw new NotFoundException();
     }
 
-    return event.board.tiles as TileDocument[];
+    return event.board as Board;
   }
 
   async createTile(

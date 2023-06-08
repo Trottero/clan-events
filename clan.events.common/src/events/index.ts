@@ -3,6 +3,7 @@ export * from './responses/event.response';
 export * from './responses/tile.response';
 export * from './responses/challenge.response';
 export * from './responses/event-team.response';
+export * from './responses/board.response';
 
 export * from './requests/create-event.request';
 export * from './requests/get-events.request';
