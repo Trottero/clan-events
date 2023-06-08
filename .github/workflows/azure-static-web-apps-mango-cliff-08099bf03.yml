@@ -38,7 +38,7 @@ jobs:
       - name: Build Client
         run: npm install -w clan.events.client && npm run build -w clan.events.client
 
-      - name: Build And Deploy
+      - name: Deploy to Static Web App
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
