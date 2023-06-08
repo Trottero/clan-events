@@ -27,7 +27,7 @@ jobs:
         run: npm install -w clan.events.common && npm run build -w clan.events.common
 
       - name: Build Client
-        run: npm install -w clan.events.client && npm run build -w clan.events.Client
+        run: npm install -w clan.events.client && npm run build -w clan.events.client
 
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v2.0
