@@ -23,6 +23,10 @@ jobs:
     needs: build
 
     steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
       # - name: "Login via Azure CLI"
       #   uses: azure/login@v1
       #   with:
@@ -35,8 +39,8 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
       - run: |
-          docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/clan-events-api:${{ github.sha }}
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/clan-events-api:${{ github.sha }}
+          docker build . --file Dockerfile -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/clan-events-api:latest
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/clan-events-api:latest
 
   deploy:
     if: github.event_name == 'push'
@@ -48,7 +52,7 @@ jobs:
         with:
           resource-group: ${{ secrets.RESOURCE_GROUP }}
           dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
-          image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/clan-events-api:${{ github.sha }}
+          image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/clan-events-api:latest
           registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           registry-username: ${{ secrets.REGISTRY_USERNAME }}
           registry-password: ${{ secrets.REGISTRY_PASSWORD }}
