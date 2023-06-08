@@ -14,10 +14,26 @@ jobs:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
+    strategy:
+    matrix:
+      node-version: [18.x]
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: true
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Build Common
+        run: npm install -w clan.events.common && npm run build -w clan.events.common
+
+      - name: Build Client
+        run: npm install -w clan.events.client && npm run build -w clan.events.client
+
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -25,11 +41,12 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_MANGO_CLIFF_08099BF03 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
           action: "upload"
+          skip_app_build: true # Set to 'true' if you do not want to rebuild the app before deployment
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "/clan.events.client" # App source code path
+          app_location: "/clan.events.client/dist/clan.events.client" # App source code path
           api_location: "" # Api source code path - optional
-          output_location: "dist/clan.events.client" # Built app content directory - optional
+          output_location: "" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
