@@ -11,7 +11,7 @@ export class ReadonlyTileRenderer extends BoardRenderer {
   tiles$ = this.boardService.tiles$.pipe(filterMapSuccess(x => x.value));
 
   override canvasObjects$: Observable<BoardCanvasObject[]> = this.tiles$.pipe(
-    map(tiles => tiles.data.map(mapTileToCanvasObject))
+    map(tiles => tiles.map(mapTileToCanvasObject))
   );
 
   lineColor$ = this.themingService.theme$.pipe(
@@ -42,7 +42,7 @@ export class ReadonlyTileRenderer extends BoardRenderer {
         this.isGridEnabled$,
       ]).subscribe(([tiles, lineColor, textColor, isGridEnabled]) => {
         this.state = {
-          tiles: tiles.data,
+          tiles: tiles,
           lineColor,
           textColor,
           isGridEnabled,

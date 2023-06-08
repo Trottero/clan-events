@@ -8,7 +8,10 @@ export function convertToEventResponse(event: EventDocument): EventResponse {
     description: event.description,
     startsAt: event.startsAt,
     endsAt: event.endsAt,
-    board: event.board,
+    board: {
+      type: event.board.type,
+      startingTile: event.board.startingTile?.toString(),
+    },
     participants: event.participants.map((participant) => ({
       name: participant.name,
       members: participant.members.map((member) => ({

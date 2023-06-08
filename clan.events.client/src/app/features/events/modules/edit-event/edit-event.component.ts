@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { BoardType, EventResponse, EventVisibility } from '@common/events';
 import { Response } from '@common/responses';
 import {
@@ -11,7 +11,6 @@ import {
   Observable,
   map,
   shareReplay,
-  tap,
 } from 'rxjs';
 import { EventsService } from '../../events.service';
 import { FormControl, FormGroup } from '@ngneat/reactive-forms';
@@ -20,6 +19,8 @@ import { notNullOrUndefined } from 'src/app/core/common/operators/not-undefined'
 import { SelectedClanService } from 'src/app/features/clan/services/selected-clan.service';
 import { MatDialogRef } from '@angular/material/dialog';
 import { EventIdStream } from '../../streams/event-id.stream';
+import { BoardService } from '../board/board.service';
+import { filterMapSuccess } from 'src/app/core/common/operators/loadable';
 
 @Component({
   selector: 'app-edit-event',
@@ -34,6 +35,7 @@ export class EditEventComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly eventIdStream = inject(EventIdStream);
   private readonly dialogRef = inject(MatDialogRef);
+  private readonly boardService = inject(BoardService);
 
   id$ = this.eventIdStream.pipe(notNullOrUndefined());
 
@@ -42,6 +44,12 @@ export class EditEventComponent implements OnInit, OnDestroy {
     switchMap(([id, clan]) => this.eventsService.getEventById(id, clan.name))
   );
 
+  availableTiles$ = this.boardService.tiles$.pipe(
+    notNullOrUndefined(),
+    filterMapSuccess(tiles => tiles.value)
+  );
+
+  boardTypeEnum = BoardType;
   boardTypeOptions$ = of(
     Object.values(BoardType)
       .map(value => ({ label: value, value }))
@@ -60,6 +68,8 @@ export class EditEventComponent implements OnInit, OnDestroy {
     Validators.required,
   ]);
 
+  startingTileIdControl = new FormControl<string | undefined>();
+
   eventVisibility = new FormControl<EventVisibility>(EventVisibility.Private, [
     Validators.required,
   ]);
@@ -71,6 +81,7 @@ export class EditEventComponent implements OnInit, OnDestroy {
     endsAt: this.endsAt,
     boardType: this.boardType,
     eventVisibility: this.eventVisibility,
+    startingTile: this.startingTileIdControl,
   });
 
   private updateEventSubject = new Subject<void>();
@@ -104,6 +115,7 @@ export class EditEventComponent implements OnInit, OnDestroy {
           endsAt: event.data.endsAt,
           boardType: event.data.board.type,
           eventVisibility: event.data.visibility,
+          startingTile: event.data.board.startingTile,
         });
       })
     );
@@ -123,6 +135,10 @@ export class EditEventComponent implements OnInit, OnDestroy {
                 endsAt: value.endsAt ?? new Date(),
                 boardType: value.boardType ?? BoardType.Unknown,
                 visibility: value.eventVisibility ?? EventVisibility.Private,
+                startingTile:
+                  value.boardType == BoardType.Tilerace
+                    ? value.startingTile
+                    : undefined,
               })
               .pipe(map(event => ({ event, clan })))
           )

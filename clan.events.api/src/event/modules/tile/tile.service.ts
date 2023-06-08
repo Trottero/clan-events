@@ -225,6 +225,10 @@ export class TileService {
       throw new NotFoundException();
     }
 
+    if (tileId === event.board.startingTile?.toString()) {
+      throw new Error('Cannot delete start tile');
+    }
+
     event.board.tiles = event.board.tiles.filter(
       (tile) => (tile as TileDocument).id !== tileId,
     );
