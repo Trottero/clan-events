@@ -23,20 +23,17 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
 
-      - name: Install Dependencies
-        run: npm install
-
       - name: Build Common
-        run: npm run build -w clan.events.common
+        run: npm install -w clan.events.common && npm run build -w clan.events.common
 
       - name: Build Client
-        run: npm run build -w clan.events.Client
+        run: npm install -w clan.events.client && npm run build -w clan.events.Client
 
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v2.0
         with:
           publish-dir: "./clan.events.client/dist/clan.events.client"
-          production-branch: master
+          production-branch: main
           github-token: ${{ secrets.GITHUB_TOKEN }}
           deploy-message: "Deploy from GitHub Actions"
           enable-pull-request-comment: false
