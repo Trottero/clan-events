@@ -1,8 +1,4 @@
-export interface Environment {
-  backendUrl: string;
-  discordLoginUrl: string;
-  production: boolean;
-}
+import { Environment } from './environment.model';
 
 export const ENVIRONMENT: Environment = {
   backendUrl: 'http://localhost:3000/api',
