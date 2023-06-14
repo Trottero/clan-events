@@ -42,19 +42,19 @@ jobs:
           docker build . --file Dockerfile -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/clan-events-api:latest
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/clan-events-api:latest
 
-  deploy:
-    if: github.event_name == 'push'
-    needs: push_image
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Deploy to Azure Container Instances"
-        uses: "azure/aci-deploy@v1"
-        with:
-          resource-group: ${{ secrets.RESOURCE_GROUP }}
-          dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
-          image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/clan-events-api:latest
-          registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-          registry-username: ${{ secrets.REGISTRY_USERNAME }}
-          registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-          name: aci-clan-events-api
-          location: euwest
+  # deploy:
+  #   if: github.event_name == 'push'
+  #   needs: push_image
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: "Deploy to Azure Container Instances"
+  #       uses: "azure/aci-deploy@v1"
+  #       with:
+  #         resource-group: ${{ secrets.RESOURCE_GROUP }}
+  #         dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
+  #         image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/clan-events-api:latest
+  #         registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+  #         registry-username: ${{ secrets.REGISTRY_USERNAME }}
+  #         registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+  #         name: aci-clan-events-api
+  #         location: euwest
