@@ -11,3 +11,19 @@ This site provides tooling for Administrators to manage clan events which includ
 - Integrated Dice rolling system
 
 Clan members can then in real-time see the position of their team as well as their competitions' in addition to providing a central hub for anything event-related.
+
+## Back-end
+
+In order to run the API with the docker image you need to run the following commands.
+
+Build the image:
+
+```bash
+docker build -t clan-events-api .
+```
+
+Run the image:
+
+```bash
+docker run -p 49160:3000 -d clan-events-api
+```
